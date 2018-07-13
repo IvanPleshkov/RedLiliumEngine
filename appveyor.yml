@@ -20,16 +20,10 @@ environment:
     - arch: Win64
     
 before_build:
-    - cmd: |
-    if exist .build (
-        rd /s /q .build
-    )
-    if exist .bin (
-        rd /s /q .bin
-    )
-    mkdir .build
-    cd .build
-    cmake ../ -G "Visual Studio 15 2017 Win64"
+    - if exist build ( rd /s /q build )
+    - mkdir build
+    - cd build
+    - cmake ../ -G "Visual Studio 15 2017 Win64"
     
 build:
     project: c:\projects\RedLiliumEngine\build\RedLiliumEngine.sln
