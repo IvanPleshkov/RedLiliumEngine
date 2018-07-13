@@ -1,0 +1,36 @@
+version: '{build}'
+branches:
+  only:
+    - master
+    
+clone_folder: c:\projects\RedLiliumEngine
+
+image:
+    - Visual Studio 2017
+
+configuration:
+    - Release
+    - Debug
+
+platform:
+    - x64
+    - x86
+
+environment:
+  matrix:
+    - arch: Win64
+    
+before_build:
+    - cmd: generate_solution.bat
+    
+build:
+    project: c:\projects\RedLiliumEngine\build\RedLiliumEngine.sln
+    verbosity: normal
+    parallel: true
+
+only_commits:
+  files:
+    - CMakeLists.txt
+    - appveyor.yml
+    - src/
+    - 3rdparty/
