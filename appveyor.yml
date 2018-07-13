@@ -19,6 +19,9 @@ environment:
   matrix:
     - arch: Win64
     
+install:
+    - git submodule update --init --recursive
+    
 before_build:
     - if exist build ( rd /s /q build )
     - mkdir build
