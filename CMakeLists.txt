@@ -4,7 +4,7 @@ if(WIN32)
 	SET(gtest_force_shared_crt ON CACHE BOOL "Use shared (DLL) run-time lib even when Google Test is built as static lib.")
 endif()
 
-set(PROJECT_NAME RedLiliumEditor)
+set(PROJECT_NAME RedLiliumEngine)
 PROJECT("RedLiliumEditor")
 
 # 3rdparty
