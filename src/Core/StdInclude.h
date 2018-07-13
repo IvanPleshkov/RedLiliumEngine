@@ -28,7 +28,7 @@
 #include <typeinfo>
 #include <typeindex>
 
-#include "common_defs.h"
+#include "CommonDefs.h"
 
 #include <glm\glm.hpp>
 #include <spdlog\spdlog.h>

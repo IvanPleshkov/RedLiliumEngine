@@ -1,6 +1,6 @@
 #pragma once
 
-#include "flags.h"
-#include "signal.h"
+#include "Flags.h"
+#include "Signal.h"
 #include "SmartPointers.h"
 #include "StdInclude.h"
