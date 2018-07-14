@@ -24,4 +24,4 @@ private:
 	vec2 m_rectDesiredSize = { 100, 100 };
 };
 
-}  // namespace RED_LILIUM_NAMESPACE
+} // namespace RED_LILIUM_NAMESPACE

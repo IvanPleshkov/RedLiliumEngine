@@ -9,63 +9,54 @@ namespace RED_LILIUM_NAMESPACE
 class ClickableWidget : public Widget
 {
 public:
-	bool CanFocusing() const override { return true; }
+	~ClickableWidget() override {}
 
-	bool IsPressed() const;
+	bool IsClicked(MouseKey mouseKey = MouseKey::Left) const;
+	bool IsClicked(Flags<MouseKey> mouseKey) const;
 
-	bool IsClicked() const { return m_isClicked; }
+	bool IsDoubleClicked(MouseKey mouseKey = MouseKey::Left) const;
+	bool IsDoubleClicked(Flags<MouseKey> mouseKey) const;
+
+	bool IsTripleClicked(MouseKey mouseKey = MouseKey::Left) const;
+	bool IsTripleClicked(Flags<MouseKey> mouseKey) const;
+
+	bool IsPressed(MouseKey mouseKey = MouseKey::Left) const;
+	bool IsPressed(Flags<MouseKey> mouseKey) const;
+
+	bool CanDoubleClicked(bool value) const;
+	bool CanTripleClicked(bool value) const;
+
+	bool CanFocusing() const override;
 
 protected:
-	virtual void OnClick() {}
-	virtual void OnPress() {}
+	virtual void OnClick(MouseKey mouseKey) {}
+	virtual void OnDoubleClick(MouseKey mouseKey) {}
+	virtual void OnTripleClick(MouseKey mouseKey) {}
 
-	bool HandleKeyEvent(const KeyEvent& keyEvent) override
-	{
-		// TODO: press by enter and space
-		return false;
-	}
-
-	bool HandleMouseEvent(const MouseEvent& mouseEvent) override
-	{
-		if (mouseEvent.eventType == MouseEventType::LeftReleased && IsHovered(true) && IsFocused())
-		{
-			m_isClicked = true;
-			OnClick();
-			return true;
-		}
-
-		return false;
-	}
+	bool HandleKeyEvent(const KeyEvent& keyEvent) override;
+	bool HandleMouseEvent(const MouseEvent& mouseEvent) override;
 
 	void Update() override
 	{
 		m_isClicked = false;
+		m_isDoubleClicked = false;
+		m_isTripleClicked = false;
 	}
 
-	void Draw() override
-	{
-		vec2 position = GetPosition();
-		vec2 size = GetSize();
-		NVGcolor color = nvgRGBAf(0, 1, 0, 1);
-
-		if (IsHovered())
-		{
-			color = nvgRGBAf(1, 0, 0, 1);
-		}
-
-		if (IsPressed())
-		{
-			color = nvgRGBAf(0, 0, 1, 1);
-		}
-
-		nvgBeginPath(GetNvgContext());
-		nvgRect(GetNvgContext(), position.x, position.y, size.x, size.y);
-		nvgFillColor(GetNvgContext(), color);
-		nvgFill(GetNvgContext());
-	}
+	void SetDoubleClicked(bool value);
+	void SetTripleClicked(bool value);
 
 private:
+	bool m_canDoubleClicked = false;
+	bool m_canTripleClicked = false;
+
 	bool m_isClicked = false;
+	bool m_isDoubleClicked = false;
+	bool m_isTripleClicked = false;
+
+	MouseKey m_lastMouseKey = MouseKey::None;
+	Time m_lastClickTime = 0;
+	u32 m_clicksCount = 0;
 };
 
-}  // namespace RED_LILIUM_NAMESPACE
+} // namespace RED_LILIUM_NAMESPACE

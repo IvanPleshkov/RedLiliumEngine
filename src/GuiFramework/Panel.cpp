@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Panel.h"
+#include "Widget.h"
 
 using namespace RED_LILIUM_NAMESPACE;
 

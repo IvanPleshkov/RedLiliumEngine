@@ -6,10 +6,10 @@
 #include "imgui/imgui.h"
 #include "nanovg/nanovg.h"
 
-#include "core/common.h"
-#include "Widget.h"
-#include "Panel.h"
-#include "GuiManager.h"
+#include <Core/Common.h>
+#include <GuiFramework/Widget.h>
+#include <GuiFramework/Panel.h>
+#include "GuiFramework/GuiManager.h"
 
 #include <fstream>
 

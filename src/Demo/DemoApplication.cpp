@@ -1,11 +1,11 @@
 #include "pch.h"
 
-#include "GuiFramework/GuiApplication.h"
-#include "GuiWidgets/LabeledButton.h"
-#include "GuiFramework/Widgets/StackLayout.h"
-#include "GuiFramework/Widgets/Label.h"
-#include "GuiFramework/Widgets/ColoredRectangle.h"
-#include "GuiFramework/Widgets/ClickableWidget.h"
+#include "GuiApplication.h"
+#include <GuiWidgets/LabeledButton.h>
+#include <GuiFramework/Widgets/StackLayout.h>
+#include <GuiFramework/Widgets/Label.h>
+#include <GuiFramework/Widgets/ColoredRectangle.h>
+#include <GuiFramework/Widgets/ClickableWidget.h>
 
 using namespace RED_LILIUM_NAMESPACE;
 
@@ -96,7 +96,7 @@ public:
 			mouseState.pressedKeys.Add(MouseKey::Middle);
 		}
 
-		m_guiManager->UpdateInputState(mouseState, keyState);
+		m_guiManager->UpdateFrame(0, mouseState, keyState);
 	}
 
 private:

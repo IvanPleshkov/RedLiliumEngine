@@ -1,7 +1,6 @@
 #pragma once
 
-#include "core/common.h"
-#include "Widget.h"
+#include "Common.h"
 
 namespace RED_LILIUM_NAMESPACE
 {
@@ -32,6 +31,7 @@ public:
 public:
 	ptr<Widget> BeginFrame();
 	void EndFrame(NVGcontextPtr nvgContext, vec2 position, vec2 size);
+
 	NVGcontextPtr GetNvgContext();
 	ptr<GuiManager> GetGuiManager();
 	ptr<const GuiManager> GetGuiManager() const;
@@ -56,4 +56,4 @@ private:
 	NVGcontextPtr m_nvgContext;
 };
 
-}  // namespace RED_LILIUM_NAMESPACE
+} // namespace RED_LILIUM_NAMESPACE

@@ -24,9 +24,10 @@ public:
 	RedLiliumWeakPointer(U* pointer)
 	{
 		static_assert(std::is_convertible<U*, T*>::value, "Cannot convert pointer from U to T");
+		static_assert(std::is_convertible<U*, RedLiliumObject*>::value, "Smart pointer supports only RedLiliumObject class");
 		if (pointer)
 		{
-			m_handler = reinterpret_cast<const RedLiliumObject*>(pointer)->m_handler;
+			m_handler = static_cast<const RedLiliumObject*>(pointer)->m_handler;
 			RED_LILIUM_ASSERT(pointer == m_handler->ptr);
 		}
 		else
