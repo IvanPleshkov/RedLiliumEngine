@@ -5,7 +5,7 @@ if(WIN32)
 endif()
 
 set(PROJECT_NAME RedLiliumEngine)
-PROJECT(PROJECT_NAME)
+PROJECT("${PROJECT_NAME}")
 
 # 3rdparty
 add_subdirectory("3rdparty/googletest")
