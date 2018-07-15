@@ -54,45 +54,54 @@ vec2 Widget::GetDesiredSize() const
 
 bool Widget::CanFocusing() const
 {
-	return false;
+	return m_canFocusing;
 }
 
-bool Widget::IsFocused(bool includeChildren) const
+bool Widget::CanHovering() const
 {
-	if (m_panel->GetGuiManager()->m_focusedWidget == this)
-	{
-		return true;
-	}
+	return m_canHovering;
+}
 
-	if (includeChildren)
+void Widget::SetFocusing(bool value)
+{
+	m_canFocusing = value;
+}
+
+void Widget::SetHovering(bool value)
+{
+	m_canHovering = value;
+}
+
+bool Widget::IsFocused() const
+{
+	return m_panel->GetGuiManager()->m_focusedWidget == this;
+}
+
+bool Widget::HasFocusedChild() const
+{
+	for (auto& child : m_children)
 	{
-		for (auto& child : m_children)
+		if (child->IsFocused() || child->HasFocusedChild())
 		{
-			if (child->IsFocused())
-			{
-				return true;
-			}
+			return true;
 		}
 	}
 
 	return false;
 }
 
-bool Widget::IsHovered(bool includeChildren) const
+bool Widget::IsHovered() const
 {
-	if (m_panel->GetGuiManager()->m_hoveredWidget == this)
-	{
-		return true;
-	}
+	return m_panel->GetGuiManager()->m_hoveredWidget == this;
+}
 
-	if (includeChildren)
+bool Widget::HasHoveredChild() const
+{
+	for (auto& child : m_children)
 	{
-		for (auto& child : m_children)
+		if (child->IsHovered() || child->HasHoveredChild())
 		{
-			if (child->IsHovered())
-			{
-				return true;
-			}
+			return true;
 		}
 	}
 
@@ -158,7 +167,9 @@ bool Widget::IsContainingPoint(vec2 point)
 	return true;
 }
 
-void Widget::Update() { }
+void Widget::Tick() { }
+
+void Widget::PostTick() { }
 
 void Widget::CreateFirstChilds() { }
 

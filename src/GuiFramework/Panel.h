@@ -5,21 +5,6 @@
 namespace RED_LILIUM_NAMESPACE
 {
 
-class GuiManager;
-
-enum class GuiPipelineStep : u32
-{
-	Idle					= 1 << 0,
-	AddingsWidgets			= 1 << 1,
-	TickWidgets				= 1 << 2,
-	SetWidgetsMinimumSize	= 1 << 3,
-	SetWidgetsDesiredSize	= 1 << 4,
-	SetWidgetsTransform		= 1 << 5,
-	Drawing					= 1 << 6,
-	HandlingMouseEvent		= 1 << 7,
-	HandlingKeyEvent		= 1 << 8,
-};
-
 class Panel : public RedLiliumObject
 {
 public:
@@ -29,31 +14,52 @@ public:
 	~Panel() override {}
 
 public:
-	ptr<Widget> BeginFrame();
-	void EndFrame(NVGcontextPtr nvgContext, vec2 position, vec2 size);
+	ptr<Widget> GetTopWidget();
+	ptr<const Widget> GetTopWidget() const;
+
+	void BeginFrame();
+	void EndFrame();
+
+	void SetWindow(ptr<INativeWindow> nativeWindow);
+	ptr<INativeWindow> GetWindow();
+	ptr<const INativeWindow> GetWindow() const;
+
+	void SetSize(vec2 size);
+	vec2 GetSize() const;
+
+	void SetPosition(vec2 position);
+	vec2 GetPosition() const;
 
 	NVGcontextPtr GetNvgContext();
 	ptr<GuiManager> GetGuiManager();
 	ptr<const GuiManager> GetGuiManager() const;
-	void Draw();
-	ptr<Widget> GetWidgetUnderPoint(vec2 position);
+	ptr<Widget> GetWidgetUnderPoint(vec2 position, bool onlyHoverableWidgets = true);
 	GuiPipelineStep GetCurrentPipelineStep() const;
+
+	void Draw();
 
 private:
 	void DrawRecursive(const ptr<Widget>& widget);
+	void TickWidgetsRecursive(const uptr<Widget>& widget);
+	void PostTickWidgetsRecursive(const uptr<Widget>& widget);
+
 	void UpdateWidgetsDesiredSize(const uptr<Widget>& widget);
 	void UpdateWidgetsMinimumSize(const uptr<Widget>& widget);
 	void UpdateWidgetsLayouting(const uptr<Widget>& widget);
-	void UpdateWidgets(const uptr<Widget>& widget);
-	ptr<Widget> GetWidgetUnderPoint(const uptr<Widget>& widget, vec2 position);
-	void SetWidgetScissor(const ptr<Widget>& widget) const;
 
+	ptr<Widget> GetWidgetUnderPointRecursive(
+		const uptr<Widget>& widget,
+		vec2 position,
+		bool onlyHoverableWidgets);
+	void SetWidgetScissor(const ptr<Widget>& widget);
+
+private:
 	GuiPipelineStep m_currentGuiPipelineState;
 	ptr<GuiManager> m_guiManager;
+	ptr<INativeWindow> m_nativeWindow;
 	uptr<Widget> m_topWidget;
 	vec2 m_position;
 	vec2 m_size;
-	NVGcontextPtr m_nvgContext;
 };
 
 } // namespace RED_LILIUM_NAMESPACE

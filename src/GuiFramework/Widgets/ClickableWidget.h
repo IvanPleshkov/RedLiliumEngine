@@ -9,6 +9,7 @@ namespace RED_LILIUM_NAMESPACE
 class ClickableWidget : public Widget
 {
 public:
+	ClickableWidget();
 	~ClickableWidget() override {}
 
 	bool IsClicked(MouseKey mouseKey = MouseKey::Left) const;
@@ -26,8 +27,6 @@ public:
 	bool CanDoubleClicked(bool value) const;
 	bool CanTripleClicked(bool value) const;
 
-	bool CanFocusing() const override;
-
 protected:
 	virtual void OnClick(MouseKey mouseKey) {}
 	virtual void OnDoubleClick(MouseKey mouseKey) {}
@@ -35,13 +34,7 @@ protected:
 
 	bool HandleKeyEvent(const KeyEvent& keyEvent) override;
 	bool HandleMouseEvent(const MouseEvent& mouseEvent) override;
-
-	void Update() override
-	{
-		m_isClicked = false;
-		m_isDoubleClicked = false;
-		m_isTripleClicked = false;
-	}
+	void PostTick() override;
 
 	void SetDoubleClicked(bool value);
 	void SetTripleClicked(bool value);

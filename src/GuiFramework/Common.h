@@ -10,6 +10,7 @@ class Widget;
 class Panel;
 class GuiManager;
 class INativeWindow;
+class INativeEnvironment;
 
 using NVGcontextPtr = NVGcontext*;
 
@@ -121,6 +122,20 @@ public:
 	FontSettings m_regular;
 	FontSettings m_disabled;
 	FontSettings m_caption;
+};
+
+enum class GuiPipelineStep : u32
+{
+	Idle = 1 << 0,
+	AddingsWidgets = 1 << 1,
+	TickWidgets = 1 << 2,
+	SetWidgetsMinimumSize = 1 << 3,
+	SetWidgetsDesiredSize = 1 << 4,
+	SetWidgetsTransform = 1 << 5,
+	Drawing = 1 << 6,
+	HandlingMouseEvent = 1 << 7,
+	HandlingKeyEvent = 1 << 8,
+	PostTickWidgets = 1 << 9,
 };
 
 } // namespace RED_LILIUM_NAMESPACE

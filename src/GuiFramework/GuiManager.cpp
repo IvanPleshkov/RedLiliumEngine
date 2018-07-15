@@ -5,8 +5,9 @@
 
 using namespace RED_LILIUM_NAMESPACE;
 
-GuiManager::GuiManager()
-	: m_focusedWidget(nullptr)
+GuiManager::GuiManager(ptr<INativeEnvironment> nativeEnvironment)
+	: m_nativeEnvironment(nativeEnvironment)
+	, m_focusedWidget(nullptr)
 	, m_hoveredWidget(nullptr)
 	, m_draggableWidget(nullptr)
 {
@@ -28,16 +29,29 @@ const KeyState& GuiManager::GetKeyState() const
 	return m_keyState;
 }
 
-void GuiManager::UpdateFrame(const Time& timeFromStart, const MouseState& mouseState, const KeyState& keyState)
+void GuiManager::BeginFrame(const Time& timeFromStart, const MouseState& mouseState, const KeyState& keyState)
 {
 	m_timeFromStart = timeFromStart;
 	UpdateKeyState(keyState);
 	UpdateMouseState(mouseState);
 }
 
+void GuiManager::EndFrame()
+{
+	for (auto& panel : m_panels)
+	{
+		panel->EndFrame();
+	}
+}
+
 void GuiManager::Draw()
 {
+	// TODO: z-indexing for panels
 
+	for (auto& panel : m_panels)
+	{
+		panel->Draw();
+	}
 }
 
 void GuiManager::UpdateKeyState(const KeyState& mouseState)
@@ -203,6 +217,8 @@ void GuiManager::ChangeFocusByMouse()
 
 void GuiManager::SetFocusedWidget(const ptr<Widget>& focusedWidget)
 {
+	RED_LILIUM_ASSERT(focusedWidget == nullptr || focusedWidget->CanFocusing());
+
 	if (focusedWidget == m_focusedWidget)
 	{
 		return;
@@ -222,6 +238,8 @@ void GuiManager::SetFocusedWidget(const ptr<Widget>& focusedWidget)
 
 void GuiManager::SetHoveredWidget(const ptr<Widget>& hoveredWidget)
 {
+	RED_LILIUM_ASSERT(hoveredWidget == nullptr || hoveredWidget->CanHovering());
+
 	if (hoveredWidget == m_hoveredWidget)
 	{
 		return;

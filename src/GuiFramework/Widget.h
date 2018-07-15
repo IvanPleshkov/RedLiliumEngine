@@ -21,8 +21,10 @@ public:
 	vec2 GetMinimumSize() const;
 	vec2 GetDesiredSize() const;
 
-	bool IsFocused(bool includeChildren = false) const;
-	bool IsHovered(bool includeChildren = false) const;
+	bool IsFocused() const;
+	bool HasFocusedChild() const;
+	bool IsHovered() const;
+	bool HasHoveredChild() const;
 	
 	ptr<Panel> GetPanel();
 	ptr<GuiManager> GetGuiManager();
@@ -34,14 +36,16 @@ public:
 	ptr<Style> GetStyle();
 
 public:
-	virtual bool CanFocusing() const;
+	bool CanFocusing() const;
+	bool CanHovering() const;
 
 protected:
 	virtual bool HandleKeyEvent(const KeyEvent& keyEvent);
 	virtual bool HandleMouseEvent(const MouseEvent& mouseEvent);
 	virtual bool IsContainingPoint(vec2 point);
 
-	virtual void Update();
+	virtual void Tick();
+	virtual void PostTick();
 	virtual void CreateFirstChilds();
 	virtual void CreateLastChilds();
 
@@ -54,11 +58,16 @@ protected:
 	virtual void Draw();
 	virtual void PostDraw();
 
+protected:
 	virtual void OnFocus();
 	virtual void OnFocusLost();
 
 	virtual void OnHover();
 	virtual void OnHoverLost();
+
+protected:
+	void SetFocusing(bool value);
+	void SetHovering(bool value);
 
 protected:
 	friend class Panel;
@@ -76,6 +85,7 @@ protected:
 	template <class TWidget>
 	ptr<TWidget> AddNewChild();
 
+protected:
 	ptr<Panel> m_panel = nullptr;
 	ptr<Widget> m_parent = nullptr;
 	std::vector<uptr<Widget>> m_children;
@@ -88,6 +98,9 @@ protected:
 
 	bool m_visible = true;
 	bool m_enable = true;
+
+	bool m_canFocusing;
+	bool m_canHovering;
 };
 
 }  // namespace RED_LILIUM_NAMESPACE

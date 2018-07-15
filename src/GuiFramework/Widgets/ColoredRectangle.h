@@ -9,6 +9,9 @@ namespace RED_LILIUM_NAMESPACE
 class ColoredRectangle : public Widget
 {
 public:
+	ColoredRectangle();
+	~ColoredRectangle() override {}
+
 	ptr<ColoredRectangle> SetColor(vec4 color);
 	ptr<ColoredRectangle> SetMinimumSize(vec2 minimumSize);
 	ptr<ColoredRectangle> SetDesiredSize(vec2 desiredSize);

@@ -3,6 +3,11 @@
 
 using namespace RED_LILIUM_NAMESPACE;
 
+ColoredRectangle::ColoredRectangle()
+{
+	SetHovering(true);
+}
+
 ptr<ColoredRectangle> ColoredRectangle::SetColor(vec4 color)
 {
 	m_color = color;

@@ -3,6 +3,7 @@
 #include "GuiFramework.h"
 #include "GuiManager.h"
 #include "INativeWindow.h"
+#include "INativeEnviroment.h"
 #include "Panel.h"
 #include "Widget.h"
 

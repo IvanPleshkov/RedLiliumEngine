@@ -7,13 +7,12 @@ endif()
 set(PROJECT_NAME RedLiliumEngine)
 PROJECT("${PROJECT_NAME}")
 
-# 3rdparty
-add_subdirectory("3rdparty/googletest")
-add_subdirectory("3rdparty/bgfx")
+include("3rdparty/3rdparty.cmake")
 
 add_subdirectory("src/Core")
 add_subdirectory("src/EditorFramework")
 add_subdirectory("src/GuiFramework")
 add_subdirectory("src/GuiWidgets")
+add_subdirectory("src/GuiBgfxAdapter")
 add_subdirectory("src/Demo")
 add_subdirectory("src/tests")

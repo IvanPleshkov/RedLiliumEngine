@@ -8,14 +8,16 @@ namespace RED_LILIUM_NAMESPACE
 class GuiManager : public RedLiliumObject
 {
 public:
-	GuiManager();
+	GuiManager(ptr<INativeEnvironment> nativeEnvironment);
 	~GuiManager() override { }
 
 	ptr<Style> GetStyle();
 	ptr<Panel> AddPanel();
 	void RemovePanel(const ptr<Panel>& panel);
 
-	void UpdateFrame(const Time& timeFromStart, const MouseState& mouseState, const KeyState& keyState);
+	void BeginFrame(const Time& timeFromStart, const MouseState& mouseState, const KeyState& keyState);
+	void EndFrame();
+
 	void Draw();
 
 	const MouseState& GetMouseState() const;
@@ -42,6 +44,8 @@ private:
 	void SetFocusedWidget(const ptr<Widget>& focusedWidget);
 	void SetHoveredWidget(const ptr<Widget>& hoveredWidget);
 
+private:
+	ptr<INativeEnvironment> m_nativeEnvironment;
 	std::unordered_set<uptr<Panel>> m_panels;
 	ptr<Widget> m_focusedWidget;
 	ptr<Widget> m_hoveredWidget;

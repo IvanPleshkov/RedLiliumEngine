@@ -3,14 +3,15 @@
 
 using namespace RED_LILIUM_NAMESPACE;
 
-bool ClickableWidget::CanFocusing() const
+ClickableWidget::ClickableWidget()
 {
-	return true;
+	SetHovering(true);
+	SetFocusing(true);
 }
 
 bool ClickableWidget::IsPressed(MouseKey mouseKey) const
 {
-	return IsHovered(true) && IsFocused() && GetMouseState().pressedKeys.Test(mouseKey);
+	return IsHovered() && IsFocused() && GetMouseState().pressedKeys.Test(mouseKey);
 }
 
 bool ClickableWidget::IsPressed(Flags<MouseKey> mouseKey) const
@@ -44,6 +45,13 @@ bool ClickableWidget::HandleMouseEvent(const MouseEvent& mouseEvent)
 	//}
 
 	return false;
+}
+
+void ClickableWidget::PostTick()
+{
+	m_isClicked = false;
+	m_isDoubleClicked = false;
+	m_isTripleClicked = false;
 }
 
 bool ClickableWidget::IsDoubleClicked(MouseKey mouseKey) const

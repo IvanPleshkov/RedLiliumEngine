@@ -27,6 +27,7 @@
 #include <string_view>
 #include <typeinfo>
 #include <typeindex>
+#include <fstream>
 
 #include "CommonDefs.h"
 
