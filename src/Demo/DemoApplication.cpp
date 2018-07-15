@@ -113,8 +113,9 @@ void DemoGuiApplication::LoadFonts(NVGcontextPtr nvg)
 	style->m_caption.fontFamily = m_sansFontFamily;
 }
 
-int main()
+int _main_(int _argc, char** _argv)
 {
 	uptr<DemoGuiApplication> application = std::make_unique<DemoGuiApplication>();
 	application->Run();
+	return 0;
 }

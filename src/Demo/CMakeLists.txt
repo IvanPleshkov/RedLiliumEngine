@@ -5,8 +5,6 @@ PROJECT("Demo")
 
 include("../common.cmake")
 
-add_definitions(-DENTRY_CONFIG_IMPLEMENT_MAIN)
-
 add_executable(${PROJECT_NAME} ${SRC_FILES})
 
 target_link_libraries(${PROJECT_NAME} Core)

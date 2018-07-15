@@ -16,10 +16,12 @@ using namespace RED_LILIUM_NAMESPACE;
 class GuiApplication::Impl : public entry::AppI
 {
 public:
-	GuiApplication::Impl(ptr<GuiApplication> application, const char* _name, const char* _description)
+	Impl(ptr<GuiApplication> application, const char* _name, const char* _description)
 		: entry::AppI(_name, _description)
 		, m_application(application)
 	{ }
+
+	~Impl() override {}
 
 	void init(int32_t _argc, const char* const* _argv, uint32_t _width, uint32_t _height) override;
 	int shutdown() override;
@@ -59,6 +61,9 @@ GuiApplication::GuiApplication(
 	m_guiManager = std::make_unique<GuiManager>(m_nativeEnvironment.get());
 }
 
+GuiApplication::~GuiApplication()
+{}
+
 void GuiApplication::Run()
 {
 	std::vector<const char*> argv;
@@ -66,6 +71,10 @@ void GuiApplication::Run()
 	for (auto& arg : m_args)
 	{
 		argv.push_back(arg.c_str());
+	}
+	if (argv.size() == 0)
+	{
+		argv.push_back(nullptr);
 	}
 	entry::runApp(m_impl.get(), m_args.size(), &argv[0]);
 }

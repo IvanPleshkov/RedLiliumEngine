@@ -15,8 +15,7 @@ public:
 		const std::string& description,
 		const std::vector<std::string>& args,
 		vec2 windowSize);
-
-	~GuiApplication() override {}
+	~GuiApplication() override;
 
 	void Run();
 

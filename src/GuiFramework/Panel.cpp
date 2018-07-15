@@ -9,7 +9,7 @@ Panel::Panel(const ptr<GuiManager>& guiManager)
 	: m_guiManager(guiManager)
 	, m_nativeWindow(nullptr)
 {
-	m_currentGuiPipelineState = GuiPipelineStep::Idle;
+	m_currentGuiPipelineState = GuiPipelineStep::AddingsWidgets;
 	m_topWidget = std::make_unique<Widget>();
 	m_topWidget->m_panel = this;
 }
@@ -64,6 +64,8 @@ ptr<const Widget> Panel::GetTopWidget() const
 
 void Panel::SetWindow(ptr<INativeWindow> nativeWindow)
 {
+	RED_LILIUM_ASSERT(m_currentGuiPipelineState == GuiPipelineStep::AddingsWidgets);
+
 	m_nativeWindow = nativeWindow;
 }
 
@@ -80,12 +82,14 @@ ptr<const INativeWindow> Panel::GetWindow() const
 void Panel::SetSize(vec2 size)
 {
 	RED_LILIUM_ASSERT(m_currentGuiPipelineState == GuiPipelineStep::AddingsWidgets);
+
 	m_size = size;
 }
 
 void Panel::SetPosition(vec2 position)
 {
 	RED_LILIUM_ASSERT(m_currentGuiPipelineState == GuiPipelineStep::AddingsWidgets);
+
 	m_position = position;
 }
 
