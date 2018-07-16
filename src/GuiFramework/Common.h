@@ -11,6 +11,9 @@ class Panel;
 class GuiManager;
 class INativeWindow;
 class INativeEnvironment;
+class GuiReplayData;
+class GuiRecorder;
+
 
 using NVGcontextPtr = NVGcontext*;
 

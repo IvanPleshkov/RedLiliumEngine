@@ -27,7 +27,7 @@ public:
 	int shutdown() override;
 	bool update() override;
 
-	MouseState GetMouseState(entry::MouseState bgfxState);
+	MouseState GetMouseState();
 	KeyState GetKeyState();
 
 protected:
@@ -40,6 +40,8 @@ protected:
 	uint32_t m_height;
 	uint32_t m_debug;
 	uint32_t m_reset;
+
+	entry::MouseState m_bgfxMouseState;
 };
 
 //============================= GuiApplication
@@ -190,8 +192,7 @@ int GuiApplication::Impl::shutdown()
 
 bool GuiApplication::Impl::update()
 {
-	entry::MouseState bgfxMouseState;
-	if (!entry::processEvents(m_width, m_height, m_debug, m_reset, &bgfxMouseState))
+	if (!entry::processEvents(m_width, m_height, m_debug, m_reset, &m_bgfxMouseState))
 	{
 		const int64_t now = bx::getHPCounter();
 		const double freq = double(bx::getHPFrequency());
@@ -210,7 +211,7 @@ bool GuiApplication::Impl::update()
 			ptr<GuiManager> guiManager = m_application->GetGuiManager();
 			guiManager->BeginFrame(
 				time,
-				GetMouseState(bgfxMouseState),
+				GetMouseState(),
 				GetKeyState());
 
 			m_application->Update();
@@ -231,19 +232,19 @@ bool GuiApplication::Impl::update()
 	return false;
 }
 
-MouseState GuiApplication::Impl::GetMouseState(entry::MouseState bgfxState)
+MouseState GuiApplication::Impl::GetMouseState()
 {
 	MouseState mouseState;
-	mouseState.mousePosition = { bgfxState.m_mx, bgfxState.m_my };
-	if (bgfxState.m_buttons[entry::MouseButton::Left])
+	mouseState.mousePosition = { m_bgfxMouseState.m_mx, m_bgfxMouseState.m_my };
+	if (m_bgfxMouseState.m_buttons[entry::MouseButton::Left])
 	{
 		mouseState.pressedKeys.Add(MouseKey::Left);
 	}
-	if (bgfxState.m_buttons[entry::MouseButton::Right])
+	if (m_bgfxMouseState.m_buttons[entry::MouseButton::Right])
 	{
 		mouseState.pressedKeys.Add(MouseKey::Right);
 	}
-	if (bgfxState.m_buttons[entry::MouseButton::Middle])
+	if (m_bgfxMouseState.m_buttons[entry::MouseButton::Middle])
 	{
 		mouseState.pressedKeys.Add(MouseKey::Middle);
 	}
