@@ -127,7 +127,7 @@ public:
 enum class GuiPipelineStep : u32
 {
 	Idle = 1 << 0,
-	AddingsWidgets = 1 << 1,
+	ConfigureWidgets = 1 << 1,
 	TickWidgets = 1 << 2,
 	SetWidgetsMinimumSize = 1 << 3,
 	SetWidgetsDesiredSize = 1 << 4,

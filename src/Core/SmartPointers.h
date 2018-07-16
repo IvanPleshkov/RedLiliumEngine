@@ -17,7 +17,8 @@ public:
 	}
 
 	RedLiliumWeakPointer(std::nullptr_t)
-		: m_handler(RedLiliumObject::m_nullHandler)
+		: m_existingHandler(RedLiliumObject::m_nullExistingHandler)
+		, m_ptr(nullptr)
 	{}
 
 	template<class U>
@@ -25,44 +26,52 @@ public:
 	{
 		static_assert(std::is_convertible<U*, T*>::value, "Cannot convert pointer from U to T");
 		static_assert(std::is_convertible<U*, RedLiliumObject*>::value, "Smart pointer supports only RedLiliumObject class");
+
 		if (pointer)
 		{
-			m_handler = static_cast<const RedLiliumObject*>(pointer)->m_handler;
-			RED_LILIUM_ASSERT(pointer == m_handler->ptr);
+			m_existingHandler = static_cast<const RedLiliumObject*>(pointer)->m_existingHandler;
+			m_ptr = static_cast<T*>(pointer);
+			RED_LILIUM_ASSERT(IsValid());
 		}
 		else
 		{
-			m_handler = RedLiliumObject::m_nullHandler;
+			m_existingHandler = RedLiliumObject::m_nullExistingHandler;
+			m_ptr = nullptr;
 		}
 	}
 
 	RedLiliumWeakPointer(const RedLiliumWeakPointer& r)
 	{
 		RED_LILIUM_ASSERT(r.IsValid());
-		m_handler = r.m_handler;
+		m_existingHandler = r.m_existingHandler;
+		m_ptr = r.m_ptr;
 	}
 
 	template<class U>
 	RedLiliumWeakPointer(const RedLiliumWeakPointer<U>& r)
 	{
+		static_assert(std::is_convertible<U*, T*>::value, "Cannot convert pointer from U to T");
 		RED_LILIUM_ASSERT(r.IsValid());
-		m_handler = r.m_handler;
+
+		m_existingHandler = r.m_existingHandler;
+		m_ptr = static_cast<T*>(r.m_ptr);
 	}
 
 	RedLiliumWeakPointer(RedLiliumWeakPointer&& r)
 	{
 		RED_LILIUM_ASSERT(r.IsValid());
-		m_handler = std::move(r.m_handler);
-		r.m_handler = nullptr;
+		m_existingHandler = r.m_existingHandler;
+		m_ptr = r.m_ptr;
 	}
 
 	template<class U>
 	RedLiliumWeakPointer(RedLiliumWeakPointer<U>&& r)
 	{
 		static_assert(std::is_convertible<U*, T*>::value, "Cannot convert pointer from U to T");
-
 		RED_LILIUM_ASSERT(r.IsValid());
-		m_handler = r.m_handler;
+
+		m_existingHandler = r.m_existingHandler;
+		m_ptr = static_cast<T*>(r.m_ptr);
 	}
 
 	RedLiliumWeakPointer& operator=(const RedLiliumWeakPointer& r)
@@ -71,7 +80,8 @@ public:
 
 		if (&r != this)
 		{
-			m_handler = r.m_handler;
+			m_existingHandler = r.m_existingHandler;
+			m_ptr = r.m_ptr;
 		}
 		return *this;
 	}
@@ -80,12 +90,12 @@ public:
 	RedLiliumWeakPointer& operator=(const RedLiliumWeakPointer<U>& r)
 	{
 		static_assert(std::is_convertible<U*, T*>::value, "Cannot convert pointer from U to T");
-
 		RED_LILIUM_ASSERT(r.IsValid());
 
 		if (&r != this)
 		{
-			m_handler = r.m_handler;
+			m_existingHandler = r.m_existingHandler;
+			m_ptr = static_cast<T*>(r.m_ptr);
 		}
 		return *this;
 	}
@@ -96,7 +106,8 @@ public:
 
 		if (&r != this)
 		{
-			m_handler = r.m_handler;
+			m_existingHandler = r.m_existingHandler;
+			m_ptr = r.m_ptr;
 		}
 		return *this;
 	}
@@ -105,12 +116,12 @@ public:
 	RedLiliumWeakPointer& operator=(RedLiliumWeakPointer<U>&& r)
 	{
 		static_assert(std::is_convertible<U*, T*>::value, "Cannot convert pointer from U to T");
-
 		RED_LILIUM_ASSERT(r.IsValid());
 
 		if (&r != this)
 		{
-			m_handler = r.m_handler;
+			m_existingHandler = r.m_existingHandler;
+			m_ptr = static_cast<T*>(r.m_ptr);
 		}
 		return *this;
 	}
@@ -118,60 +129,61 @@ public:
 	RedLiliumWeakPointer& operator=(std::nullptr_t) noexcept
 	{
 		RED_LILIUM_ASSERT(IsValid());
-		m_handler = RedLiliumObject::m_nullHandler;
+		m_handler = RedLiliumObject::m_nullExistingHandler;
+		m_ptr = nullptr;
 		return *this;
 	}
 
 	T* operator->() const noexcept
 	{
 		RED_LILIUM_ASSERT(IsValid());
-		RED_LILIUM_ASSERT(m_handler->ptr != nullptr);
-		return reinterpret_cast<T*>(m_handler->ptr);
+		return m_ptr;
 	}
 
 	T& operator*() const noexcept
 	{
 		RED_LILIUM_ASSERT(IsValid());
-		RED_LILIUM_ASSERT(m_handler->ptr != nullptr);
-		return *reinterpret_cast<T*>(m_handler->ptr);
+		return *m_ptr;
 	}
 
 	bool operator!() const noexcept
 	{
 		RED_LILIUM_ASSERT(IsValid());
-		return m_handler->ptr == nullptr;
+		return (m_ptr == nullptr);
 	}
 
 	operator bool() const noexcept
 	{
 		RED_LILIUM_ASSERT(IsValid());
-		return (m_handler->ptr != nullptr);
+		return (m_ptr != nullptr);
 	}
 
 	void swap(RedLiliumWeakPointer& r)
 	{
 		RED_LILIUM_ASSERT(IsValid());
 		RED_LILIUM_ASSERT(r.IsValid());
-		std::swap(m_handler, r.m_handler);
+		std::swap(m_existingHandler, r.m_existingHandler);
+		std::swap(m_ptr, r.m_ptr);
 	}
 
 	T* Get() const noexcept
 	{
 		RED_LILIUM_ASSERT(IsValid());
-		return reinterpret_cast<T*>(m_handler->ptr);
+		return m_ptr;
 	}
 
 	bool IsValid() const noexcept
 	{
-		return m_handler->exists;
+		return (*m_existingHandler == true);
 	}
 
 	template<typename U>
 	friend class RedLiliumWeakPointer;
 	friend class RedLiliumObject;
-private:
+public:
 
-	sptr<RedLiliumPtrHandler> m_handler;
+	T* m_ptr;
+	sptr<std::atomic_bool> m_existingHandler;
 };
 
 template <typename T>

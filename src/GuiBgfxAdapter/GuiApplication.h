@@ -47,9 +47,6 @@ private:
 	std::string m_dataPath;
 	std::string m_name;
 	std::string m_description;
-
-	MouseState m_mouseState;
-	KeyState m_keyState;
 };
 
 }  // namespace RED_LILIUM_NAMESPACE

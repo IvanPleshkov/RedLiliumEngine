@@ -6,12 +6,12 @@
 using namespace RED_LILIUM_NAMESPACE;
 
 #if RED_LILIUM_POINTER_COUNTERS
-sptr<RedLiliumPtrHandler> RedLiliumObject::m_nullHandler = std::make_shared<RedLiliumPtrHandler>(nullptr);
+sptr<std::atomic_bool> RedLiliumObject::m_nullExistingHandler = std::make_shared<std::atomic_bool>(true);
 #endif // RED_LILIUM_POINTER_COUNTERS
 
 RedLiliumObject::~RedLiliumObject()
 {
 #if RED_LILIUM_POINTER_COUNTERS
-	m_handler->exists = false;
+	*m_existingHandler = false;
 #endif // RED_LILIUM_POINTER_COUNTERS
 }

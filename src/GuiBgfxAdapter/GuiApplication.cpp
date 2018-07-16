@@ -167,6 +167,8 @@ void GuiApplication::Impl::init(int32_t _argc, const char* const* _argv, uint32_
 	m_timeOffset = bx::getHPCounter();
 
 	entry::WindowState windowState;
+	windowState.m_width = m_width;
+	windowState.m_height = m_height;
 	m_application->GetNativeWindow()->UpdateWindowState(windowState, m_nvg);
 
 	m_application->OnBeginApplication();
@@ -204,14 +206,18 @@ bool GuiApplication::Impl::update()
 
 		nvgBeginFrame(m_nvg, m_width, m_height, 1.0f);
 
-		m_application->m_mouseState = GetMouseState(bgfxMouseState);
-		m_application->m_keyState = GetKeyState();
-		m_application->m_guiManager->BeginFrame(time, m_application->m_mouseState, m_application->m_keyState);
+		{
+			ptr<GuiManager> guiManager = m_application->GetGuiManager();
+			guiManager->BeginFrame(
+				time,
+				GetMouseState(bgfxMouseState),
+				GetKeyState());
 
-		m_application->Update();
+			m_application->Update();
 
-		m_application->m_guiManager->EndFrame();
-		m_application->m_guiManager->Draw();
+			guiManager->EndFrame();
+			guiManager->Draw();
+		}
 
 		nvgEndFrame(m_nvg);
 

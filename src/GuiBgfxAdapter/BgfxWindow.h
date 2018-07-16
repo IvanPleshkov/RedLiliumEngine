@@ -12,12 +12,12 @@ public:
 	BgfxWindow();
 	~BgfxWindow() override {}
 
-	void UpdateWindowState(const entry::WindowState& windowState, NVGcontextPtr nvgContext);
-
 	vec2 GetSize() const override;
 	bool IsFocused() const override;
 	NVGcontextPtr GetNvgContext() override;
 	const NVGcontextPtr GetNvgContext() const override;
+
+	void UpdateWindowState(const entry::WindowState& windowState, NVGcontextPtr nvgContext);
 
 private:
 	NVGcontextPtr m_nvgContext;

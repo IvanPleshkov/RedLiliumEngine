@@ -34,6 +34,11 @@ void GuiManager::BeginFrame(const Time& timeFromStart, const MouseState& mouseSt
 	m_timeFromStart = timeFromStart;
 	UpdateKeyState(keyState);
 	UpdateMouseState(mouseState);
+
+	for (auto& panel : m_panels)
+	{
+		panel->BeginFrame();
+	}
 }
 
 void GuiManager::EndFrame()
