@@ -5,18 +5,17 @@
 namespace RED_LILIUM_NAMESPACE
 {
 
-enum class GuiRecordingDataType
+enum class GuiRecordingMode
 {
-	MouseState			= 1 << 0,
-	KeyState			= 1 << 1,
-	WidgetsTree			= 1 << 2
+	NoRecording				= 0,
+	RecordReplay			= 1 << 0,
+	RecordFunctionalTest	= 1 << 1
 };
-using GuiRecordingDataTypes = Flags<GuiRecordingDataType>;
 
 class GuiRecorder : public RedLiliumObject
 {
 public:
-	GuiRecorder(GuiRecordingDataTypes recordingData);
+	GuiRecorder(GuiRecordingMode recordingMode);
 	~GuiRecorder() override;
 
 	void PushNewFrame();
@@ -25,20 +24,45 @@ public:
 	void PushMouseState(const MouseState& mouseState);
 	void PushKeyState(const KeyState& keyState);
 
-	void PushConstructWidget(const ptr<const Widget> widget);
-	void PushDestructWidget(const ptr<const Widget> widget);
-
 	void PushLogMessage(const std::string& message);
 
+	ptr<GuiReplayData> GetReplayData();
+	const ptr<GuiReplayData> GetReplayData() const;
+
 private:
-	GuiRecordingDataTypes m_recordingDataTypes;
+	GuiRecordingMode m_recordingMode;
 	uptr<GuiReplayData> m_data;
 };
+
 
 class GuiReplayData : public RedLiliumObject
 {
 public:
 	~GuiReplayData() override;
+
+	void Save(const std::string& filename) const;
+	void Load(const std::string& filename);
+	void Clear();
+
+	u32 GetFramesCount() const;
+
+	const Time& GetTime(u32 frameIndex) const;
+	const MouseState& GetMouseState(u32 frameIndex) const;
+	const KeyState& GetKeyState(u32 frameIndex) const;
+
+	u32 GetLogMessagesCount(u32 frameIndex) const;
+	const std::string GetLogMessage(u32 frameIndex, u32 messageIndex) const;
+
+private:
+	friend class GuiRecorder;
+
+	static const u32 currentReplayVersion = 0;
+
+	u32 m_framesCount;
+	std::vector<Time> m_timeData;
+	std::vector<MouseState> m_mouseState;
+	std::vector<KeyState> m_keyState;
+	std::vector<std::vector<std::string>> m_logMessagesData;
 };
 
 } // namespace RED_LILIUM_NAMESPACE

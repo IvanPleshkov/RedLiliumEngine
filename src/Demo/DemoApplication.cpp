@@ -85,6 +85,16 @@ void DemoGuiApplication::Update()
 	{
 		std::cout << "Clicked!" << std::endl;
 	}
+
+	if (button->IsDoubleClicked())
+	{
+		std::cout << "Double Clicked!" << std::endl;
+	}
+
+	if (button->IsTripleClicked())
+	{
+		std::cout << "Triple Clicked!" << std::endl;
+	}
 }
 
 void DemoGuiApplication::LoadFonts(NVGcontextPtr nvg)

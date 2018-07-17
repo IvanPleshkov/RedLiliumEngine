@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Common.h"
+#include "GuiRecorder.h"
 
 namespace RED_LILIUM_NAMESPACE
 {
@@ -8,7 +9,7 @@ namespace RED_LILIUM_NAMESPACE
 class GuiManager : public RedLiliumObject
 {
 public:
-	GuiManager(ptr<INativeEnvironment> nativeEnvironment);
+	GuiManager(ptr<INativeEnvironment> nativeEnvironment, GuiRecordingMode recordingData = GuiRecordingMode::NoRecording);
 	~GuiManager() override { }
 
 	ptr<Style> GetStyle();
@@ -55,6 +56,8 @@ private:
 	MouseState m_mouseState;
 	KeyState m_keyState;
 	Time m_timeFromStart;
+
+	uptr<GuiRecorder> m_recorder;
 };
 
 } // namespace RED_LILIUM_NAMESPACE
