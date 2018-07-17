@@ -15,22 +15,41 @@ GuiRecorder::~GuiRecorder()
 
 void GuiRecorder::PushNewFrame()
 {
+	m_data->m_logMessagesData.push_back({});
 	m_data->m_framesCount++;
 }
 
 void GuiRecorder::PushFrameTime(const Time& time)
 {
-
+	if (m_recordingMode != GuiRecordingMode::NoRecording)
+	{
+		m_data->m_timeData.push_back(time);
+	}
 }
 
 void GuiRecorder::PushMouseState(const MouseState& mouseState)
-{}
+{
+	if (m_recordingMode != GuiRecordingMode::NoRecording)
+	{
+		m_data->m_mouseState.push_back(mouseState);
+	}
+}
 
 void GuiRecorder::PushKeyState(const KeyState& keyState)
-{}
+{
+	if (m_recordingMode != GuiRecordingMode::NoRecording)
+	{
+		m_data->m_keyState.push_back(keyState);
+	}
+}
 
 void GuiRecorder::PushLogMessage(const std::string& message)
-{}
+{
+	if (m_recordingMode != GuiRecordingMode::NoRecording)
+	{
+		m_data->m_logMessagesData.back().push_back(message);
+	}
+}
 
 ptr<GuiReplayData> GuiRecorder::GetReplayData()
 {

@@ -5,7 +5,7 @@
 
 using namespace RED_LILIUM_NAMESPACE;
 
-GuiManager::GuiManager(ptr<INativeEnvironment> nativeEnvironment, GuiRecordingDataTypes recordingData)
+GuiManager::GuiManager(ptr<INativeEnvironment> nativeEnvironment, GuiRecordingMode recordingData)
 	: m_nativeEnvironment(nativeEnvironment)
 	, m_focusedWidget(nullptr)
 	, m_hoveredWidget(nullptr)
@@ -32,6 +32,7 @@ const KeyState& GuiManager::GetKeyState() const
 
 void GuiManager::BeginFrame(const Time& timeFromStart, const MouseState& mouseState, const KeyState& keyState)
 {
+	m_recorder->PushNewFrame();
 	m_recorder->PushFrameTime(timeFromStart);
 	m_recorder->PushKeyState(keyState);
 	m_recorder->PushMouseState(mouseState);
