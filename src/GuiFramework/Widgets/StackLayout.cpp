@@ -28,6 +28,12 @@ ptr<StackLayout> StackLayout::SetNormalization(bool useXNormalization, bool useY
 	return this;
 }
 
+ptr<StackLayout> StackLayout::SetDirection(Direction direction)
+{
+	m_direction = direction;
+	return this;
+}
+
 void StackLayout::UpdateDesiredSize()
 {
 	switch (m_direction)

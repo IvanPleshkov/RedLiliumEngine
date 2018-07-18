@@ -17,7 +17,8 @@ public:
 		vec2 windowSize);
 	~GuiApplication() override;
 
-	void Run();
+	void Run(GuiRecordingMode recordingMode = GuiRecordingMode::NoRecording);
+	void TakeScreenshot(const std::string& outputFile);
 
 	virtual void OnBeginApplication() {}
 	virtual void OnEndApplication() {}
@@ -47,6 +48,8 @@ private:
 	std::string m_dataPath;
 	std::string m_name;
 	std::string m_description;
+
+	std::string m_screenshotOutputFilename;
 };
 
 }  // namespace RED_LILIUM_NAMESPACE

@@ -13,6 +13,7 @@ public:
 	ptr<StackLayout> SetHorizontalAlignment(HorizontalAlignment alignment);
 	ptr<StackLayout> SetVerticalAlignment(VerticalAlignment alignment);
 	ptr<StackLayout> SetNormalization(bool useXNormalization, bool useYNormalization);
+	ptr<StackLayout> SetDirection(Direction direction);
 
 protected:
 	void UpdateDesiredSize() override;

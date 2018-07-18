@@ -26,6 +26,8 @@ public:
 
 	ptr<Widget> GetWidgetUnderPoint(vec2 point);
 
+	void LogMessage(const std::string& message);
+
 private:
 	friend class Widget;
 

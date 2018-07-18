@@ -47,7 +47,7 @@ private:
 	bool m_isDoubleClicked = false;
 	bool m_isTripleClicked = false;
 
-	MouseKey m_lastMouseKey = MouseKey::None;
+	MouseKey m_lastMouseKey = MouseKey::Left;
 	Time m_lastClickTime = 0;
 	u32 m_clicksCount = 0;
 };

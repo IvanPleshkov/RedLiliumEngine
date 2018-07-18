@@ -6,22 +6,22 @@
 namespace RED_LILIUM_NAMESPACE
 {
 
-class BgfxWindow : public RedLiliumObject, public INativeWindow
-{
-public:
-	BgfxWindow();
-	~BgfxWindow() override {}
+	class BgfxWindow : public RedLiliumObject, public INativeWindow
+	{
+	public:
+		BgfxWindow();
+		~BgfxWindow() override {}
 
-	vec2 GetSize() const override;
-	bool IsFocused() const override;
-	NVGcontextPtr GetNvgContext() override;
-	const NVGcontextPtr GetNvgContext() const override;
+		vec2 GetSize() const override;
+		bool IsFocused() const override;
+		NVGcontextPtr GetNvgContext() override;
+		const NVGcontextPtr GetNvgContext() const override;
 
-	void UpdateWindowState(const entry::WindowState& windowState, NVGcontextPtr nvgContext);
+		void UpdateWindowState(const entry::WindowState& windowState, NVGcontextPtr nvgContext);
 
-private:
-	NVGcontextPtr m_nvgContext;
-	entry::WindowState m_windowState;
-};
+	private:
+		NVGcontextPtr m_nvgContext;
+		entry::WindowState m_windowState;
+	};
 
 } // namespace RED_LILIUM_NAMESPACE

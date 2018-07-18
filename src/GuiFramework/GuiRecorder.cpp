@@ -15,8 +15,11 @@ GuiRecorder::~GuiRecorder()
 
 void GuiRecorder::PushNewFrame()
 {
-	m_data->m_logMessagesData.push_back({});
-	m_data->m_framesCount++;
+	if (m_recordingMode != GuiRecordingMode::NoRecording)
+	{
+		m_data->m_logMessagesData.push_back({});
+		m_data->m_framesCount++;
+	}
 }
 
 void GuiRecorder::PushFrameTime(const Time& time)

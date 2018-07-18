@@ -4,12 +4,14 @@
 // bgfx
 #include <bx/uint32_t.h>
 #include <common.h>
+#include <entry/input.h>
 #include <bgfx_utils.h>
 #include <imgui/imgui.h>
 #include <nanovg/nanovg.h>
 
 #include "BgfxWindow.h"
 #include "BgfxEnvironment.h"
+#include "BgfxKeysMapping.h"
 
 using namespace RED_LILIUM_NAMESPACE;
 
@@ -54,20 +56,22 @@ GuiApplication::GuiApplication(
 	: m_args(args)
 	, m_name(name)
 	, m_description(description)
+	, m_screenshotOutputFilename()
 {
 	InitDataPath();
 
 	m_impl = std::make_unique<Impl>(this, m_name.c_str(), m_description.c_str());
 	m_nativeWindow = std::make_unique<BgfxWindow>();
 	m_nativeEnvironment = std::make_unique<BgfxEnvironment>();
-	m_guiManager = std::make_unique<GuiManager>(m_nativeEnvironment.get());
 }
 
 GuiApplication::~GuiApplication()
 {}
 
-void GuiApplication::Run()
+void GuiApplication::Run(GuiRecordingMode recordingMode)
 {
+	m_guiManager = std::make_unique<GuiManager>(m_nativeEnvironment.get(), recordingMode);
+
 	std::vector<const char*> argv;
 	argv.reserve(m_args.size());
 	for (auto& arg : m_args)
@@ -79,6 +83,12 @@ void GuiApplication::Run()
 		argv.push_back(nullptr);
 	}
 	entry::runApp(m_impl.get(), m_args.size(), &argv[0]);
+}
+
+void GuiApplication::TakeScreenshot(const std::string& outputFile)
+{
+	m_screenshotOutputFilename = outputFile;
+	m_guiManager->LogMessage("[Screenshot]" + outputFile);
 }
 
 const std::string& GuiApplication::GetDataPath() const
@@ -221,10 +231,17 @@ bool GuiApplication::Impl::update()
 		}
 
 		nvgEndFrame(m_nvg);
-
+		
 		// Advance to next frame. Rendering thread will be kicked to
 		// process submitted rendering primitives.
 		bgfx::frame();
+
+		if (!m_application->m_screenshotOutputFilename.empty())
+		{
+			std::string fullFilename = m_application->GetDataPath() + m_application->m_screenshotOutputFilename;
+			bgfx::requestScreenShot(BGFX_INVALID_HANDLE, fullFilename.c_str());
+			m_application->m_screenshotOutputFilename.clear();
+		}
 
 		return true;
 	}
@@ -254,5 +271,20 @@ MouseState GuiApplication::Impl::GetMouseState()
 
 KeyState GuiApplication::Impl::GetKeyState()
 {
-	return KeyState();
+	// TODO: update ctrl, alt and shift states
+
+	KeyState keyState;
+	for (Key key : GetAllKeys())
+	{
+		std::optional<entry::Key::Enum> bgfxKey = convertBgfxKey(key);
+		if (!bgfxKey)
+		{
+			continue;
+		}
+
+		uint8_t bgfxKeyModifiers;
+		keyState.IsPressed(key) = inputGetKeyState(bgfxKey.value(), &bgfxKeyModifiers);
+	}
+
+	return keyState;
 }

@@ -20,6 +20,11 @@ ptr<Style> GuiManager::GetStyle()
 	return m_style.get();
 }
 
+void GuiManager::LogMessage(const std::string& message)
+{
+	m_recorder->PushLogMessage(message);
+}
+
 const MouseState& GuiManager::GetMouseState() const
 {
 	return m_mouseState;
@@ -94,8 +99,7 @@ void GuiManager::UpdateMouseState(const MouseState& mouseState)
 	if (oldState.hoveredWindow != m_mouseState.hoveredWindow ||
 		oldState.mousePosition != m_mouseState.mousePosition)
 	{
-		MouseEvent mouseMoveEvent;
-		mouseMoveEvent.eventType = MouseEventType::MouseMove;
+		MouseEvent mouseMoveEvent(MouseEventType::MouseMove);
 		HandleMouseEvent(mouseMoveEvent);
 	}
 
@@ -116,15 +120,16 @@ void GuiManager::CheckMouseKeyEvent(
 		return;
 	}
 	
-	MouseEvent mouseEvent;
+	MouseEventType mouseEventType;
 	if (m_mouseState.pressedKeys.Test(mouseKey))
 	{
-		mouseEvent.eventType = pressEvent;
+		mouseEventType = pressEvent;
 	}
 	else
 	{
-		mouseEvent.eventType = releaseEvent;
+		mouseEventType = releaseEvent;
 	}
+	MouseEvent mouseEvent(mouseEventType);
 	HandleMouseEvent(mouseEvent);
 }
 

@@ -28,6 +28,7 @@
 #include <typeinfo>
 #include <typeindex>
 #include <fstream>
+#include <optional>
 
 #include "CommonDefs.h"
 

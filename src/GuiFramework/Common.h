@@ -46,12 +46,8 @@ enum class Direction : u32
 	RevertedVertical		= 1 << 3
 };
 
-class KeyEvent
-{};
-
 enum class MouseKey
 {
-	None			= 0,
 	Left			= 1 << 0,
 	Right			= 1 << 1,
 	Middle			= 1 << 2
@@ -59,7 +55,6 @@ enum class MouseKey
 
 enum class MouseEventType
 {
-	None				= 0,
 	MouseMove			= 1 << 0,
 	LeftPressed			= 1 << 1,
 	LeftReleased		= 1 << 2,
@@ -73,6 +68,158 @@ enum class MouseEventType
 	Dropping			= 1 << 10
 };
 
+enum class Key
+{
+	Ctrl,
+	Alt,
+	Shift,
+	Esc,
+	Return,
+	Tab,
+	Space,
+	Backspace,
+	Up,
+	Down,
+	Left,
+	Right,
+	Insert,
+	Delete,
+	Home,
+	End,
+	PageUp,
+	PageDown,
+	Print,
+	Plus,
+	Minus,
+	LeftBracket,
+	RightBracket,
+	Semicolon,
+	Quote,
+	Comma,
+	Period,
+	Slash,
+	Backslash,
+	Tilde,
+	F1,
+	F2,
+	F3,
+	F4,
+	F5,
+	F6,
+	F7,
+	F8,
+	F9,
+	F10,
+	F11,
+	F12,
+	NumPad0,
+	NumPad1,
+	NumPad2,
+	NumPad3,
+	NumPad4,
+	NumPad5,
+	NumPad6,
+	NumPad7,
+	NumPad8,
+	NumPad9,
+	Key0,
+	Key1,
+	Key2,
+	Key3,
+	Key4,
+	Key5,
+	Key6,
+	Key7,
+	Key8,
+	Key9,
+	KeyA,
+	KeyB,
+	KeyC,
+	KeyD,
+	KeyE,
+	KeyF,
+	KeyG,
+	KeyH,
+	KeyI,
+	KeyJ,
+	KeyK,
+	KeyL,
+	KeyM,
+	KeyN,
+	KeyO,
+	KeyP,
+	KeyQ,
+	KeyR,
+	KeyS,
+	KeyT,
+	KeyU,
+	KeyV,
+	KeyW,
+	KeyX,
+	KeyY,
+	KeyZ,
+
+	GamepadA,
+	GamepadB,
+	GamepadX,
+	GamepadY,
+	GamepadThumbL,
+	GamepadThumbR,
+	GamepadShoulderL,
+	GamepadShoulderR,
+	GamepadUp,
+	GamepadDown,
+	GamepadLeft,
+	GamepadRight,
+	GamepadBack,
+	GamepadStart,
+	GamepadGuide
+};
+
+const u32 AllKeysCount = 103;
+const std::array<Key, AllKeysCount>& GetAllKeys();
+
+enum class KeyModifier
+{
+	Ctrl	= 1 << 0,
+	Alt		= 1 << 1,
+	Shift	= 1 << 2
+};
+
+struct Shortcut
+{
+	Shortcut(Key key)
+		: key(key)
+	{}
+
+	Shortcut(Key key, KeyModifier modifier)
+		: key(key)
+	{
+		this->modifier.Add(modifier);
+	}
+
+	Shortcut(Key key, KeyModifier modifier0, KeyModifier modifier1)
+		: key(key)
+	{
+		this->modifier.Add(modifier0);
+		this->modifier.Add(modifier1);
+	}
+
+	Shortcut(Key key, KeyModifier modifier0, KeyModifier modifier1, KeyModifier modifier2)
+		: key(key)
+	{
+		this->modifier.Add(modifier0);
+		this->modifier.Add(modifier1);
+		this->modifier.Add(modifier2);
+	}
+
+	// TODO:
+	std::string GetName() const;
+
+	Flags<KeyModifier> modifier;
+	Key key;
+};
+
 enum class KeyEventType
 {
 	None			= 0,
@@ -82,6 +229,32 @@ enum class KeyEventType
 
 struct KeyState
 {
+	KeyState()
+	{
+		for (bool& isPressed : pressedKeys)
+		{
+			isPressed = false;
+		}
+	}
+
+	bool IsPressed(Key key) const
+	{
+		return pressedKeys[static_cast<size_t>(key)];
+	}
+
+	bool& IsPressed(Key key)
+	{
+		return pressedKeys[static_cast<size_t>(key)];
+	}
+
+	std::array<bool, AllKeysCount> pressedKeys;
+};
+
+struct KeyEvent
+{
+	KeyEventType eventType;
+	Key key;
+	Flags<KeyModifier> modifiers;
 };
 
 struct MouseState
@@ -100,11 +273,12 @@ struct MouseState
 
 struct MouseEvent
 {
-	MouseEvent()
-		: eventType(MouseEventType::None)
+	MouseEvent(MouseEventType eventType)
+		: eventType(eventType)
 	{}
 
 	MouseEventType eventType;
+	Flags<KeyModifier> modifiers;
 };
 
 struct FontSettings
@@ -129,16 +303,16 @@ public:
 
 enum class GuiPipelineStep : u32
 {
-	Idle = 1 << 0,
-	ConfigureWidgets = 1 << 1,
-	TickWidgets = 1 << 2,
-	SetWidgetsMinimumSize = 1 << 3,
-	SetWidgetsDesiredSize = 1 << 4,
-	SetWidgetsTransform = 1 << 5,
-	Drawing = 1 << 6,
-	HandlingMouseEvent = 1 << 7,
-	HandlingKeyEvent = 1 << 8,
-	PostTickWidgets = 1 << 9,
+	Idle						= 1 << 0,
+	ConfigureWidgets			= 1 << 1,
+	TickWidgets					= 1 << 2,
+	SetWidgetsMinimumSize		= 1 << 3,
+	SetWidgetsDesiredSize		= 1 << 4,
+	SetWidgetsTransform			= 1 << 5,
+	Drawing						= 1 << 6,
+	HandlingMouseEvent			= 1 << 7,
+	HandlingKeyEvent			= 1 << 8,
+	PostTickWidgets				= 1 << 9,
 };
 
 } // namespace RED_LILIUM_NAMESPACE
