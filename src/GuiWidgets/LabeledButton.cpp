@@ -29,7 +29,6 @@ void LabeledButton::UpdateDesiredSize()
 
 void LabeledButton::Draw()
 {
-	vec2 position = GetPosition();
 	vec2 size = GetSize();
 	NVGcolor color = nvgRGBAf(0, 0.2f, 0, 1);
 
@@ -44,7 +43,7 @@ void LabeledButton::Draw()
 	}
 
 	nvgBeginPath(GetNvgContext());
-	nvgRect(GetNvgContext(), position.x, position.y, size.x, size.y);
+	nvgRect(GetNvgContext(), 0, 0, size.x, size.y);
 	nvgFillColor(GetNvgContext(), color);
 	nvgFill(GetNvgContext());
 }

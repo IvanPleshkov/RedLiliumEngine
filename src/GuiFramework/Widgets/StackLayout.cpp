@@ -171,7 +171,7 @@ void StackLayout::LayoutX(
 		child->SetSize(childSize);
 
 		// Child Position
-		float childPositionX = fx(GetPosition()) + fx(m_padding);
+		float childPositionX = fx(m_padding);
 		switch (alignment)
 		{
 		case HorizontalAlignment::Fill:
@@ -215,7 +215,7 @@ void StackLayout::LayoutY(
 		child->SetSize(childSize);
 
 		// Child Position
-		float childPositionY = fy(GetPosition()) + fy(m_padding);
+		float childPositionY = fy(m_padding);
 		switch (alignment)
 		{
 		case VerticalAlignment::Fill:

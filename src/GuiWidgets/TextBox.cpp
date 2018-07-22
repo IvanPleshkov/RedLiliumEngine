@@ -28,12 +28,11 @@ void TextBox::Tick()
 
 void TextBox::UpdateDesiredSize()
 {
-	m_desiredSize = { 100, 24 };
+	m_desiredSize = { 150, 24 };
 }
 
 void TextBox::Draw()
 {
-	const vec2 position = GetPosition();
 	const vec2 size = GetSize();
 	NVGcontextPtr nvg = GetNvgContext();
 
@@ -42,7 +41,7 @@ void TextBox::Draw()
 
 	nvgBeginPath(nvg);
 	nvgRoundedRect(nvg, 
-		position.x + borderWidth, position.y + borderWidth, 
+		borderWidth, borderWidth, 
 		size.x - 2 * borderWidth, size.y - 2 * borderWidth, 
 		borderRadius);
 	if (m_textField->IsHovered() || m_textField->IsFocused())

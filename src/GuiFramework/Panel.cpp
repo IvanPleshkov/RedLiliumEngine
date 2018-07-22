@@ -38,12 +38,11 @@ void Panel::EndFrame()
 	m_currentGuiPipelineState = GuiPipelineStep::SetWidgetsDesiredSize;
 	UpdateWidgetsDesiredSize(m_topWidget);
 
-	m_topWidget->m_position = m_position;
-	m_topWidget->m_size = m_size;
-	m_topWidget->m_size.x = std::max(m_topWidget->m_size.x, m_topWidget->m_minimumSize.x);
-	m_topWidget->m_size.y = std::max(m_topWidget->m_size.y, m_topWidget->m_minimumSize.y);
-
 	m_currentGuiPipelineState = GuiPipelineStep::SetWidgetsTransform;
+
+	m_topWidget->SetTransform(mat3(1.0f));
+	m_topWidget->SetSize(m_size);
+
 	UpdateWidgetsLayouting(m_topWidget);
 
 	m_currentGuiPipelineState = GuiPipelineStep::PostTickWidgets;
@@ -132,7 +131,8 @@ void Panel::Draw()
 	RED_LILIUM_ASSERT(m_currentGuiPipelineState == GuiPipelineStep::Idle);
 	m_currentGuiPipelineState = GuiPipelineStep::Drawing;
 
-	DrawRecursive(m_topWidget.get());
+	nvgResetScissor(GetNvgContext());
+	DrawRecursive(m_topWidget.get(), mat3(1.0f));
 	nvgResetScissor(GetNvgContext());
 
 	m_currentGuiPipelineState = GuiPipelineStep::Idle;
@@ -143,17 +143,19 @@ ptr<Widget> Panel::GetWidgetUnderPoint(vec2 position, bool onlyHoverableWidgets)
 	return GetWidgetUnderPointRecursive(m_topWidget, position, onlyHoverableWidgets);
 }
 
-void Panel::DrawRecursive(const ptr<Widget>& widget)
+void Panel::DrawRecursive(const ptr<Widget>& widget, mat3 transform)
 {
-	SetWidgetScissor(widget);
+	mat3 widgetTransform = transform * widget->GetTransform();
+
+	SetWidgetScissor(widget, widgetTransform);
 	widget->Draw();
 
 	for (auto& child : widget->m_children)
 	{
-		DrawRecursive(child.get());
+		DrawRecursive(child.get(), widgetTransform);
 	}
 
-	SetWidgetScissor(widget);
+	SetWidgetScissor(widget, widgetTransform);
 	widget->PostDraw();
 }
 
@@ -215,22 +217,24 @@ void Panel::PostTickWidgetsRecursive(const uptr<Widget>& widget)
 
 ptr<Widget> Panel::GetWidgetUnderPointRecursive(const uptr<Widget>& widget, vec2 position, bool onlyHoverableWidgets)
 {
-	if (widget->m_position.x > position.x ||
-		widget->m_position.y > position.y ||
-		widget->m_position.x + widget->m_size.x < position.x ||
-		widget->m_position.y + widget->m_size.y < position.y)
+	vec2 localPosition = widget->GetInvertedTransform() * vec3(position, 1.0f);
+
+	if (localPosition.x < 0 ||
+		localPosition.y < 0 ||
+		localPosition.x > widget->GetSize().x ||
+		localPosition.y > widget->GetSize().y)
 	{
 		return nullptr;
 	}
 
-	if (!widget->m_visible || !widget->IsContainingPoint(position))
+	if (!widget->m_visible || !widget->IsContainingPoint(localPosition))
 	{
 		return nullptr;
 	}
 
 	for (auto i = widget->m_children.rbegin(); i != widget->m_children.rend(); i++)
 	{
-		ptr<Widget> result = GetWidgetUnderPointRecursive(*i, position, onlyHoverableWidgets);
+		ptr<Widget> result = GetWidgetUnderPointRecursive(*i, localPosition, onlyHoverableWidgets);
 		if (result != nullptr)
 		{
 			return result;
@@ -248,19 +252,20 @@ ptr<Widget> Panel::GetWidgetUnderPointRecursive(const uptr<Widget>& widget, vec2
 	}
 }
 
-void Panel::SetWidgetScissor(const ptr<Widget>& widget)
+void Panel::SetWidgetScissor(const ptr<Widget>& widget, mat3 transform)
 {
-	nvgScissor(
-		GetNvgContext(),
-		m_position.x,
-		m_position.y,
-		m_size.x,
-		m_size.y);
+	nvgResetTransform(GetNvgContext());
 
-	nvgIntersectScissor(
-		GetNvgContext(),
-		widget->GetPosition().x,
-		widget->GetPosition().y,
+	auto transposed = glm::transpose(transform);
+	auto row0 = transposed[0];
+	auto row1 = transposed[1];
+	nvgTransform(GetNvgContext(), 
+		row0[0], row1[0],
+		row0[1], row1[1],
+		row0[2], row1[2]);
+
+	nvgScissor(
+		GetNvgContext(), 0, 0,
 		widget->GetSize().x,
 		widget->GetSize().y);
 }

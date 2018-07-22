@@ -18,23 +18,42 @@ Widget::~Widget()
 	}
 }
 
-void Widget::SetPosition(vec2 position)
-{
-	RED_LILIUM_ASSERT(m_panel->GetCurrentPipelineStep() == GuiPipelineStep::SetWidgetsTransform);
-
-	m_position = position;
-}
-
 void Widget::SetSize(vec2 size)
 {
 	RED_LILIUM_ASSERT(m_panel->GetCurrentPipelineStep() == GuiPipelineStep::SetWidgetsTransform);
 
 	m_size = size;
+	m_size.x = std::max(m_size.x, m_minimumSize.x);
+	m_size.y = std::max(m_size.y, m_minimumSize.y);
+}
+
+void Widget::SetTransform(mat3 transform)
+{
+	RED_LILIUM_ASSERT(m_panel->GetCurrentPipelineStep() == GuiPipelineStep::SetWidgetsTransform);
+
+	m_transform = transform;
+}
+
+const mat3& Widget::GetTransform() const
+{
+	return m_transform;
+}
+
+mat3 Widget::GetInvertedTransform() const
+{
+	return glm::inverse(m_transform);
+}
+
+void Widget::SetPosition(vec2 position)
+{
+	RED_LILIUM_ASSERT(m_panel->GetCurrentPipelineStep() == GuiPipelineStep::SetWidgetsTransform);
+
+	m_transform = glm::translate(mat3(1.0f), position);
 }
 
 vec2 Widget::GetPosition() const
 {
-	return m_position;
+	return { m_transform[2][0], m_transform[2][1] };
 }
 
 vec2 Widget::GetSize() const
@@ -201,7 +220,7 @@ void Widget::Layout()
 {
 	for (auto& child : m_children)
 	{
-		child->SetPosition(m_position);
+		child->SetTransform(mat3(1.0f));
 		child->SetSize(m_size);
 	}
 }

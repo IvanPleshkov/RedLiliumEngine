@@ -39,7 +39,7 @@ public:
 	void Draw();
 
 private:
-	void DrawRecursive(const ptr<Widget>& widget);
+	void DrawRecursive(const ptr<Widget>& widget, mat3 transform);
 	void TickWidgetsRecursive(const uptr<Widget>& widget);
 	void PostTickWidgetsRecursive(const uptr<Widget>& widget);
 
@@ -51,7 +51,7 @@ private:
 		const uptr<Widget>& widget,
 		vec2 position,
 		bool onlyHoverableWidgets);
-	void SetWidgetScissor(const ptr<Widget>& widget);
+	void SetWidgetScissor(const ptr<Widget>& widget, mat3 transform);
 
 private:
 	GuiPipelineStep m_currentGuiPipelineState;

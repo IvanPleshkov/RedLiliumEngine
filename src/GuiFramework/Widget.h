@@ -14,10 +14,14 @@ public:
 	ptr<TWidget> Add();
 
 	void SetPosition(vec2 position);
+	vec2 GetPosition() const;
+	void SetTransform(mat3 transform);
+	const mat3& GetTransform() const;
+	mat3 GetInvertedTransform() const;
+	
+	vec2 GetSize() const;
 	void SetSize(vec2 size);
 
-	vec2 GetPosition() const;
-	vec2 GetSize() const;
 	vec2 GetMinimumSize() const;
 	vec2 GetDesiredSize() const;
 
@@ -91,10 +95,11 @@ protected:
 	std::vector<uptr<Widget>> m_children;
 	u32 m_childAddingCursor = 0;
 
-	vec2 m_position;
-	vec2 m_size;
-	vec2 m_desiredSize;
-	vec2 m_minimumSize;
+	mat3 m_transform = mat3(1.0f);
+
+	vec2 m_size = { 0, 0 };
+	vec2 m_desiredSize = { 0, 0 };
+	vec2 m_minimumSize = { 0, 0 };
 
 	bool m_visible = true;
 	bool m_enable = true;

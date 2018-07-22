@@ -131,38 +131,38 @@ void Label::Draw()
 	switch (m_horizontalAlignment)
 	{
 	case HorizontalAlignment::Center:
-		x = m_position.x + m_leftPadding + thisSize.x / 2.0f;
+		x = m_leftPadding + thisSize.x / 2.0f;
 		break;
 	case HorizontalAlignment::Left:
-		x = m_position.x + m_leftPadding;
+		x = m_leftPadding;
 		break;
 	case HorizontalAlignment::Right:
-		x = m_position.x + m_leftPadding + thisSize.x;
+		x = m_leftPadding + thisSize.x;
 		break;
 	case HorizontalAlignment::Fill:
-		x = m_position.x + m_leftPadding + thisSize.x / 2.0f;
+		x = m_leftPadding + thisSize.x / 2.0f;
 		break;
 	default:
-		x = m_position.x + m_leftPadding + thisSize.x / 2.0f;
+		x = m_leftPadding + thisSize.x / 2.0f;
 		break;
 	}
 
 	switch (m_verticalAlignment)
 	{
 	case VerticalAlignment::Center:
-		y = m_position.y + m_topPadding + thisSize.y / 2.0f;
+		y = m_topPadding + thisSize.y / 2.0f;
 		break;
 	case VerticalAlignment::Top:
-		y = m_position.y + m_topPadding;
+		y = m_topPadding;
 		break;
 	case VerticalAlignment::Bottom:
-		y = m_position.y + m_topPadding + thisSize.y;
+		y = m_topPadding + thisSize.y;
 		break;
 	case VerticalAlignment::Fill:
-		y = m_position.y + m_topPadding + thisSize.y / 2.0f;
+		y = m_topPadding + thisSize.y / 2.0f;
 		break;
 	default:
-		y = m_position.y + m_topPadding + thisSize.y / 2.0f;
+		y = m_topPadding + thisSize.y / 2.0f;
 		break;
 	}
 

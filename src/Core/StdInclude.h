@@ -32,7 +32,12 @@
 
 #include "CommonDefs.h"
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm\glm.hpp>
+#include <glm\ext.hpp>
+#include <glm\gtx\matrix_transform_2d.hpp>
+#include <glm\gtx\matrix_decompose.hpp>
+
 #include <spdlog\spdlog.h>
 
 #define RED_LILIUM_NAMESPACE rl

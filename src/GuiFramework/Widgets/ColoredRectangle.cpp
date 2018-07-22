@@ -38,7 +38,6 @@ void ColoredRectangle::UpdateMinimumSize()
 
 void ColoredRectangle::Draw()
 {
-	vec2 position = GetPosition();
 	vec2 size = GetSize();
 	NVGcolor color = nvgRGBAf(m_color.x, m_color.y, m_color.z, m_color.a);
 
@@ -48,7 +47,7 @@ void ColoredRectangle::Draw()
 	}
 
 	nvgBeginPath(GetNvgContext());
-	nvgRect(GetNvgContext(), position.x, position.y, size.x, size.y);
+	nvgRect(GetNvgContext(), 0, 0, size.x, size.y);
 	nvgFillColor(GetNvgContext(), color);
 	nvgFill(GetNvgContext());
 }

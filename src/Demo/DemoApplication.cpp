@@ -63,7 +63,7 @@ void DemoGuiApplication::Demo1()
 	ptr<StackLayout> stackLayout = topWidget
 		->Add<StackLayout>()
 		->SetPadding({ 10, 10 })
-		->SetHorizontalAlignment(HorizontalAlignment::Fill);
+		->SetHorizontalAlignment(HorizontalAlignment::Left);
 	
 	ptr<ColoredRectangle> r1 = stackLayout
 		->Add<ColoredRectangle>()
