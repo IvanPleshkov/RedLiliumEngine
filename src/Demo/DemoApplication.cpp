@@ -5,6 +5,7 @@
 #include <GuiBgfxAdapter/BgfxEnvironment.h>
 #include <GuiFramework/GuiFramework.h>
 #include <GuiWidgets/LabeledButton.h>
+#include <GuiWidgets/TextBox.h>
 
 using namespace RED_LILIUM_NAMESPACE;
 
@@ -72,6 +73,9 @@ void DemoGuiApplication::Update()
 	ptr<LabeledButton> button = stackLayout
 		->Add<LabeledButton>()
 		->SetText("Cancel");
+
+	ptr<TextBox> textBox = stackLayout
+		->Add<TextBox>();
 
 	ptr<ColoredRectangle> r3 = stackLayout
 		->Add<ColoredRectangle>()

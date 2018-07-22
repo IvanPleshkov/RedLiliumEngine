@@ -10,6 +10,9 @@ namespace RED_LILIUM_NAMESPACE
 class LabeledButton : public ClickableWidget
 {
 public:
+	LabeledButton() {}
+	~LabeledButton() override {}
+
 	ptr<LabeledButton> SetText(const std::string& text);
 
 protected:
