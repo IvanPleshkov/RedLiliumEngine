@@ -35,6 +35,21 @@ const KeyState& GuiManager::GetKeyState() const
 	return m_keyState;
 }
 
+Time GuiManager::GetTimeFromStart() const
+{
+	return m_timeFromStart;
+}
+
+ptr<INativeEnvironment> GuiManager::GetNativeEnvironment()
+{
+	return m_nativeEnvironment;
+}
+
+ptr<const INativeEnvironment> GuiManager::GetNativeEnvironment() const
+{
+	return m_nativeEnvironment;
+}
+
 void GuiManager::BeginFrame(const Time& timeFromStart, const MouseState& mouseState, const KeyState& keyState)
 {
 	m_recorder->PushNewFrame();

@@ -13,43 +13,50 @@ public:
 	~ClickableWidget() override {}
 
 	bool IsClicked(MouseKey mouseKey = MouseKey::Left) const;
-	bool IsClicked(Flags<MouseKey> mouseKey) const;
+	bool IsClicked(Flags<MouseKey> mouseKeys) const;
 
 	bool IsDoubleClicked(MouseKey mouseKey = MouseKey::Left) const;
-	bool IsDoubleClicked(Flags<MouseKey> mouseKey) const;
+	bool IsDoubleClicked(Flags<MouseKey> mouseKeys) const;
 
 	bool IsTripleClicked(MouseKey mouseKey = MouseKey::Left) const;
-	bool IsTripleClicked(Flags<MouseKey> mouseKey) const;
+	bool IsTripleClicked(Flags<MouseKey> mouseKeys) const;
 
 	bool IsPressed(MouseKey mouseKey = MouseKey::Left) const;
-	bool IsPressed(Flags<MouseKey> mouseKey) const;
+	bool IsPressed(Flags<MouseKey> mouseKeys) const;
 
-	bool CanDoubleClicked(bool value) const;
-	bool CanTripleClicked(bool value) const;
+	bool IsEntered() const;
+
+	bool CanDoubleClicked() const;
+	bool CanTripleClicked() const;
 
 protected:
+	bool HandleKeyEvent(const KeyEvent& keyEvent) override;
+	bool HandleMouseEvent(const MouseEvent& mouseEvent) override;
+
 	virtual void OnClick(MouseKey mouseKey) {}
 	virtual void OnDoubleClick(MouseKey mouseKey) {}
 	virtual void OnTripleClick(MouseKey mouseKey) {}
-
-	bool HandleKeyEvent(const KeyEvent& keyEvent) override;
-	bool HandleMouseEvent(const MouseEvent& mouseEvent) override;
-	void PostTick() override;
+	virtual void OnEnter(Key key) {}
 
 	void SetDoubleClicked(bool value);
 	void SetTripleClicked(bool value);
 
 private:
-	bool m_canDoubleClicked = false;
-	bool m_canTripleClicked = false;
+	struct LastClickInfo
+	{
+		MouseKey mouseKey = MouseKey::Left;
+		Time clickTime = 0;
+		u32 clicksCount = 0;
+	};
 
-	bool m_isClicked = false;
-	bool m_isDoubleClicked = false;
-	bool m_isTripleClicked = false;
+	bool IsClicked(Flags<MouseKey> mouseKeys, u32 clicksCount) const;
+	bool CanMultiplingLastClick(MouseKey releasedKey) const;
+	void UpdateLastClick(MouseKey releasedKey);
 
-	MouseKey m_lastMouseKey = MouseKey::Left;
-	Time m_lastClickTime = 0;
-	u32 m_clicksCount = 0;
+	u32 m_multipleClickingCount = 1;
+
+	std::optional<MouseKey> m_pressedMouseKey = std::nullopt;
+	std::optional<LastClickInfo> m_lastClick = std::nullopt;
 };
 
 } // namespace RED_LILIUM_NAMESPACE

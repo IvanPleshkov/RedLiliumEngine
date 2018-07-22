@@ -70,7 +70,7 @@ enum class MouseEventType
 
 enum class Key
 {
-	Ctrl,
+	Ctrl = 0,
 	Alt,
 	Shift,
 	Esc,
@@ -276,6 +276,41 @@ struct MouseEvent
 	MouseEvent(MouseEventType eventType)
 		: eventType(eventType)
 	{}
+
+	bool IsMouseKeyPressedEvent() const
+	{
+		return 
+			eventType == MouseEventType::LeftPressed ||
+			eventType == MouseEventType::RightPressed ||
+			eventType == MouseEventType::MiddlePressed;
+	}
+
+	bool IsMouseKeyReleasedEvent() const
+	{
+		return
+			eventType == MouseEventType::LeftReleased ||
+			eventType == MouseEventType::RightReleased ||
+			eventType == MouseEventType::MiddleReleased;
+	}
+
+	std::optional<MouseKey> GetEventedMouseKey() const
+	{
+		switch (eventType)
+		{
+		case rl::MouseEventType::LeftPressed:
+		case rl::MouseEventType::LeftReleased:
+			return MouseKey::Left;
+
+		case rl::MouseEventType::RightPressed:
+		case rl::MouseEventType::RightReleased:
+			return MouseKey::Right;
+
+		case rl::MouseEventType::MiddlePressed:
+		case rl::MouseEventType::MiddleReleased:
+			return MouseKey::Middle;
+		}
+		return std::nullopt;
+	}
 
 	MouseEventType eventType;
 	Flags<KeyModifier> modifiers;

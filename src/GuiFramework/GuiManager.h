@@ -23,6 +23,9 @@ public:
 
 	const MouseState& GetMouseState() const;
 	const KeyState& GetKeyState() const;
+	Time GetTimeFromStart() const;
+	ptr<INativeEnvironment> GetNativeEnvironment();
+	ptr<const INativeEnvironment> GetNativeEnvironment() const;
 
 	ptr<Widget> GetWidgetUnderPoint(vec2 point);
 

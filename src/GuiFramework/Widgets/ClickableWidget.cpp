@@ -1,5 +1,8 @@
 #include "pch.h"
 #include "ClickableWidget.h"
+#include "../Panel.h"
+#include "../GuiManager.h"
+#include "../INativeEnviroment.h"
 
 using namespace RED_LILIUM_NAMESPACE;
 
@@ -11,22 +14,34 @@ ClickableWidget::ClickableWidget()
 
 bool ClickableWidget::IsPressed(MouseKey mouseKey) const
 {
-	return IsHovered() && IsFocused() && GetMouseState().pressedKeys.Test(mouseKey);
+	return m_pressedMouseKey && mouseKey == m_pressedMouseKey;
 }
 
 bool ClickableWidget::IsPressed(Flags<MouseKey> mouseKey) const
 {
-	return false;
+	return m_pressedMouseKey && mouseKey.Test(m_pressedMouseKey.value());
 }
 
-bool ClickableWidget::IsClicked(MouseKey mouseKey) const
+bool ClickableWidget::IsClicked(Flags<MouseKey> mouseKeys, u32 clicksCount) const
 {
-	return m_isClicked;
-}
+	if (!m_lastClick)
+	{
+		return false;
+	}
 
-bool ClickableWidget::IsClicked(Flags<MouseKey> mouseKey) const
-{
-	return m_isClicked;
+	LastClickInfo click = m_lastClick.value();
+	if (!mouseKeys.Test(click.mouseKey))
+	{
+		return false;
+	}
+
+	if (click.clicksCount != clicksCount)
+	{
+		return false;
+	}
+
+	Time now = GetGuiManager()->GetTimeFromStart();
+	return click.clickTime == now;
 }
 
 bool ClickableWidget::HandleKeyEvent(const KeyEvent& keyEvent)
@@ -37,59 +52,173 @@ bool ClickableWidget::HandleKeyEvent(const KeyEvent& keyEvent)
 
 bool ClickableWidget::HandleMouseEvent(const MouseEvent& mouseEvent)
 {
-	//if (mouseEvent.eventType == MouseEventType::LeftReleased && IsHovered(true) && IsFocused())
-	//{
-	//	m_isClicked = true;
-	//	OnClick();
-	//	return true;
-	//}
+	if (mouseEvent.IsMouseKeyPressedEvent())
+	{
+		if (IsHovered() && IsFocused())
+		{
+			m_pressedMouseKey = mouseEvent.GetEventedMouseKey();
+		}
+		else
+		{
+			m_pressedMouseKey = std::nullopt;
+		}
+
+		return m_pressedMouseKey.has_value();
+	}
+
+	if (mouseEvent.IsMouseKeyReleasedEvent())
+	{
+		if (!IsHovered() || !IsFocused())
+		{
+			m_pressedMouseKey = std::nullopt;
+			return false;
+		}
+
+		if (mouseEvent.GetEventedMouseKey())
+		{
+			UpdateLastClick(mouseEvent.GetEventedMouseKey().value());
+		}
+		else
+		{
+			m_lastClick = std::nullopt;
+		}
+
+		m_pressedMouseKey = std::nullopt;
+
+		if (IsClicked())
+		{
+			OnClick(m_lastClick.value().mouseKey);
+		}
+
+		if (IsDoubleClicked())
+		{
+			OnDoubleClick(m_lastClick.value().mouseKey);
+		}
+
+		if (IsTripleClicked())
+		{
+			OnTripleClick(m_lastClick.value().mouseKey);
+		}
+
+		return true;
+	}
 
 	return false;
 }
 
-void ClickableWidget::PostTick()
+bool ClickableWidget::CanMultiplingLastClick(MouseKey releasedKey) const
 {
-	m_isClicked = false;
-	m_isDoubleClicked = false;
-	m_isTripleClicked = false;
+	if (!m_lastClick)
+	{
+		return false;
+	}
+
+	LastClickInfo lastClick = m_lastClick.value();
+	if (lastClick.mouseKey != releasedKey)
+	{
+		return false;
+	}
+
+	Time time = GetGuiManager()->GetTimeFromStart();
+	Time timeFromLastClick = time - lastClick.clickTime;
+
+	ptr<const INativeEnvironment> nativeEnvironment = GetGuiManager()->GetNativeEnvironment();
+	Time doubleClickingTime = nativeEnvironment->GetDoubleClickingTime();
+
+	if (timeFromLastClick > doubleClickingTime)
+	{
+		return false;
+	}
+
+	if (lastClick.clicksCount > m_multipleClickingCount)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+void ClickableWidget::UpdateLastClick(MouseKey releasedKey)
+{
+	if (releasedKey != m_pressedMouseKey)
+	{
+		m_lastClick = std::nullopt;
+		return;
+	}
+
+	LastClickInfo click;
+	click.mouseKey = releasedKey;
+	click.clickTime = GetGuiManager()->GetTimeFromStart();
+	click.clicksCount = 1;
+
+	if (CanMultiplingLastClick(releasedKey))
+	{
+		click.clicksCount = m_lastClick.value().clicksCount + 1;
+	}
+
+	m_lastClick = click;
+}
+
+bool ClickableWidget::IsClicked(MouseKey mouseKey) const
+{
+	return IsClicked(Flags<MouseKey>(mouseKey), 1);
+}
+
+bool ClickableWidget::IsClicked(Flags<MouseKey> mouseKeys) const
+{
+	return IsClicked(mouseKeys, 1);
 }
 
 bool ClickableWidget::IsDoubleClicked(MouseKey mouseKey) const
 {
-	return m_isDoubleClicked;
+	return IsClicked(Flags<MouseKey>(mouseKey), 2);
 }
 
-bool ClickableWidget::IsDoubleClicked(Flags<MouseKey> mouseKey) const
+bool ClickableWidget::IsDoubleClicked(Flags<MouseKey> mouseKeys) const
 {
-	return m_isDoubleClicked;
+	return IsClicked(mouseKeys, 2);
 }
 
 bool ClickableWidget::IsTripleClicked(MouseKey mouseKey) const
 {
-	return m_isTripleClicked;
+	return IsClicked(Flags<MouseKey>(mouseKey), 3);
 }
 
-bool ClickableWidget::IsTripleClicked(Flags<MouseKey> mouseKey) const
+bool ClickableWidget::IsTripleClicked(Flags<MouseKey> mouseKeys) const
 {
-	return m_isTripleClicked;
+	return IsClicked(mouseKeys, 3);
 }
 
-bool ClickableWidget::CanDoubleClicked(bool value) const
+bool ClickableWidget::CanDoubleClicked() const
 {
-	return m_canDoubleClicked;
+	return m_multipleClickingCount >= 2;
 }
 
-bool ClickableWidget::CanTripleClicked(bool value) const
+bool ClickableWidget::CanTripleClicked() const
 {
-	return m_canTripleClicked;
+	return m_multipleClickingCount >= 3;
 }
 
 void ClickableWidget::SetDoubleClicked(bool value)
 {
-	m_canDoubleClicked = value;
+	if (value)
+	{
+		m_multipleClickingCount = std::max(m_multipleClickingCount, u32(2));
+	}
+	else
+	{
+		m_multipleClickingCount = 1;
+	}
 }
 
 void ClickableWidget::SetTripleClicked(bool value)
 {
-	m_canTripleClicked = value;
+	if (value)
+	{
+		m_multipleClickingCount = 3;
+	}
+	else
+	{
+		m_multipleClickingCount = std::min(m_multipleClickingCount, u32(2));
+	}
 }
