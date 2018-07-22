@@ -79,6 +79,12 @@ using dmat4 = glm::dmat4;
 using dmat3 = glm::dmat3;
 using dmat2 = glm::dmat2;
 
+struct Rect
+{
+	vec2 position;
+	vec2 size;
+};
+
 using Color32 = u32;
 
 #if RED_LILIUM_USE_ASSERTS

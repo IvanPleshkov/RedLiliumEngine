@@ -108,7 +108,7 @@ bool ClickableWidget::HandleMouseEvent(const MouseEvent& mouseEvent)
 
 bool ClickableWidget::CanMultiplingLastClick(MouseKey releasedKey) const
 {
-	if (!m_lastClick)
+	if (!m_lastClick || m_multipleClickingCount == 1)
 	{
 		return false;
 	}
@@ -130,7 +130,7 @@ bool ClickableWidget::CanMultiplingLastClick(MouseKey releasedKey) const
 		return false;
 	}
 
-	if (lastClick.clicksCount > m_multipleClickingCount)
+	if (lastClick.clicksCount >= m_multipleClickingCount)
 	{
 		return false;
 	}

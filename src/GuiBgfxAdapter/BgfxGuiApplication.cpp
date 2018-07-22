@@ -57,6 +57,7 @@ BgfxGuiApplication::BgfxGuiApplication(
 	, m_name(name)
 	, m_description(description)
 	, m_screenshotOutputFilename()
+	, m_isStopped(false)
 {
 	InitDataPath();
 
@@ -83,6 +84,11 @@ void BgfxGuiApplication::Run(GuiRecordingMode recordingMode)
 		argv.push_back(nullptr);
 	}
 	entry::runApp(m_impl.get(), m_args.size(), &argv[0]);
+}
+
+void BgfxGuiApplication::Stop()
+{
+	m_isStopped = true;
 }
 
 void BgfxGuiApplication::TakeScreenshot(const std::string& outputFile)
@@ -166,7 +172,7 @@ void BgfxGuiApplication::Impl::init(int32_t _argc, const char* const* _argv, uin
 	// Set view 0 clear state.
 	bgfx::setViewClear(0
 		, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
-		, 0x303030ff
+		, 0x202020ff
 		, 1.0f
 		, 0
 	);
@@ -243,7 +249,7 @@ bool BgfxGuiApplication::Impl::update()
 			m_application->m_screenshotOutputFilename.clear();
 		}
 
-		return true;
+		return !m_application->m_isStopped;
 	}
 
 	return false;

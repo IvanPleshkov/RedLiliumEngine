@@ -10,6 +10,7 @@
 #include "Widgets/Label.h"
 #include "Widgets/Layout.h"
 #include "Widgets/StackLayout.h"
+#include "Widgets/CanvasLayout.h"
 #include "Widgets/TextField.h"
 #include "Widgets/ColoredRectangle.h"
 #include "Widgets/ClickableWidget.h"

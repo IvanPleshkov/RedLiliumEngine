@@ -21,6 +21,7 @@ protected:
 	void Draw() override;
 
 private:
+	std::string m_text;
 	ptr<TextField> m_textField = nullptr;
 };
 

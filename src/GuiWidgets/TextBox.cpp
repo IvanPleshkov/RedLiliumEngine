@@ -9,6 +9,7 @@ TextBox::TextBox()
 
 ptr<TextBox> TextBox::SetText(const std::string& text)
 {
+	m_text = text;
 	return this;
 }
 
@@ -19,6 +20,10 @@ void TextBox::CreateFirstChilds()
 
 void TextBox::Tick()
 {
+	ptr<Style> style = GetStyle();
+	m_textField->SetFontSettings(style->m_h2);
+
+	m_textField->SetText(m_text);
 }
 
 void TextBox::UpdateDesiredSize()
@@ -32,9 +37,22 @@ void TextBox::Draw()
 	const vec2 size = GetSize();
 	NVGcontextPtr nvg = GetNvgContext();
 
+	const float borderWidth = 2.0f;
+	const float borderRadius = 4.0f;
+
 	nvgBeginPath(nvg);
-	nvgRoundedRect(nvg, position.x, position.y, size.x, size.y, 4);
-	nvgFillColor(nvg, DefaultWidgetsSettings::GetEditableTextBackgroundColor());
+	nvgRoundedRect(nvg, 
+		position.x + borderWidth, position.y + borderWidth, 
+		size.x - 2 * borderWidth, size.y - 2 * borderWidth, 
+		borderRadius);
+	if (m_textField->IsHovered() || m_textField->IsFocused())
+	{
+		nvgFillColor(nvg, DefaultWidgetsSettings::GetEditableTextBackgroundHoveredColor());
+	}
+	else
+	{
+		nvgFillColor(nvg, DefaultWidgetsSettings::GetEditableTextBackgroundColor());
+	}
 	nvgFill(nvg);
 
 	if (m_textField->IsFocused())
@@ -45,6 +63,6 @@ void TextBox::Draw()
 	{
 		nvgStrokeColor(nvg, DefaultWidgetsSettings::GetEditableTextBorderColor());
 	}
-	nvgStrokeWidth(nvg, 2.0f);
+	nvgStrokeWidth(nvg, borderWidth);
 	nvgStroke(nvg);
 }

@@ -10,29 +10,33 @@ namespace DefaultWidgetsSettings
 
 inline NVGcolor GetFontColor()
 {
-	return nvgRGBAf(1.0f, 1.0f, 1.0f, 1.0f);
+	return nvgRGBA(0xff, 0xff, 0xff, 0xff);
 }
 
 inline NVGcolor GetNonActiveFontColor()
 {
-	return nvgRGBAf(0.8f, 0.8f, 0.8f, 1.0f);
+	return nvgRGBA(0xa0, 0xa0, 0xa0, 0xff);
 }
 
 inline NVGcolor GetEditableTextBackgroundColor()
 {
-	return nvgRGBAf(0.3f, 0.3f, 0.3f, 1.0f);
+	return nvgRGBA(0x20, 0x20, 0x20, 0xff);
+}
+
+inline NVGcolor GetEditableTextBackgroundHoveredColor()
+{
+	return nvgRGBA(0x30, 0x30, 0x30, 0xff);
 }
 
 inline NVGcolor GetEditableTextBorderColor()
 {
-	return nvgRGBAf(0.4f, 0.1f, 0.1f, 1.0f);
+	return nvgRGBA(0x40, 0x40, 0x40, 0xff);
 }
 
 inline NVGcolor GetEditableTextBorderFocusedColor()
 {
-	return nvgRGBAf(0.6f, 0.2f, 0.2f, 1.0f);
+	return nvgRGBA(0x20, 0x50, 0x90, 0xff);
 }
-
 
 }
 } // namespace RED_LILIUM_NAMESPACE

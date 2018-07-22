@@ -18,6 +18,7 @@ public:
 	~BgfxGuiApplication() override;
 
 	void Run(GuiRecordingMode recordingMode = GuiRecordingMode::NoRecording);
+	void Stop();
 	void TakeScreenshot(const std::string& outputFile);
 
 	virtual void OnBeginApplication() {}
@@ -50,6 +51,7 @@ private:
 	std::string m_description;
 
 	std::string m_screenshotOutputFilename;
+	bool m_isStopped;
 };
 
 }  // namespace RED_LILIUM_NAMESPACE

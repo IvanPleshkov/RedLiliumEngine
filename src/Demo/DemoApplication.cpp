@@ -20,10 +20,13 @@ public:
 
 	void OnBeginApplication() override;
 	void OnEndApplication() override;
-	void Update() override;
+	void Update() override { Demo1(); }
 
 private:
 	void LoadFonts(NVGcontextPtr nvg);
+
+	void Demo1();
+	void Demo2();
 
 	ptr<Panel> m_mainPanel;
 	int m_sansFontFamily;
@@ -49,7 +52,7 @@ void DemoGuiApplication::OnEndApplication()
 {
 }
 
-void DemoGuiApplication::Update()
+void DemoGuiApplication::Demo1()
 {
 	m_mainPanel->SetWindow(GetNativeWindow());
 	m_mainPanel->SetPosition({ 0, 0 });
@@ -75,7 +78,8 @@ void DemoGuiApplication::Update()
 		->SetText("Cancel");
 
 	ptr<TextBox> textBox = stackLayout
-		->Add<TextBox>();
+		->Add<TextBox>()
+		->SetText(u8"ptr<Widget> topWidget = m_mainPanel->GetTopWidget();опаопаровкынпруцп");
 
 	ptr<ColoredRectangle> r3 = stackLayout
 		->Add<ColoredRectangle>()
@@ -101,6 +105,11 @@ void DemoGuiApplication::Update()
 	}
 }
 
+void DemoGuiApplication::Demo2()
+{
+
+}
+
 void DemoGuiApplication::LoadFonts(NVGcontextPtr nvg)
 {
 	std::string robotoRegularFile = GetDataPath() + "/fonts/roboto-regular.ttf";
@@ -111,19 +120,19 @@ void DemoGuiApplication::LoadFonts(NVGcontextPtr nvg)
 
 	ptr<Style> style = GetGuiManager()->GetStyle();
 	style->m_regular.color = { 1, 1, 1, 1 };
-	style->m_regular.fontSize = 12;
+	style->m_regular.fontSize = 25;
 	style->m_regular.fontFamily = m_sansFontFamily;
 
 	style->m_h1.color = { 1, 1, 1, 1 };
-	style->m_h1.fontSize = 12;
+	style->m_h1.fontSize = 16;
 	style->m_h1.fontFamily = m_sansFontFamily;
 
 	style->m_h2.color = { 1, 1, 1, 1 };
-	style->m_h2.fontSize = 12;
+	style->m_h2.fontSize = 16;
 	style->m_h2.fontFamily = m_sansFontFamily;
 
 	style->m_caption.color = { 1, 1, 1, 1 };
-	style->m_caption.fontSize = 12;
+	style->m_caption.fontSize = 16;
 	style->m_caption.fontFamily = m_sansFontFamily;
 }
 
