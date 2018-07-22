@@ -7,15 +7,15 @@ namespace RED_LILIUM_NAMESPACE
 class BgfxWindow;
 class BgfxEnvironment;
 
-class GuiApplication : public RedLiliumObject
+class BgfxGuiApplication : public RedLiliumObject
 {
 public:
-	GuiApplication(
+	BgfxGuiApplication(
 		const std::string& name,
 		const std::string& description,
 		const std::vector<std::string>& args,
 		vec2 windowSize);
-	~GuiApplication() override;
+	~BgfxGuiApplication() override;
 
 	void Run(GuiRecordingMode recordingMode = GuiRecordingMode::NoRecording);
 	void TakeScreenshot(const std::string& outputFile);

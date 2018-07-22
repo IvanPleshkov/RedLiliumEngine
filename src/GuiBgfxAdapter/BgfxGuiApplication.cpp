@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "GuiApplication.h"
+#include "BgfxGuiApplication.h"
 
 // bgfx
 #include <bx/uint32_t.h>
@@ -15,10 +15,10 @@
 
 using namespace RED_LILIUM_NAMESPACE;
 
-class GuiApplication::Impl : public entry::AppI
+class BgfxGuiApplication::Impl : public entry::AppI
 {
 public:
-	Impl(ptr<GuiApplication> application, const char* _name, const char* _description)
+	Impl(ptr<BgfxGuiApplication> application, const char* _name, const char* _description)
 		: entry::AppI(_name, _description)
 		, m_application(application)
 	{ }
@@ -33,7 +33,7 @@ public:
 	KeyState GetKeyState();
 
 protected:
-	ptr<GuiApplication> m_application;
+	ptr<BgfxGuiApplication> m_application;
 
 	NVGcontextPtr m_nvg;
 	int64_t m_timeOffset;
@@ -48,7 +48,7 @@ protected:
 
 //============================= GuiApplication
 
-GuiApplication::GuiApplication(
+BgfxGuiApplication::BgfxGuiApplication(
 	const std::string& name,
 	const std::string& description,
 	const std::vector<std::string>& args,
@@ -65,10 +65,10 @@ GuiApplication::GuiApplication(
 	m_nativeEnvironment = std::make_unique<BgfxEnvironment>();
 }
 
-GuiApplication::~GuiApplication()
+BgfxGuiApplication::~BgfxGuiApplication()
 {}
 
-void GuiApplication::Run(GuiRecordingMode recordingMode)
+void BgfxGuiApplication::Run(GuiRecordingMode recordingMode)
 {
 	m_guiManager = std::make_unique<GuiManager>(m_nativeEnvironment.get(), recordingMode);
 
@@ -85,48 +85,48 @@ void GuiApplication::Run(GuiRecordingMode recordingMode)
 	entry::runApp(m_impl.get(), m_args.size(), &argv[0]);
 }
 
-void GuiApplication::TakeScreenshot(const std::string& outputFile)
+void BgfxGuiApplication::TakeScreenshot(const std::string& outputFile)
 {
 	m_screenshotOutputFilename = outputFile;
 	m_guiManager->LogMessage("[Screenshot]" + outputFile);
 }
 
-const std::string& GuiApplication::GetDataPath() const
+const std::string& BgfxGuiApplication::GetDataPath() const
 {
 	return m_dataPath;
 }
 
-ptr<GuiManager> GuiApplication::GetGuiManager()
+ptr<GuiManager> BgfxGuiApplication::GetGuiManager()
 {
 	return m_guiManager.get();
 }
 
-ptr<const GuiManager> GuiApplication::GetGuiManager() const
+ptr<const GuiManager> BgfxGuiApplication::GetGuiManager() const
 {
 	return m_guiManager.get();
 }
 
-ptr<BgfxWindow> GuiApplication::GetNativeWindow()
+ptr<BgfxWindow> BgfxGuiApplication::GetNativeWindow()
 {
 	return m_nativeWindow.get();
 }
 
-ptr<const BgfxWindow> GuiApplication::GetNativeWindow() const
+ptr<const BgfxWindow> BgfxGuiApplication::GetNativeWindow() const
 {
 	return m_nativeWindow.get();
 }
 
-ptr<BgfxEnvironment> GuiApplication::GetNativeEnvironment()
+ptr<BgfxEnvironment> BgfxGuiApplication::GetNativeEnvironment()
 {
 	return m_nativeEnvironment.get();
 }
 
-ptr<const BgfxEnvironment> GuiApplication::GetNativeEnvironment() const
+ptr<const BgfxEnvironment> BgfxGuiApplication::GetNativeEnvironment() const
 {
 	return m_nativeEnvironment.get();
 }
 
-void GuiApplication::InitDataPath()
+void BgfxGuiApplication::InitDataPath()
 {
 	std::string line;
 	std::ifstream pathsFile("paths.json");
@@ -143,7 +143,7 @@ void GuiApplication::InitDataPath()
 
 //============================= GuiApplication::Impl
 
-void GuiApplication::Impl::init(int32_t _argc, const char* const* _argv, uint32_t _width, uint32_t _height)
+void BgfxGuiApplication::Impl::init(int32_t _argc, const char* const* _argv, uint32_t _width, uint32_t _height)
 {
 	Args args(_argc, _argv);
 
@@ -186,7 +186,7 @@ void GuiApplication::Impl::init(int32_t _argc, const char* const* _argv, uint32_
 	m_application->OnBeginApplication();
 }
 
-int GuiApplication::Impl::shutdown()
+int BgfxGuiApplication::Impl::shutdown()
 {
 	m_application->OnEndApplication();
 
@@ -200,7 +200,7 @@ int GuiApplication::Impl::shutdown()
 	return 0;
 }
 
-bool GuiApplication::Impl::update()
+bool BgfxGuiApplication::Impl::update()
 {
 	if (!entry::processEvents(m_width, m_height, m_debug, m_reset, &m_bgfxMouseState))
 	{
@@ -249,7 +249,7 @@ bool GuiApplication::Impl::update()
 	return false;
 }
 
-MouseState GuiApplication::Impl::GetMouseState()
+MouseState BgfxGuiApplication::Impl::GetMouseState()
 {
 	MouseState mouseState;
 	mouseState.mousePosition = { m_bgfxMouseState.m_mx, m_bgfxMouseState.m_my };
@@ -269,7 +269,7 @@ MouseState GuiApplication::Impl::GetMouseState()
 	return mouseState;
 }
 
-KeyState GuiApplication::Impl::GetKeyState()
+KeyState BgfxGuiApplication::Impl::GetKeyState()
 {
 	// TODO: update ctrl, alt and shift states
 

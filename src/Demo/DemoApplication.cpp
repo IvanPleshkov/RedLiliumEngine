@@ -1,6 +1,6 @@
 #include "pch.h"
 
-#include <GuiBgfxAdapter/GuiApplication.h>
+#include <GuiBgfxAdapter/BgfxGuiApplication.h>
 #include <GuiBgfxAdapter/BgfxWindow.h>
 #include <GuiBgfxAdapter/BgfxEnvironment.h>
 #include <GuiFramework/GuiFramework.h>
@@ -11,7 +11,7 @@ using namespace RED_LILIUM_NAMESPACE;
 namespace
 {
 
-class DemoGuiApplication : public GuiApplication
+class DemoGuiApplication : public BgfxGuiApplication
 {
 public:
 	DemoGuiApplication();
@@ -32,7 +32,7 @@ private:
 } // namespace
 
 DemoGuiApplication::DemoGuiApplication()
-	: GuiApplication("Demo", "", {}, {500, 500})
+	: BgfxGuiApplication("Demo", "", {}, {500, 500})
 	, m_mainPanel(nullptr)
 {}
 
