@@ -2,6 +2,7 @@
 
 #include "core/common.h"
 #include "GuiFramework/Widget.h"
+#include "../Internal/TextWidgetsHelper.h"
 
 namespace RED_LILIUM_NAMESPACE
 {
@@ -9,6 +10,9 @@ namespace RED_LILIUM_NAMESPACE
 class Label : public Widget
 {
 public:
+	Label();
+	~Label() override {}
+
 	ptr<Label> SetText(const std::string& text);
 	ptr<Label> SetColor(vec4 color);
 	ptr<Label> SetFontSize(float size);
@@ -16,28 +20,17 @@ public:
 	ptr<Label> SetHorizontalAlignment(HorizontalAlignment alignment);
 	ptr<Label> SetVerticalAlignment(VerticalAlignment alignment);
 	ptr<Label> SetFontSettings(const FontSettings& fontSettings);
-	ptr<Label> SetTopPadding(float topMargin);
-	ptr<Label> SetBottomPadding(float bottomMargin);
-	ptr<Label> SetLeftPadding(float leftMargin);
-	ptr<Label> SetRightPadding(float rightMargin);
+	ptr<Label> SetTopPadding(float topPadding);
+	ptr<Label> SetBottomPadding(float bottomPadding);
+	ptr<Label> SetLeftPadding(float leftPadding);
+	ptr<Label> SetRightPadding(float rightPadding);
 
 protected:
 	void Draw() override;
 	void UpdateDesiredSize() override;
 
 private:
-	void SetTextNvgParameters();
-
-	float m_topPadding = 0;
-	float m_bottomPadding = 0;
-	float m_leftPadding = 0;
-	float m_rightPadding = 0;
-	std::string m_text = "";
-	vec4 m_color = { 1, 1, 1, 1 };
-	float m_fontSize = 14;
-	FontFamily m_fontFamily = -1;
-	HorizontalAlignment m_horizontalAlignment = HorizontalAlignment::Center;
-	VerticalAlignment m_verticalAlignment = VerticalAlignment::Center;
+	uptr<TextWidgetsHelper> m_textWidgetsHelper;
 };
 
 }  // namespace RED_LILIUM_NAMESPACE

@@ -38,5 +38,15 @@ inline NVGcolor GetEditableTextBorderFocusedColor()
 	return nvgRGBA(0x20, 0x50, 0x90, 0xff);
 }
 
+inline float GetBorderWidth()
+{
+	return 2.0f;
+}
+
+inline float GetBorderRadius()
+{
+	return 4.0f;
+}
+
 }
 } // namespace RED_LILIUM_NAMESPACE

@@ -78,7 +78,7 @@ public:
 	{
 		RED_LILIUM_ASSERT(r.IsValid());
 
-		if (&r != this)
+		if (r.m_existingHandler != m_existingHandler || r.m_ptr != m_ptr)
 		{
 			m_existingHandler = r.m_existingHandler;
 			m_ptr = r.m_ptr;
@@ -92,7 +92,7 @@ public:
 		static_assert(std::is_convertible<U*, T*>::value, "Cannot convert pointer from U to T");
 		RED_LILIUM_ASSERT(r.IsValid());
 
-		if (&r != this)
+		if (r.m_existingHandler != m_existingHandler || r.m_ptr != m_ptr)
 		{
 			m_existingHandler = r.m_existingHandler;
 			m_ptr = static_cast<T*>(r.m_ptr);
@@ -104,7 +104,7 @@ public:
 	{
 		RED_LILIUM_ASSERT(r.IsValid());
 
-		if (&r != this)
+		if (r.m_existingHandler != m_existingHandler || r.m_ptr != m_ptr)
 		{
 			m_existingHandler = r.m_existingHandler;
 			m_ptr = r.m_ptr;
@@ -118,7 +118,7 @@ public:
 		static_assert(std::is_convertible<U*, T*>::value, "Cannot convert pointer from U to T");
 		RED_LILIUM_ASSERT(r.IsValid());
 
-		if (&r != this)
+		if (r.m_existingHandler != m_existingHandler || r.m_ptr != m_ptr)
 		{
 			m_existingHandler = r.m_existingHandler;
 			m_ptr = static_cast<T*>(r.m_ptr);

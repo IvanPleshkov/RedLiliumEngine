@@ -271,6 +271,7 @@ MouseState BgfxGuiApplication::Impl::GetMouseState()
 	{
 		mouseState.pressedKeys.Add(MouseKey::Middle);
 	}
+	mouseState.hoveredWindow = m_application->GetNativeWindow();
 
 	return mouseState;
 }

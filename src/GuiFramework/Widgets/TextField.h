@@ -3,6 +3,7 @@
 #include "Core/Common.h"
 #include "../Widget.h"
 #include "ClickableWidget.h"
+#include "../Internal/TextWidgetsHelper.h"
 
 namespace RED_LILIUM_NAMESPACE
 {
@@ -10,7 +11,7 @@ namespace RED_LILIUM_NAMESPACE
 class TextField : public ClickableWidget
 {
 public:
-	TextField() {}
+	TextField();
 	~TextField() override {}
 
 	ptr<TextField> SetText(const std::string& text);
@@ -20,10 +21,10 @@ public:
 	ptr<TextField> SetHorizontalAlignment(HorizontalAlignment alignment);
 	ptr<TextField> SetVerticalAlignment(VerticalAlignment alignment);
 	ptr<TextField> SetFontSettings(const FontSettings& fontSettings);
-	ptr<TextField> SetTopPadding(float topMargin);
-	ptr<TextField> SetBottomPadding(float bottomMargin);
-	ptr<TextField> SetLeftPadding(float leftMargin);
-	ptr<TextField> SetRightPadding(float rightMargin);
+	ptr<TextField> SetTopPadding(float topPadding);
+	ptr<TextField> SetBottomPadding(float bottomPadding);
+	ptr<TextField> SetLeftPadding(float leftPadding);
+	ptr<TextField> SetRightPadding(float rightPadding);
 
 protected:
 	virtual void DrawCursor();
@@ -32,23 +33,7 @@ protected:
 	void UpdateDesiredSize() override;
 
 private:
-	void SetTextNvgParameters();
-
-	float m_topPadding = 0;
-	float m_bottomPadding = 0;
-	float m_leftPadding = 0;
-	float m_rightPadding = 0;
-
-	std::string m_text = "";
-	std::string m_displayedText = "";
-	std::optional<u32> m_cursorPosition;
-
-	vec4 m_color = { 1, 1, 1, 1 };
-	float m_fontSize = 14;
-	FontFamily m_fontFamily = -1;
-
-	HorizontalAlignment m_horizontalAlignment = HorizontalAlignment::Left;
-	VerticalAlignment m_verticalAlignment = VerticalAlignment::Center;
+	uptr<TextWidgetsHelper> m_textWidgetsHelper;
 };
 
 } // namespace RED_LILIUM_NAMESPACE

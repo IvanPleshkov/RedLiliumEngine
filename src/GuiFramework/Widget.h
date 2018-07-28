@@ -70,6 +70,10 @@ protected:
 	virtual void OnHoverLost();
 
 protected:
+	std::optional<vec2> GetLocalMousePosition() const;
+	mat3 GetTransformToLocal() const;
+	mat3 GetTransformToGlobal() const;
+
 	void SetFocusing(bool value);
 	void SetHovering(bool value);
 
@@ -104,8 +108,8 @@ protected:
 	bool m_visible = true;
 	bool m_enable = true;
 
-	bool m_canFocusing;
-	bool m_canHovering;
+	bool m_canFocusing = false;
+	bool m_canHovering = false;
 };
 
 }  // namespace RED_LILIUM_NAMESPACE

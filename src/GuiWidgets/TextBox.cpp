@@ -21,14 +21,16 @@ void TextBox::CreateFirstChilds()
 void TextBox::Tick()
 {
 	ptr<Style> style = GetStyle();
-	m_textField->SetFontSettings(style->m_h2);
-
-	m_textField->SetText(m_text);
+	m_textField
+		->SetFontSettings(style->m_h2)
+		->SetText(m_text)
+		->SetLeftPadding(DefaultWidgetsSettings::GetBorderWidth() + DefaultWidgetsSettings::GetBorderRadius())
+		->SetRightPadding(DefaultWidgetsSettings::GetBorderWidth() + DefaultWidgetsSettings::GetBorderRadius());
 }
 
 void TextBox::UpdateDesiredSize()
 {
-	m_desiredSize = { 150, 24 };
+	m_desiredSize = { 150, 28 };
 }
 
 void TextBox::Draw()
@@ -36,8 +38,8 @@ void TextBox::Draw()
 	const vec2 size = GetSize();
 	NVGcontextPtr nvg = GetNvgContext();
 
-	const float borderWidth = 2.0f;
-	const float borderRadius = 4.0f;
+	const float borderWidth = DefaultWidgetsSettings::GetBorderWidth();
+	const float borderRadius = DefaultWidgetsSettings::GetBorderRadius();
 
 	nvgBeginPath(nvg);
 	nvgRoundedRect(nvg, 

@@ -247,7 +247,7 @@ void Widget::EndChildAdding()
 {
 	CreateLastChilds();
 
-	// remove obsolete childs
+	// remove obsolete children
 	m_children.erase(m_children.begin() + m_childAddingCursor, m_children.end());
 	m_childAddingCursor = 0;
 
@@ -255,4 +255,34 @@ void Widget::EndChildAdding()
 	{
 		child->EndChildAdding();
 	}
+}
+
+std::optional<vec2> Widget::GetLocalMousePosition() const
+{
+	MouseState mouseState = GetGuiManager()->GetMouseState();
+	if (mouseState.hoveredWindow != GetPanel()->GetWindow())
+	{
+		return std::nullopt;
+	}
+
+	vec3 globalMousePos = vec3(mouseState.mousePosition, 1.0f);
+	return GetTransformToLocal() * globalMousePos;
+}
+
+mat3 Widget::GetTransformToLocal() const
+{
+	mat3 toGloabl = GetTransformToGlobal();
+	return glm::inverse(toGloabl);
+}
+
+mat3 Widget::GetTransformToGlobal() const
+{
+	mat3 toGloabl = m_transform;
+	ptr<Widget> parent = m_parent;
+	while (parent != nullptr)
+	{
+		toGloabl = toGloabl * parent->m_transform;
+		parent = parent->m_parent;
+	}
+	return toGloabl;
 }
