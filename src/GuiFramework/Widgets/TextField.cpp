@@ -5,11 +5,13 @@ using namespace RED_LILIUM_NAMESPACE;
 
 TextField::TextField()
 	: m_textWidgetsHelper(std::move(std::make_unique<TextWidgetsHelper>()))
+	, m_disaplyedText()
+	, m_glyphsPositionData()
 {}
 
 ptr<TextField> TextField::SetText(const std::string& text)
 {
-	m_textWidgetsHelper->SetDisplayedText(text);
+	m_disaplyedText = text;
 	return this;
 }
 
@@ -75,25 +77,44 @@ ptr<TextField> TextField::SetFontSettings(const FontSettings& fontSettings)
 
 void TextField::Draw()
 {
-	m_textWidgetsHelper->Draw(GetNvgContext(), { 0, 0 }, m_size);
+	m_textWidgetsHelper->Draw(GetNvgContext(), m_disaplyedText, { 0, 0 }, m_size);
 
-	auto posOpt = GetLocalMousePosition();
-	if (posOpt)
-	{
-		vec2 mousePos = posOpt.value();
-
-		nvgBeginPath(GetNvgContext());
-		nvgCircle(GetNvgContext(), mousePos.x, mousePos.y, 5);
-		nvgFillColor(GetNvgContext(), nvgRGBA(0xff, 0x00, 0x00, 0xff));
-		nvgFill(GetNvgContext());
-	}
+	DrawCursor();
 }
 
 void TextField::DrawCursor()
 {
+	auto mousePositionOpt = GetLocalMousePosition();
+	if (!mousePositionOpt)
+	{
+		return;
+	}
+
+	m_textWidgetsHelper->GetDisplayedTextGlyphsPosition(GetNvgContext(), m_disaplyedText, { 0, 0 }, m_glyphsPositionData);
+
+	auto glyphIterator = std::lower_bound(
+		m_glyphsPositionData.begin(),
+		m_glyphsPositionData.end(),
+		mousePositionOpt.value().x,
+		[](const NVGglyphPosition& glyph, float x)
+		{
+			return glyph.x < x;
+		});
+
+	if (glyphIterator != m_glyphsPositionData.end())
+	{
+		float cursorX = glyphIterator->x;
+
+		nvgBeginPath(GetNvgContext());
+		nvgRect(GetNvgContext(), cursorX - 1, 0, 2, GetSize().y);
+		nvgFillColor(GetNvgContext(), nvgRGBA(0xff, 0x00, 0x00, 0xff));
+		nvgFill(GetNvgContext());
+	}
+
+	m_glyphsPositionData.clear();
 }
 
 void TextField::UpdateDesiredSize()
 {
-	m_desiredSize = m_textWidgetsHelper->GetDisplayedTextSize(GetNvgContext());
+	m_desiredSize = m_textWidgetsHelper->GetDisplayedTextSize(GetNvgContext(), m_disaplyedText);
 }

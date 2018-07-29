@@ -34,6 +34,8 @@ protected:
 
 private:
 	uptr<TextWidgetsHelper> m_textWidgetsHelper;
+	std::string m_disaplyedText;
+	std::vector<NVGglyphPosition> m_glyphsPositionData;
 };
 
 } // namespace RED_LILIUM_NAMESPACE

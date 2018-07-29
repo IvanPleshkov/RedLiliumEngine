@@ -5,11 +5,12 @@ using namespace RED_LILIUM_NAMESPACE;
 
 Label::Label()
 	: m_textWidgetsHelper(std::move(std::make_unique<TextWidgetsHelper>()))
+	, m_disaplyedText()
 {}
 
 ptr<Label> Label::SetText(const std::string& text)
 {
-	m_textWidgetsHelper->SetDisplayedText(text);
+	m_disaplyedText = text;
 	return this;
 }
 
@@ -75,10 +76,10 @@ ptr<Label> Label::SetFontSettings(const FontSettings& fontSettings)
 
 void Label::Draw()
 {
-	m_textWidgetsHelper->Draw(GetNvgContext(), { 0, 0 }, GetSize());
+	m_textWidgetsHelper->Draw(GetNvgContext(), m_disaplyedText, { 0, 0 }, GetSize());
 }
 
 void Label::UpdateDesiredSize()
 {
-	m_desiredSize = m_textWidgetsHelper->GetDisplayedTextSize(GetNvgContext());
+	m_desiredSize = m_textWidgetsHelper->GetDisplayedTextSize(GetNvgContext(), m_disaplyedText);
 }

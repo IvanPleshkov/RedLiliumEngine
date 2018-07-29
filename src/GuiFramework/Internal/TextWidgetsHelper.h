@@ -12,12 +12,16 @@ public:
 	TextWidgetsHelper();
 	~TextWidgetsHelper() override {}
 
-	void Draw(NVGcontextPtr nvg, vec2 textBoxPosition, vec2 textBoxSize);
+	void Draw(NVGcontextPtr nvg, const std::string_view& displayedText, vec2 textBoxPosition, vec2 textBoxSize);
 
 	void SetFontSettings(const FontSettings& fontSettings);
-	vec2 GetDisplayedTextSize(NVGcontextPtr nvg) const;
+	vec2 GetDisplayedTextSize(NVGcontextPtr nvg, const std::string_view& displayedText) const;
+	void GetDisplayedTextGlyphsPosition(
+		NVGcontextPtr nvg,
+		const std::string_view& displayedText, 
+		vec2 textBoxPosition,
+		std::vector<NVGglyphPosition>& glyphsPosition) const;
 
-	void SetDisplayedText(const std::string& text);
 	void SetColor(vec4 color);
 	void SetFontSize(float size);
 	void SetFontFamily(FontFamily fontFamily);
@@ -27,6 +31,7 @@ public:
 	void SetBottomPadding(float bottomMargin);
 	void SetLeftPadding(float leftMargin);
 	void SetRightPadding(float rightMargin);
+	void SetTextOffset(float textOffset);
 
 	const std::string& GetDisplayedText() const;
 	vec4 GetColor() const;
@@ -38,16 +43,16 @@ public:
 	float GetBottomPadding() const;
 	float GetLeftPadding() const;
 	float GetRightPadding() const;
+	float GetTextOffset() const;
 
 private:
 	void SetTextNvgParameters(NVGcontextPtr nvg) const;
-
-	std::string m_displayedText;
 
 	float m_topPadding;
 	float m_bottomPadding;
 	float m_leftPadding;
 	float m_rightPadding;
+	float m_textOffset;
 
 	vec4 m_color;
 	float m_fontSize;

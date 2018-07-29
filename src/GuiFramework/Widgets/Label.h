@@ -31,6 +31,7 @@ protected:
 
 private:
 	uptr<TextWidgetsHelper> m_textWidgetsHelper;
+	std::string m_disaplyedText;
 };
 
 }  // namespace RED_LILIUM_NAMESPACE

@@ -4,22 +4,17 @@
 using namespace RED_LILIUM_NAMESPACE;
 
 TextWidgetsHelper::TextWidgetsHelper()
-	: m_displayedText()
-	, m_topPadding(0)
+	: m_topPadding(0)
 	, m_bottomPadding(0)
 	, m_leftPadding(0)
 	, m_rightPadding(0)
+	, m_textOffset(0)
 	, m_color( 1, 1, 1, 1 )
 	, m_fontSize(14)
 	, m_fontFamily(-1)
 	, m_horizontalAlignment(HorizontalAlignment::Left)
 	, m_verticalAlignment(VerticalAlignment::Center)
 {}
-
-void TextWidgetsHelper::SetDisplayedText(const std::string& text)
-{
-	m_displayedText = text;
-}
 
 void TextWidgetsHelper::SetColor(vec4 color)
 {
@@ -64,11 +59,6 @@ void TextWidgetsHelper::SetLeftPadding(float leftPadding)
 void TextWidgetsHelper::SetRightPadding(float rightPadding)
 {
 	m_rightPadding = rightPadding;
-}
-
-const std::string& TextWidgetsHelper::GetDisplayedText() const
-{
-	return m_displayedText;
 }
 
 vec4 TextWidgetsHelper::GetColor() const
@@ -123,7 +113,7 @@ void TextWidgetsHelper::SetFontSettings(const FontSettings& fontSettings)
 	m_fontFamily = fontSettings.fontFamily;
 }
 
-vec2 TextWidgetsHelper::GetDisplayedTextSize(NVGcontextPtr nvg) const
+vec2 TextWidgetsHelper::GetDisplayedTextSize(NVGcontextPtr nvg, const std::string_view& displayedText) const
 {
 	float bounds[4] = { -1.0f, -1.0f, -1.0f, -1.0f };
 
@@ -132,14 +122,33 @@ vec2 TextWidgetsHelper::GetDisplayedTextSize(NVGcontextPtr nvg) const
 		nvg,
 		0.0f,
 		0.0f,
-		m_displayedText.c_str(),
-		m_displayedText.c_str() + m_displayedText.size(),
+		displayedText.data(),
+		displayedText.data() + displayedText.size(),
 		bounds);
 
 	return {
 		bounds[2] - bounds[0] + m_leftPadding + m_rightPadding,
 		bounds[3] - bounds[1] + m_topPadding + m_bottomPadding
 	};
+}
+
+void TextWidgetsHelper::GetDisplayedTextGlyphsPosition(
+	NVGcontextPtr nvg,
+	const std::string_view& displayedText,
+	vec2 textBoxPosition,
+	std::vector<NVGglyphPosition>& glyphsPosition) const
+{
+	SetTextNvgParameters(nvg);
+
+	glyphsPosition.resize(displayedText.size());
+	nvgTextGlyphPositions(
+		nvg,
+		textBoxPosition.x,
+		textBoxPosition.y,
+		displayedText.data(),
+		displayedText.data() + displayedText.size(),
+		glyphsPosition.data(),
+		displayedText.size());
 }
 
 void TextWidgetsHelper::SetTextNvgParameters(NVGcontextPtr nvg) const
@@ -190,7 +199,7 @@ void TextWidgetsHelper::SetTextNvgParameters(NVGcontextPtr nvg) const
 	nvgTextAlign(nvg, horizontalAlignment | verticalAlignment);
 }
 
-void TextWidgetsHelper::Draw(NVGcontextPtr nvg, vec2 textBoxPosition, vec2 textBoxSize)
+void TextWidgetsHelper::Draw(NVGcontextPtr nvg, const std::string_view& displayedText, vec2 textBoxPosition, vec2 textBoxSize)
 {
 	SetTextNvgParameters(nvg);
 
@@ -223,6 +232,7 @@ void TextWidgetsHelper::Draw(NVGcontextPtr nvg, vec2 textBoxPosition, vec2 textB
 		x = m_leftPadding + thisSize.x / 2.0f;
 		break;
 	}
+	x -= m_textOffset;
 
 	switch (m_verticalAlignment)
 	{
@@ -245,6 +255,6 @@ void TextWidgetsHelper::Draw(NVGcontextPtr nvg, vec2 textBoxPosition, vec2 textB
 
 	nvgText(
 		nvg, x, y,
-		m_displayedText.c_str(),
-		m_displayedText.c_str() + m_displayedText.size());
+		displayedText.data(),
+		displayedText.data() + displayedText.size());
 }
