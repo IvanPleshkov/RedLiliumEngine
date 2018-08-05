@@ -148,7 +148,7 @@ void TextField::OnClick(MouseKey mouseKey)
 	}
 
 	std::optional<u32> hoveredSymbolOpt = m_textWidgetsHelper->GetSymbolUnderPoint(
-		GetNvgContext(), m_disaplyedText, { 0, 0 }, m_size, mousePositionOpt.value());
+		GetNvgContext(), m_disaplyedText, GetPosition(), GetSize(), mousePositionOpt.value());
 
 	if (hoveredSymbolOpt)
 	{
