@@ -38,11 +38,13 @@ private:
 	void ResetText();
 	void SetCursorPosition(std::string::iterator cursorPosition, bool saveSelection);
 	void InsertText(const std::string_view& text);
+	void RemoveSelection();
 
 	uptr<TextWidgetsHelper> m_textWidgetsHelper;
 	std::string m_text;
 	std::string m_disaplyedText;
 	std::string::iterator m_cursorPosition;
+	std::optional<std::string::iterator> m_selectionCursorPosition;
 	float m_cursorDrawPosition;
 };
 

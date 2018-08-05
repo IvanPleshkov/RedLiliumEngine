@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 
 #include <GuiBgfxAdapter/BgfxGuiApplication.h>
 #include <GuiBgfxAdapter/BgfxWindow.h>
@@ -79,9 +79,9 @@ void DemoGuiApplication::Demo1()
 
 	ptr<TextBox> textBox = stackLayout
 		->Add<TextBox>()
-		//->SetText(u8"ptr<Widget> topWidget = m_mainPanel->GetTopWidget();îïàîïàðîâêûíïðóöï");
-		//->SetText(u8"îâêûíïðóöï");
-		->SetText(u8"abcd");
+		//->SetText(u8"ptr<Widget> topWidget = m_mainPanel->GetTopWidget();Ã®Ã¯Ã Ã®Ã¯Ã Ã°Ã®Ã¢ÃªÃ»Ã­Ã¯Ã°Ã³Ã¶Ã¯");
+		->SetText(u8"ÐŸÑ€Ð¸Ð²ÐµÑ‚, UTF8-Ð¼Ð¸Ñ€!");
+		//->SetText(u8"abcd");
 
 	ptr<ColoredRectangle> r3 = stackLayout
 		->Add<ColoredRectangle>()

@@ -8,6 +8,7 @@ TextField::TextField()
 	, m_disaplyedText()
 	, m_cursorPosition(m_disaplyedText.end())
 	, m_cursorDrawPosition(0)
+	, m_selectionCursorPosition(std::nullopt)
 {}
 
 ptr<TextField> TextField::SetText(const std::string& text)
@@ -84,6 +85,16 @@ void TextField::Draw()
 {
 	m_textWidgetsHelper->Draw(GetNvgContext(), m_disaplyedText, GetPosition(), GetSize());
 
+	for (auto glyph : m_textWidgetsHelper->GetNvgGlyphsPosition(GetNvgContext(), m_disaplyedText, GetPosition()))
+	{
+		float glyphx = m_textWidgetsHelper->NvgGlyphPositionToLocal(glyph.x, GetPosition());
+
+		nvgBeginPath(GetNvgContext());
+		nvgRect(GetNvgContext(), glyphx - 1, 0, 2, GetSize().y);
+		nvgFillColor(GetNvgContext(), nvgRGBA(0x00, 0xff, 0x00, 0xff));
+		nvgFill(GetNvgContext());
+	}
+
 	if (IsFocused())
 	{
 		DrawCursor();
@@ -114,6 +125,11 @@ void TextField::SetCursorPosition(std::string::iterator cursorPosition, bool sav
 	RED_LILIUM_ASSERT(cursorPosition >= m_disaplyedText.begin() && cursorPosition <= m_disaplyedText.end());
 	m_cursorPosition = cursorPosition;
 
+	if (!saveSelection)
+	{
+		m_selectionCursorPosition = std::nullopt;
+	}
+
 	// update m_cursorDrawPosition
 	if (m_cursorPosition != m_disaplyedText.end())
 	{
@@ -131,6 +147,43 @@ void TextField::SetCursorPosition(std::string::iterator cursorPosition, bool sav
 void TextField::InsertText(const std::string_view& text)
 {
 	RED_LILIUM_ASSERT(m_cursorPosition >= m_disaplyedText.begin() && m_cursorPosition <= m_disaplyedText.end());
+
+	if (m_selectionCursorPosition)
+	{
+		RemoveSelection();
+	}
+
+	size_t cursorPos = std::distance(m_disaplyedText.begin(), m_cursorPosition);
+	m_disaplyedText.insert(m_cursorPosition, text.begin(), text.end());
+	m_cursorPosition = m_disaplyedText.begin() + cursorPos + text.size();
+}
+
+void TextField::RemoveSelection()
+{
+	if (!m_selectionCursorPosition)
+	{
+		return;
+	}
+
+	std::string::iterator begin = m_selectionCursorPosition.value();
+	std::string::iterator end = m_cursorPosition;
+	if (end < begin)
+	{
+		std::swap(begin, end);
+	}
+	size_t cursorPos = std::distance(m_disaplyedText.begin(), begin);
+
+	m_disaplyedText.erase(begin, end);
+
+	m_selectionCursorPosition = std::nullopt;
+	if (cursorPos >= m_disaplyedText.size())
+	{
+		m_cursorPosition = m_disaplyedText.end();
+	}
+	else
+	{
+		m_cursorPosition = m_disaplyedText.begin() + cursorPos;
+	}
 }
 
 bool TextField::HandleKeyEvent(const KeyEvent& keyEvent)
