@@ -6,12 +6,17 @@ using namespace RED_LILIUM_NAMESPACE;
 TextField::TextField()
 	: m_textWidgetsHelper(std::move(std::make_unique<TextWidgetsHelper>()))
 	, m_disaplyedText()
-	, m_glyphsPositionData()
+	, m_cursorPosition(m_disaplyedText.end())
+	, m_cursorDrawPosition(0)
 {}
 
 ptr<TextField> TextField::SetText(const std::string& text)
 {
-	m_disaplyedText = text;
+	if (m_text != text)
+	{
+		m_text = text;
+		ResetText();
+	}
 	return this;
 }
 
@@ -77,44 +82,80 @@ ptr<TextField> TextField::SetFontSettings(const FontSettings& fontSettings)
 
 void TextField::Draw()
 {
-	m_textWidgetsHelper->Draw(GetNvgContext(), m_disaplyedText, { 0, 0 }, m_size);
+	m_textWidgetsHelper->Draw(GetNvgContext(), m_disaplyedText, GetPosition(), GetSize());
 
-	DrawCursor();
+	if (IsFocused())
+	{
+		DrawCursor();
+	}
 }
 
 void TextField::DrawCursor()
 {
-	auto mousePositionOpt = GetLocalMousePosition();
-	if (!mousePositionOpt)
-	{
-		return;
-	}
-
-	m_textWidgetsHelper->GetDisplayedTextGlyphsPosition(GetNvgContext(), m_disaplyedText, { 0, 0 }, m_glyphsPositionData);
-
-	auto glyphIterator = std::lower_bound(
-		m_glyphsPositionData.begin(),
-		m_glyphsPositionData.end(),
-		mousePositionOpt.value().x,
-		[](const NVGglyphPosition& glyph, float x)
-		{
-			return glyph.x < x;
-		});
-
-	if (glyphIterator != m_glyphsPositionData.end())
-	{
-		float cursorX = glyphIterator->x;
-
-		nvgBeginPath(GetNvgContext());
-		nvgRect(GetNvgContext(), cursorX - 1, 0, 2, GetSize().y);
-		nvgFillColor(GetNvgContext(), nvgRGBA(0xff, 0x00, 0x00, 0xff));
-		nvgFill(GetNvgContext());
-	}
-
-	m_glyphsPositionData.clear();
+	nvgBeginPath(GetNvgContext());
+	nvgRect(GetNvgContext(), m_cursorDrawPosition - 1, 0, 2, GetSize().y);
+	nvgFillColor(GetNvgContext(), nvgRGBA(0xff, 0x00, 0x00, 0xff));
+	nvgFill(GetNvgContext());
 }
 
 void TextField::UpdateDesiredSize()
 {
 	m_desiredSize = m_textWidgetsHelper->GetDisplayedTextSize(GetNvgContext(), m_disaplyedText);
+}
+
+void TextField::ResetText()
+{
+	m_disaplyedText = m_text;
+	SetCursorPosition(m_disaplyedText.end(), false);
+}
+
+void TextField::SetCursorPosition(std::string::iterator cursorPosition, bool saveSelection)
+{
+	RED_LILIUM_ASSERT(cursorPosition >= m_disaplyedText.begin() && cursorPosition <= m_disaplyedText.end());
+	m_cursorPosition = cursorPosition;
+
+	// update m_cursorDrawPosition
+	if (m_cursorPosition != m_disaplyedText.end())
+	{
+		const u32 symbolIndex = static_cast<u32>(std::distance(m_disaplyedText.begin(), m_cursorPosition));
+		m_cursorDrawPosition = m_textWidgetsHelper->GetSymbolGlyphBeginPosition(
+			GetNvgContext(), m_disaplyedText, GetPosition(), GetSize(), symbolIndex);
+	}
+	else
+	{
+		m_cursorDrawPosition = m_textWidgetsHelper->GetLastSymbolEndPosition(
+			GetNvgContext(), m_disaplyedText, GetPosition(), GetSize());
+	}
+}
+
+void TextField::InsertText(const std::string_view& text)
+{
+	RED_LILIUM_ASSERT(m_cursorPosition >= m_disaplyedText.begin() && m_cursorPosition <= m_disaplyedText.end());
+}
+
+bool TextField::HandleKeyEvent(const KeyEvent& keyEvent)
+{
+	return false;
+}
+
+void TextField::OnClick(MouseKey mouseKey)
+{
+	auto mousePositionOpt = GetLocalMousePosition();
+	if (!mousePositionOpt)
+	{
+		SetCursorPosition(m_disaplyedText.end(), false);
+		return;
+	}
+
+	std::optional<u32> hoveredSymbolOpt = m_textWidgetsHelper->GetSymbolUnderPoint(
+		GetNvgContext(), m_disaplyedText, { 0, 0 }, m_size, mousePositionOpt.value());
+
+	if (hoveredSymbolOpt)
+	{
+		SetCursorPosition(m_disaplyedText.begin() + hoveredSymbolOpt.value(), false);
+	}
+	else
+	{
+		SetCursorPosition(m_disaplyedText.end(), false);
+	}
 }

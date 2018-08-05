@@ -16,11 +16,26 @@ public:
 
 	void SetFontSettings(const FontSettings& fontSettings);
 	vec2 GetDisplayedTextSize(NVGcontextPtr nvg, const std::string_view& displayedText) const;
-	void GetDisplayedTextGlyphsPosition(
+	std::optional<u32> GetSymbolUnderPoint(
 		NVGcontextPtr nvg,
-		const std::string_view& displayedText, 
-		vec2 textBoxPosition,
-		std::vector<NVGglyphPosition>& glyphsPosition) const;
+		const std::string_view& displayedText,
+		vec2 textBoxPosition, vec2 textBoxSize,
+		vec2 pointPosition) const;
+
+	float GetSymbolGlyphBeginPosition(
+		NVGcontextPtr nvg,
+		const std::string_view& displayedText,
+		vec2 textBoxPosition, vec2 textBoxSize,
+		u32 symbolIndex) const;
+	float GetSymbolGlyphEndPosition(
+		NVGcontextPtr nvg,
+		const std::string_view& displayedText,
+		vec2 textBoxPosition, vec2 textBoxSize,
+		u32 symbolIndex) const;
+	float GetLastSymbolEndPosition(
+		NVGcontextPtr nvg,
+		const std::string_view& displayedText,
+		vec2 textBoxPosition, vec2 textBoxSize) const;
 
 	void SetColor(vec4 color);
 	void SetFontSize(float size);
@@ -33,7 +48,6 @@ public:
 	void SetRightPadding(float rightMargin);
 	void SetTextOffset(float textOffset);
 
-	const std::string& GetDisplayedText() const;
 	vec4 GetColor() const;
 	float GetFontSize() const;
 	FontFamily GetFontFamily() const;
@@ -47,6 +61,11 @@ public:
 
 private:
 	void SetTextNvgParameters(NVGcontextPtr nvg) const;
+	std::vector<NVGglyphPosition> GetGlyphsPosition(
+		NVGcontextPtr nvg,
+		const std::string_view& displayedText,
+		vec2 textBoxPosition) const;
+	float NvgGlyphPositionToLocal(float nvgGlyphPosition, vec2 textBoxPosition) const;
 
 	float m_topPadding;
 	float m_bottomPadding;

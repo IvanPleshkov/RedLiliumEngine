@@ -61,6 +61,11 @@ void TextWidgetsHelper::SetRightPadding(float rightPadding)
 	m_rightPadding = rightPadding;
 }
 
+void TextWidgetsHelper::SetTextOffset(float textOffset)
+{
+	m_textOffset = textOffset;
+}
+
 vec4 TextWidgetsHelper::GetColor() const
 {
 	return m_color;
@@ -106,6 +111,11 @@ float TextWidgetsHelper::GetRightPadding() const
 	return m_rightPadding;
 }
 
+float TextWidgetsHelper::GetTextOffset() const
+{
+	return m_textOffset;
+}
+
 void TextWidgetsHelper::SetFontSettings(const FontSettings& fontSettings)
 {
 	m_color = fontSettings.color;
@@ -132,23 +142,106 @@ vec2 TextWidgetsHelper::GetDisplayedTextSize(NVGcontextPtr nvg, const std::strin
 	};
 }
 
-void TextWidgetsHelper::GetDisplayedTextGlyphsPosition(
+std::vector<NVGglyphPosition> TextWidgetsHelper::GetGlyphsPosition(
 	NVGcontextPtr nvg,
 	const std::string_view& displayedText,
-	vec2 textBoxPosition,
-	std::vector<NVGglyphPosition>& glyphsPosition) const
+	vec2 textBoxPosition) const
 {
 	SetTextNvgParameters(nvg);
 
-	glyphsPosition.resize(displayedText.size());
-	nvgTextGlyphPositions(
+	std::vector<NVGglyphPosition> glyphsPosition(displayedText.size());
+	auto cnt = nvgTextGlyphPositions(
 		nvg,
-		textBoxPosition.x,
-		textBoxPosition.y,
+		0, 0,
 		displayedText.data(),
 		displayedText.data() + displayedText.size(),
 		glyphsPosition.data(),
 		displayedText.size());
+	glyphsPosition.resize(static_cast<size_t>(cnt));
+
+	return std::move(glyphsPosition);
+}
+
+float TextWidgetsHelper::NvgGlyphPositionToLocal(float nvgGlyphPosition, vec2 textBoxPosition) const
+{
+	return nvgGlyphPosition + textBoxPosition.x - m_textOffset + m_leftPadding;
+}
+
+std::optional<u32> TextWidgetsHelper::GetSymbolUnderPoint(
+	NVGcontextPtr nvg,
+	const std::string_view& displayedText,
+	vec2 textBoxPosition, vec2 textBoxSize,
+	vec2 pointPosition) const
+{
+	if (pointPosition.x < textBoxPosition.x ||
+		pointPosition.y < textBoxPosition.y ||
+		pointPosition.x > textBoxPosition.x + textBoxSize.x ||
+		pointPosition.y > textBoxPosition.y + textBoxSize.y)
+	{
+		return std::nullopt;
+	}
+
+	const std::vector<NVGglyphPosition> glyphsPosition = std::move(GetGlyphsPosition(nvg, displayedText, textBoxPosition));
+
+	const auto glyphIterator = std::lower_bound(
+		glyphsPosition.begin(),
+		glyphsPosition.end(),
+		pointPosition.x,
+		[&](const NVGglyphPosition& glyph, float x)
+	{
+		const float glyphLocalPosition = NvgGlyphPositionToLocal(glyph.x, textBoxPosition);
+		return glyphLocalPosition <= x;
+	});
+
+	if (glyphsPosition.empty() || glyphIterator == glyphsPosition.begin())
+	{
+		return 0;
+	}
+
+	if (glyphIterator == glyphsPosition.end())
+	{
+		return std::nullopt;
+	}
+
+	return static_cast<u32>(std::distance(displayedText.data(), glyphIterator->str) - 1);
+}
+
+float TextWidgetsHelper::GetSymbolGlyphBeginPosition(
+	NVGcontextPtr nvg,
+	const std::string_view& displayedText,
+	vec2 textBoxPosition, vec2 textBoxSize,
+	u32 symbolIndex) const
+{
+	RED_LILIUM_ASSERT(symbolIndex < displayedText.size());
+
+	std::string_view shortText(displayedText.data(), symbolIndex + 1);
+	const std::vector<NVGglyphPosition> glyphsPosition = std::move(GetGlyphsPosition(nvg, shortText, textBoxPosition));
+	return NvgGlyphPositionToLocal(glyphsPosition.back().minx, textBoxPosition);
+}
+
+float TextWidgetsHelper::GetSymbolGlyphEndPosition(
+	NVGcontextPtr nvg,
+	const std::string_view& displayedText,
+	vec2 textBoxPosition, vec2 textBoxSize,
+	u32 symbolIndex) const
+{
+	std::string_view shortText(displayedText.data(), symbolIndex + 1);
+	const std::vector<NVGglyphPosition> glyphsPosition = std::move(GetGlyphsPosition(nvg, shortText, textBoxPosition));
+	return NvgGlyphPositionToLocal(glyphsPosition.back().maxx, textBoxPosition);
+}
+
+float TextWidgetsHelper::GetLastSymbolEndPosition(
+	NVGcontextPtr nvg,
+	const std::string_view& displayedText,
+	vec2 textBoxPosition, vec2 textBoxSize) const
+{
+	if (displayedText.empty())
+	{
+		return NvgGlyphPositionToLocal(0, textBoxPosition);
+	}
+
+	const std::vector<NVGglyphPosition> glyphsPosition = std::move(GetGlyphsPosition(nvg, displayedText, textBoxPosition));
+	return NvgGlyphPositionToLocal(glyphsPosition.back().maxx, textBoxPosition);
 }
 
 void TextWidgetsHelper::SetTextNvgParameters(NVGcontextPtr nvg) const

@@ -29,13 +29,21 @@ public:
 protected:
 	virtual void DrawCursor();
 
+	void OnClick(MouseKey mouseKey) override;
+	bool HandleKeyEvent(const KeyEvent& keyEvent) override;
 	void Draw() override;
 	void UpdateDesiredSize() override;
 
 private:
+	void ResetText();
+	void SetCursorPosition(std::string::iterator cursorPosition, bool saveSelection);
+	void InsertText(const std::string_view& text);
+
 	uptr<TextWidgetsHelper> m_textWidgetsHelper;
+	std::string m_text;
 	std::string m_disaplyedText;
-	std::vector<NVGglyphPosition> m_glyphsPositionData;
+	std::string::iterator m_cursorPosition;
+	float m_cursorDrawPosition;
 };
 
 } // namespace RED_LILIUM_NAMESPACE

@@ -79,7 +79,9 @@ void DemoGuiApplication::Demo1()
 
 	ptr<TextBox> textBox = stackLayout
 		->Add<TextBox>()
-		->SetText(u8"ptr<Widget> topWidget = m_mainPanel->GetTopWidget();îïàîïàðîâêûíïðóöï");
+		//->SetText(u8"ptr<Widget> topWidget = m_mainPanel->GetTopWidget();îïàîïàðîâêûíïðóöï");
+		//->SetText(u8"îâêûíïðóöï");
+		->SetText(u8"abcd");
 
 	ptr<ColoredRectangle> r3 = stackLayout
 		->Add<ColoredRectangle>()
@@ -128,7 +130,7 @@ void DemoGuiApplication::LoadFonts(NVGcontextPtr nvg)
 	style->m_h1.fontFamily = m_sansFontFamily;
 
 	style->m_h2.color = { 1, 1, 1, 1 };
-	style->m_h2.fontSize = 16;
+	style->m_h2.fontSize = 40;
 	style->m_h2.fontFamily = m_sansFontFamily;
 
 	style->m_caption.color = { 1, 1, 1, 1 };

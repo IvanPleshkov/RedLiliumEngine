@@ -30,7 +30,9 @@ void TextBox::Tick()
 
 void TextBox::UpdateDesiredSize()
 {
-	m_desiredSize = { 150, 28 };
+	const float borderWidth = DefaultWidgetsSettings::GetBorderWidth();
+	const float borderRadius = DefaultWidgetsSettings::GetBorderRadius();
+	m_desiredSize = { 400, m_textField->GetDesiredSize().y + borderRadius + borderRadius };
 }
 
 void TextBox::Draw()
