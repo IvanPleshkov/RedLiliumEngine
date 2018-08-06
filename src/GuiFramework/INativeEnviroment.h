@@ -11,6 +11,8 @@ public:
 	virtual ~INativeEnvironment() {}
 
 	virtual Time GetDoubleClickingTime() const = 0;
+
+	virtual std::string GetUserInputSymbol() const = 0;
 };
 
 } // namespace RED_LILIUM_NAMESPACE

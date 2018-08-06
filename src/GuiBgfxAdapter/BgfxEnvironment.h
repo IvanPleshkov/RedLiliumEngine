@@ -12,6 +12,8 @@ public:
 	~BgfxEnvironment() override {}
 
 	Time GetDoubleClickingTime() const override;
+
+	std::string GetUserInputSymbol() const override;
 };
 
 }  // namespace RED_LILIUM_NAMESPACE

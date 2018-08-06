@@ -63,6 +63,11 @@ bool ClickableWidget::HandleMouseEvent(const MouseEvent& mouseEvent)
 			m_pressedMouseKey = std::nullopt;
 		}
 
+		if (m_pressedMouseKey && mouseEvent.GetEventedMouseKey())
+		{
+			OnPress(mouseEvent.GetEventedMouseKey().value());
+		}
+
 		return m_pressedMouseKey.has_value();
 	}
 

@@ -59,7 +59,7 @@ public:
 	float GetRightPadding() const;
 	float GetTextOffset() const;
 
-public:
+private:
 	void SetTextNvgParameters(NVGcontextPtr nvg) const;
 	float NvgGlyphPositionToLocal(float nvgGlyphPosition, vec2 textBoxPosition) const;
 	std::vector<NVGglyphPosition> GetNvgGlyphsPosition(

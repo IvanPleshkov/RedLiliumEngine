@@ -202,9 +202,16 @@ float TextWidgetsHelper::GetSymbolGlyphBeginPosition(
 {
 	RED_LILIUM_ASSERT(symbolIndex < displayedText.size());
 
-	std::string_view shortText(displayedText.data(), symbolIndex + 1);
-	const std::vector<NVGglyphPosition> glyphsPosition = std::move(GetNvgGlyphsPosition(nvg, shortText, textBoxPosition));
-	return NvgGlyphPositionToLocal(glyphsPosition.back().minx, textBoxPosition);
+	const std::vector<NVGglyphPosition> glyphsPosition = std::move(GetNvgGlyphsPosition(nvg, displayedText, textBoxPosition));
+	for (const auto& glyph : glyphsPosition)
+	{
+		u32 index = static_cast<u32>(std::distance(displayedText.data(), glyph.str));
+		if (symbolIndex <= index)
+		{
+			return NvgGlyphPositionToLocal(glyph.minx, textBoxPosition);
+		}
+	}
+	return 0;
 }
 
 float TextWidgetsHelper::GetSymbolGlyphEndPosition(
@@ -213,9 +220,18 @@ float TextWidgetsHelper::GetSymbolGlyphEndPosition(
 	vec2 textBoxPosition, vec2 textBoxSize,
 	u32 symbolIndex) const
 {
-	std::string_view shortText(displayedText.data(), symbolIndex + 1);
-	const std::vector<NVGglyphPosition> glyphsPosition = std::move(GetNvgGlyphsPosition(nvg, shortText, textBoxPosition));
-	return NvgGlyphPositionToLocal(glyphsPosition.back().maxx, textBoxPosition);
+	RED_LILIUM_ASSERT(symbolIndex < displayedText.size());
+
+	const std::vector<NVGglyphPosition> glyphsPosition = std::move(GetNvgGlyphsPosition(nvg, displayedText, textBoxPosition));
+	for (const auto& glyph : glyphsPosition)
+	{
+		u32 index = static_cast<u32>(std::distance(displayedText.data(), glyph.str));
+		if (symbolIndex <= index)
+		{
+			return NvgGlyphPositionToLocal(glyph.maxx, textBoxPosition);
+		}
+	}
+	return 0;
 }
 
 float TextWidgetsHelper::GetLastSymbolEndPosition(

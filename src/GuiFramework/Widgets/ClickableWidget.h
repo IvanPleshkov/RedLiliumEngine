@@ -33,6 +33,7 @@ protected:
 	bool HandleKeyEvent(const KeyEvent& keyEvent) override;
 	bool HandleMouseEvent(const MouseEvent& mouseEvent) override;
 
+	virtual void OnPress(MouseKey mouseKey) {}
 	virtual void OnClick(MouseKey mouseKey) {}
 	virtual void OnDoubleClick(MouseKey mouseKey) {}
 	virtual void OnTripleClick(MouseKey mouseKey) {}

@@ -1,5 +1,8 @@
 #include "pch.h"
 #include "TextField.h"
+#include "../GuiManager.h"
+#include "../INativeEnviroment.h"
+#include "../Panel.h"
 
 using namespace RED_LILIUM_NAMESPACE;
 
@@ -84,16 +87,6 @@ ptr<TextField> TextField::SetFontSettings(const FontSettings& fontSettings)
 void TextField::Draw()
 {
 	m_textWidgetsHelper->Draw(GetNvgContext(), m_disaplyedText, GetPosition(), GetSize());
-
-	for (auto glyph : m_textWidgetsHelper->GetNvgGlyphsPosition(GetNvgContext(), m_disaplyedText, GetPosition()))
-	{
-		float glyphx = m_textWidgetsHelper->NvgGlyphPositionToLocal(glyph.x, GetPosition());
-
-		nvgBeginPath(GetNvgContext());
-		nvgRect(GetNvgContext(), glyphx - 1, 0, 2, GetSize().y);
-		nvgFillColor(GetNvgContext(), nvgRGBA(0x00, 0xff, 0x00, 0xff));
-		nvgFill(GetNvgContext());
-	}
 
 	if (IsFocused())
 	{
@@ -188,10 +181,19 @@ void TextField::RemoveSelection()
 
 bool TextField::HandleKeyEvent(const KeyEvent& keyEvent)
 {
+	ptr<INativeEnvironment> environment = GetGuiManager()->GetNativeEnvironment();
+	std::string input = std::move(environment->GetUserInputSymbol());
+
+	if (!input.empty())
+	{
+		InsertText(input);
+		return true;
+	}
+
 	return false;
 }
 
-void TextField::OnClick(MouseKey mouseKey)
+void TextField::OnPress(MouseKey mouseKey)
 {
 	auto mousePositionOpt = GetLocalMousePosition();
 	if (!mousePositionOpt)
@@ -211,4 +213,36 @@ void TextField::OnClick(MouseKey mouseKey)
 	{
 		SetCursorPosition(m_disaplyedText.end(), false);
 	}
+}
+
+bool TextField::HandleMouseEvent(const MouseEvent& mouseEvent)
+{
+	auto result = ClickableWidget::HandleMouseEvent(mouseEvent);
+	if (result)
+	{
+		return result;
+	}
+
+	auto mousePositionOpt = GetLocalMousePosition();
+	// selecting text by mouse
+	if (mousePositionOpt && mouseEvent.eventType == MouseEventType::MouseMove && IsPressed(MouseKey::Left))
+	{
+		std::optional<u32> hoveredSymbolOpt = m_textWidgetsHelper->GetSymbolUnderPoint(
+			GetNvgContext(), m_disaplyedText, GetPosition(), GetSize(), mousePositionOpt.value());
+
+		m_selectionCursorPosition = std::nullopt;
+		if (!hoveredSymbolOpt)
+		{
+			auto hoveredSymbol = hoveredSymbolOpt.value();
+			if (m_disaplyedText.begin() + hoveredSymbol != m_cursorPosition)
+			{
+				m_selectionCursorPosition = m_cursorPosition;
+				SetCursorPosition(m_disaplyedText.begin() + hoveredSymbol, true);
+			}
+		}
+
+		return true;
+	}
+
+	return false;
 }

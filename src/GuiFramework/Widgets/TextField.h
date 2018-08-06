@@ -29,7 +29,8 @@ public:
 protected:
 	virtual void DrawCursor();
 
-	void OnClick(MouseKey mouseKey) override;
+	bool HandleMouseEvent(const MouseEvent& mouseEvent) override;
+	void OnPress(MouseKey mouseKey) override;
 	bool HandleKeyEvent(const KeyEvent& keyEvent) override;
 	void Draw() override;
 	void UpdateDesiredSize() override;
