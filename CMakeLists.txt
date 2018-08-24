@@ -10,6 +10,7 @@ PROJECT("${PROJECT_NAME}")
 include("3rdparty/3rdparty.cmake")
 
 add_subdirectory("src/Core")
+add_subdirectory("src/TaskManager")
 add_subdirectory("src/EditorFramework")
 add_subdirectory("src/GuiFramework")
 add_subdirectory("src/GuiWidgets")
