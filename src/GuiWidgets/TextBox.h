@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/common.h>
+#include <Core/Common.h>
 #include <GuiFramework/Widgets/TextField.h>
 
 namespace RED_LILIUM_NAMESPACE

@@ -1,6 +1,6 @@
-﻿#pragma once
+#pragma once
 
-#include "core/common.h"
+#include <Core/Common.h>
 #include "Action.h"
 
 namespace RED_LILIUM_NAMESPACE

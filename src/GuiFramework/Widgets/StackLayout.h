@@ -1,6 +1,6 @@
-﻿#pragma once
+#pragma once
 
-#include "core/common.h"
+#include <Core/Common.h>
 #include "Layout.h"
 
 namespace RED_LILIUM_NAMESPACE
@@ -34,7 +34,7 @@ private:
 		bool isReverted,
 		bool normalise);
 	void LayoutY(
-		const CoordinateTaker& fy,
+        const CoordinateTaker& fy,
 		VerticalAlignment alignment,
 		bool isReverted,
 		bool normalise);

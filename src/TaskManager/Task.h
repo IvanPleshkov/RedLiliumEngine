@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/common.h>
+#include <Core/Common.h>
 
 namespace RED_LILIUM_NAMESPACE
 {
@@ -16,7 +16,7 @@ enum class TaskState : u8
 class Task : public RedLiliumObject
 {
 public:
-	Task(const std::string_view& name);
+    Task(const std::string& name);
 	~Task() override;
 
 	virtual bool Run() = 0;

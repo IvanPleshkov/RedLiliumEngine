@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <memory>
 #include <vector>
+#include <list>
 #include <string>
 #include <iostream>
 #include <map>
@@ -31,17 +32,18 @@
 #include <typeinfo>
 #include <typeindex>
 #include <fstream>
+#include <functional>
 #include <optional>
 
 #include "CommonDefs.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
-#include <glm\glm.hpp>
-#include <glm\ext.hpp>
-#include <glm\gtx\matrix_transform_2d.hpp>
-#include <glm\gtx\matrix_decompose.hpp>
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
+#include <glm/gtx/matrix_transform_2d.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
 
-#include <spdlog\spdlog.h>
+#include <spdlog/spdlog.h>
 
 #define RED_LILIUM_NAMESPACE rl
 

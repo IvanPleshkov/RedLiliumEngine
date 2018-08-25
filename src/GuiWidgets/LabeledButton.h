@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/common.h>
+#include <Core/Common.h>
 #include <GuiFramework/Widgets/ClickableWidget.h>
 #include <GuiFramework/Widgets/Label.h>
 

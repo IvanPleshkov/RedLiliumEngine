@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/common.h"
+#include <Core/Common.h>
 #include "GuiFramework/Widget.h"
 #include "../Internal/TextWidgetsHelper.h"
 

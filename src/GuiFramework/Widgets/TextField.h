@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/Common.h"
+#include <Core/Common.h>
 #include "../Widget.h"
 #include "ClickableWidget.h"
 #include "../Internal/TextWidgetsHelper.h"

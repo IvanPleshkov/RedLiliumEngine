@@ -9,6 +9,9 @@ PROJECT("${PROJECT_NAME}")
 
 include("3rdparty/3rdparty.cmake")
 
+set(COMMON_SRC src/common.cmake)
+add_custom_target(common SOURCES ${COMMON_SRC})
+
 add_subdirectory("src/Core")
 add_subdirectory("src/TaskManager")
 add_subdirectory("src/EditorFramework")

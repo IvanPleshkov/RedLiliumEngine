@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/common.h"
+#include <Core/Common.h>
 #include "Action.h"
 #include "Event.h"
 

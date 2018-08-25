@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "StdInclude.h"
 #include "RedLiliumObject.h"
@@ -129,8 +129,8 @@ public:
 	RedLiliumWeakPointer& operator=(std::nullptr_t) noexcept
 	{
 		RED_LILIUM_ASSERT(IsValid());
-		m_handler = RedLiliumObject::m_nullExistingHandler;
-		m_ptr = nullptr;
+        m_existingHandler = RedLiliumObject::m_nullExistingHandler;
+        m_ptr = nullptr;
 		return *this;
 	}
 

@@ -9,7 +9,7 @@ template<typename T, typename FlagsSupportsOnlyEnumTypes = void>
 class Flags;
 
 template<typename T>
-class Flags<T, typename std::enable_if_t<std::is_enum_v<T>>>
+class Flags<T, typename std::enable_if_t<std::is_enum<T>::value>>
 {
     using UnderlyingType = std::underlying_type_t<T>;
 public:

@@ -32,6 +32,10 @@ endif()
 
 if(MSVC)
   set(CMAKE_CXX_FLAGS "/std:c++latest /EHsc")
+else()
+  set(CMAKE_CXX_STANDARD 17)
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+  set(CMAKE_CXX_EXTENSIONS OFF)
 endif()
 
 file(GLOB_RECURSE SRC_FILES
@@ -50,7 +54,7 @@ include_directories("../../3rdparty/bgfx/bgfx/include")
 include_directories("../../3rdparty/bgfx/bimg/include")
 include_directories("../../3rdparty/bgfx/bx/include")
 include_directories("../../3rdparty/bgfx/bgfx/examples/common")
-	
+
 # генерация MSVC фильтров
 foreach(SRC_FILE IN LISTS SRC_FILES)
 	if(IS_ABSOLUTE "${SRC_FILE}")
