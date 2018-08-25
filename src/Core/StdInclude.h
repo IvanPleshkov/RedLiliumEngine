@@ -1,7 +1,10 @@
 #pragma once
 
 #include <stdio.h>
-#include <tchar.h>
+
+#if WIN32
+    #include <tchar.h>
+#endif
 
 #include <cassert>
 #include <iostream>

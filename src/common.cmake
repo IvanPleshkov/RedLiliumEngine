@@ -30,13 +30,15 @@ elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-long-long -pedantic")
 endif()
 
-set(CMAKE_CXX_FLAGS "/std:c++latest /EHsc")
+if(MSVC)
+  set(CMAKE_CXX_FLAGS "/std:c++latest /EHsc")
+endif()
 
 file(GLOB_RECURSE SRC_FILES
 	"*.cpp"
-    "*.c"
-    "*.hpp"
-    "*.h"
+	"*.c"
+	"*.hpp"
+	"*.h"
 	"*.inl")
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
@@ -48,7 +50,7 @@ include_directories("../../3rdparty/bgfx/bgfx/include")
 include_directories("../../3rdparty/bgfx/bimg/include")
 include_directories("../../3rdparty/bgfx/bx/include")
 include_directories("../../3rdparty/bgfx/bgfx/examples/common")
-
+	
 # генерация MSVC фильтров
 foreach(SRC_FILE IN LISTS SRC_FILES)
 	if(IS_ABSOLUTE "${SRC_FILE}")
