@@ -9,6 +9,9 @@ os:
     - linux
     # - osx
 
+    env:
+        - MATRIX_EVAL="CC=gcc-7.3 && CXX=g++-7.3"
+
 compiler:
     # ... и с помощью GCC, и Clang
     - gcc
