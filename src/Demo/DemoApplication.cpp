@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 
 #include <GuiBgfxAdapter/BgfxGuiApplication.h>
 #include <GuiBgfxAdapter/BgfxWindow.h>
@@ -114,10 +114,10 @@ void DemoGuiApplication::Demo2()
 
 void DemoGuiApplication::LoadFonts(NVGcontextPtr nvg)
 {
-	std::string robotoRegularFile = GetDataPath() + "/fonts/roboto-regular.ttf";
+    std::string robotoRegularFile = GetDataPath() + "/Fonts/roboto-regular.ttf";
 	m_sansFontFamily = nvgCreateFont(nvg, "sans", robotoRegularFile.c_str());
 
-	std::string robotoBoldFile = GetDataPath() + "/fonts/roboto-bold.ttf";
+    std::string robotoBoldFile = GetDataPath() + "/Fonts/roboto-bold.ttf";
 	m_sansFontBoldFamily = nvgCreateFont(nvg, "sans-bold", robotoBoldFile.c_str());
 
 	ptr<Style> style = GetGuiManager()->GetStyle();
