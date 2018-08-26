@@ -109,8 +109,9 @@ void StackLayout::UpdateDesiredSize(
 
 	for (auto& child : m_children)
 	{
-		fx(m_desiredSize) = std::max(fx(m_desiredSize), fx(child->GetDesiredSize()));
-		fy(m_desiredSize) += fy(child->GetDesiredSize());
+        vec2 childDesiredSize = child->GetDesiredSize();
+        fx(m_desiredSize) = std::max(fx(m_desiredSize), fx(childDesiredSize));
+        fy(m_desiredSize) += fy(childDesiredSize);
 		fy(m_desiredSize) += fy(m_padding);
 	}
 
@@ -126,8 +127,9 @@ void StackLayout::UpdateMinimumSize(
 
 	for (auto& child : m_children)
 	{
-		fx(m_minimumSize) = std::max(fx(m_minimumSize), fx(child->GetMinimumSize()));
-		fy(m_minimumSize) += fy(child->GetMinimumSize());
+        vec2 childMinimumSize = child->GetMinimumSize();
+        fx(m_minimumSize) = std::max(fx(m_minimumSize), fx(childMinimumSize));
+        fy(m_minimumSize) += fy(childMinimumSize);
 		fy(m_minimumSize) += fy(m_padding);
 	}
 
@@ -141,7 +143,8 @@ void StackLayout::LayoutX(
 	bool isReverted,
 	bool normalise)
 {
-	const float maxChildSizeX = fx(GetSize()) - 2.0f * fx(m_padding);
+    vec2 thisSize = GetSize();
+    const float maxChildSizeX = fx(thisSize) - 2.0f * fx(m_padding);
 	for (size_t i = 0; i < m_children.size(); i++)
 	{
 		size_t j = isReverted ? (m_children.size() - i - 1) : i;
@@ -157,11 +160,13 @@ void StackLayout::LayoutX(
 		{
 			if (normalise)
 			{
-				childSizeX = fx(GetDesiredSize()) - 2.0f * fx(m_padding);
+                vec2 thisDesiredSize = this->GetDesiredSize();
+                childSizeX = fx(thisDesiredSize) - 2.0f * fx(m_padding);
 			}
 			else
 			{
-				childSizeX = fx(child->GetDesiredSize());
+                vec2 childDesiredSize = child->GetDesiredSize();
+                childSizeX = fx(childDesiredSize);
 			}
 			childSizeX = std::min(childSizeX, maxChildSizeX);
 		}
@@ -209,7 +214,8 @@ void StackLayout::LayoutY(
 		auto& child = m_children[j];
 
 		// Child size
-		const float childSizeY = fy(child->GetDesiredSize());
+        vec2 childDesiredSize = child->GetDesiredSize();
+        const float childSizeY = fy(childDesiredSize);
 		vec2 childSize = child->GetSize();
 		fy(childSize) = childSizeY;
 		child->SetSize(childSize);
@@ -220,19 +226,22 @@ void StackLayout::LayoutY(
 		{
 		case VerticalAlignment::Fill:
 			break;
-		case VerticalAlignment::Top:
-			childPositionY += childYSizeAccumulator;
-			break;
-		case VerticalAlignment::Bottom:
-			childPositionY += fy(GetSize()) - fy(m_padding) - childYSizeAccumulator;
-			break;
-		case VerticalAlignment::Center:
-			break;
+        case VerticalAlignment::Top:
+            childPositionY += childYSizeAccumulator;
+            break;
+        case VerticalAlignment::Bottom:
+            {
+                vec2 thisSize = this->GetSize();
+                childPositionY += fy(thisSize) - fy(m_padding) - childYSizeAccumulator;
+            }
+            break;
+        case VerticalAlignment::Center:
+            break;
 		}
 
 		vec2 childPosition = child->GetPosition();
 		fy(childPosition) = childPositionY;
 		child->SetPosition(childPosition);
-		childYSizeAccumulator += fy(child->GetSize()) + fy(m_padding);
+        childYSizeAccumulator += fy(childSize) + fy(m_padding);
 	}
 }

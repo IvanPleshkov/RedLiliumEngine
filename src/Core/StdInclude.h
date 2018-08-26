@@ -34,6 +34,7 @@
 #include <fstream>
 #include <functional>
 #include <optional>
+#include <exception>
 
 #include "CommonDefs.h"
 

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "core/common.h"
-#include "EditorFramework/Editor.h"
-#include "EditorFramework/Action.h"
-#include "EditorFramework/Event.h"
+#include <Core/Common.h>
+#include <EditorFramework/Editor.h>
+#include <EditorFramework/Action.h>
+#include <EditorFramework/Event.h>
 
 namespace RED_LILIUM_NAMESPACE
 {

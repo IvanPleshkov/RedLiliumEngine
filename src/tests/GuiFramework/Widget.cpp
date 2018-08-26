@@ -1,6 +1,6 @@
 #include "pch.h"
 
-#include "tests.h"
+#include "Tests.h"
 
 using namespace RED_LILIUM_NAMESPACE;
 

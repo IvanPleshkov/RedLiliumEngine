@@ -16,11 +16,11 @@ void LabeledButton::CreateFirstChilds()
 
 void LabeledButton::Tick()
 {
-	ptr<Style> style = GetStyle();
-	m_label
-		->SetFontSettings(style->m_h2)
-		->SetText(m_text)
-		->SetHorizontalAlignment(HorizontalAlignment::Center);
+    ptr<Style> style = GetStyle();
+    m_label
+        ->SetFontSettings(style->m_h2)
+        ->SetText(m_text)
+        ->SetHorizontalAlignment(HorizontalAlignment::Center);
 }
 
 void LabeledButton::UpdateDesiredSize()

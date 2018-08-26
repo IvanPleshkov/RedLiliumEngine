@@ -1,7 +1,7 @@
 #include "pch.h"
 
-#include "core/SmartPointers.h"
-#include "tests.h"
+#include <Core/SmartPointers.h>
+#include "Tests.h"
 
 using namespace RED_LILIUM_NAMESPACE;
 

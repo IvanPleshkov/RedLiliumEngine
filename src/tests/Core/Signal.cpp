@@ -1,7 +1,7 @@
 #include "pch.h"
 
-#include "core/signal.h"
-#include "tests.h"
+#include <Core/Signal.h>
+#include "Tests.h"
 
 using namespace RED_LILIUM_NAMESPACE;
 
