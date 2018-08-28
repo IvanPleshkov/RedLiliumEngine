@@ -15,3 +15,4 @@
 #endif // _DEBUG
 
 #define RED_LILIUM_GUARD(LEVEL)
+#define RED_LILIUM_SCOPE(LEVEL, NAME)

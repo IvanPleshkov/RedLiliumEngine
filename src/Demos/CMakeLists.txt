@@ -9,6 +9,7 @@ target_link_libraries(${PROJECT_NAME} EditorFramework)
 target_link_libraries(${PROJECT_NAME} GuiFramework)
 target_link_libraries(${PROJECT_NAME} GuiWidgets)
 target_link_libraries(${PROJECT_NAME} GuiBgfxAdapter)
+target_link_libraries(${PROJECT_NAME} TaskManager)
 
 target_link_libraries(${PROJECT_NAME} bgfx)
 target_link_libraries(${PROJECT_NAME} example-common)
