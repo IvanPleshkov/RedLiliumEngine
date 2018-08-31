@@ -156,7 +156,7 @@ ptr<Panel> GuiManager::AddPanel()
 	return result;
 }
 
-void GuiManager::RemovePanel(const ptr<Panel>& panel)
+void GuiManager::RemovePanel(ptr<Panel> panel)
 {
 	// TODO:
 	RED_LILIUM_ASSERT(false && "Not implemented");
@@ -246,7 +246,7 @@ void GuiManager::ChangeFocusByMouse()
 	}
 }
 
-void GuiManager::SetFocusedWidget(const ptr<Widget>& focusedWidget)
+void GuiManager::SetFocusedWidget(ptr<Widget> focusedWidget)
 {
 	RED_LILIUM_ASSERT(focusedWidget == nullptr || focusedWidget->CanFocusing());
 
@@ -267,7 +267,7 @@ void GuiManager::SetFocusedWidget(const ptr<Widget>& focusedWidget)
 	}
 }
 
-void GuiManager::SetHoveredWidget(const ptr<Widget>& hoveredWidget)
+void GuiManager::SetHoveredWidget(ptr<Widget> hoveredWidget)
 {
 	RED_LILIUM_ASSERT(hoveredWidget == nullptr || hoveredWidget->CanHovering());
 

@@ -29,17 +29,17 @@ bool TaskSheduler::RemoveTasks(const std::vector<sptr<Task>>& tasks)
 	throw std::exception();
 }
 
-const sptr<Task>& TaskSheduler::PopTask(const ptr<TaskManagerThread>& thread)
+const sptr<Task>& TaskSheduler::PopTask(ptr<TaskManagerThread> thread)
 {
 	throw std::exception();
 }
 
-void TaskSheduler::OnStartTask(const sptr<Task>& task, const ptr<TaskManagerThread>& thread)
+void TaskSheduler::OnStartTask(const sptr<Task>& task, ptr<TaskManagerThread> thread)
 {
 	throw std::exception();
 }
 
-void TaskSheduler::OnFinishTask(const sptr<Task>& task, const ptr<TaskManagerThread>& thread)
+void TaskSheduler::OnFinishTask(const sptr<Task>& task, ptr<TaskManagerThread> thread)
 {
 	throw std::exception();
 }

@@ -21,8 +21,8 @@ public:
 class InsertTextAction : public Action<TextEditor>
 {
 public:
-	InsertTextAction(const ptr<Editor>& editor);
-	EventHandleResultFlags HandleEvent(const ptr<Event>& event) override;
+	InsertTextAction(ptr<Editor> editor);
+	EventHandleResultFlags HandleEvent(ptr<Event> event) override;
 	bool Undo() const override;
 	bool Redo() const override;
 	bool IsEmpty() const override;
@@ -39,8 +39,8 @@ private:
 class DeleteTextAction : public Action<TextEditor>
 {
 public:
-	DeleteTextAction(const ptr<Editor>& editor);
-	EventHandleResultFlags HandleEvent(const ptr<Event>& event) override;
+	DeleteTextAction(ptr<Editor> editor);
+	EventHandleResultFlags HandleEvent(ptr<Event> event) override;
 	bool Undo() const override;
 	bool Redo() const override;
 	bool IsEmpty() const override;
@@ -57,8 +57,8 @@ private:
 class ChangeCursorPositionAction : public Action<TextEditor>
 {
 public:
-	ChangeCursorPositionAction(const ptr<Editor>& editor);
-	EventHandleResultFlags HandleEvent(const ptr<Event>& event) override;
+	ChangeCursorPositionAction(ptr<Editor> editor);
+	EventHandleResultFlags HandleEvent(ptr<Event> event) override;
 	bool Undo() const override;
 	bool Redo() const override;
 	bool IsEmpty() const override;
@@ -70,8 +70,8 @@ public:
 class ChangeSelectionAction : public Action<TextEditor>
 {
 public:
-	ChangeSelectionAction(const ptr<Editor>& editor);
-	EventHandleResultFlags HandleEvent(const ptr<Event>& event) override;
+	ChangeSelectionAction(ptr<Editor> editor);
+	EventHandleResultFlags HandleEvent(ptr<Event> event) override;
 	bool Undo() const override;
 	bool Redo() const override;
 	bool IsEmpty() const override;
@@ -83,7 +83,7 @@ public:
 class SetCursorPositionEvent : public Event
 {
 public:
-	uptr<ActionBase> TriggerAction(const ptr<Editor>& editor) override;
+	uptr<ActionBase> TriggerAction(ptr<Editor> editor) override;
 
 private:
 	u64 m_cursorPosition;
@@ -92,7 +92,7 @@ private:
 class SetSelectionCursorEvent : public Event
 {
 public:
-	uptr<ActionBase> TriggerAction(const ptr<Editor>& editor) override;
+	uptr<ActionBase> TriggerAction(ptr<Editor> editor) override;
 
 private:
 	u64 m_selectionPosition;
@@ -101,7 +101,7 @@ private:
 class InputSymbolEvent : public Event
 {
 public:
-	uptr<ActionBase> TriggerAction(const ptr<Editor>& editor) override;
+	uptr<ActionBase> TriggerAction(ptr<Editor> editor) override;
 
 private:
 	std::string m_symbol;
@@ -110,7 +110,7 @@ private:
 class PasteTextEvent : public Event
 {
 public:
-	uptr<ActionBase> TriggerAction(const ptr<Editor>& editor) override;
+	uptr<ActionBase> TriggerAction(ptr<Editor> editor) override;
 
 private:
 	std::string m_pastedText;
@@ -119,13 +119,13 @@ private:
 class DeleteEvent : public Event
 {
 public:
-	uptr<ActionBase> TriggerAction(const ptr<Editor>& editor) override;
+	uptr<ActionBase> TriggerAction(ptr<Editor> editor) override;
 };
 
 class BackspaceEvent : public Event
 {
 public:
-	uptr<ActionBase> TriggerAction(const ptr<Editor>& editor) override;
+	uptr<ActionBase> TriggerAction(ptr<Editor> editor) override;
 };
 
 } // namespace TestEditor

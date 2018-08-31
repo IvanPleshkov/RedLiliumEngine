@@ -5,7 +5,7 @@
 
 using namespace RED_LILIUM_NAMESPACE;
 
-EventHandleResultFlags ActionBase::HandleEvent(const ptr<Event>& event)
+EventHandleResultFlags ActionBase::HandleEvent(ptr<Event> event)
 {
 	EventHandleResultFlags result;
 	result.Add(EventHandleResult::ActionFinished);

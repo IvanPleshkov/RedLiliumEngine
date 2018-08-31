@@ -23,7 +23,7 @@ public:
 	}
 };
 
-int TaskManagerDemo(const ptr<ArgsParser>& parser)
+int TaskManagerDemo(ptr<ArgsParser> parser)
 {
 	sptr<InitialTask> initialTask = std::make_shared<InitialTask>();
 	uptr<TaskManager> taskManager = umake<TaskManager>();

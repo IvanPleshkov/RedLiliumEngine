@@ -22,8 +22,8 @@ public:
 	virtual bool Run() = 0;
 
 	void AddDependTask(const sptr<Task>& task);
-	void AddReadResource(const ptr<RedLiliumObject>& resource);
-	void AddWriteResource(const ptr<RedLiliumObject>& resource);
+	void AddReadResource(ptr<RedLiliumObject> resource);
+	void AddWriteResource(ptr<RedLiliumObject> resource);
 
 private:
 	std::string m_name;

@@ -6,7 +6,7 @@ REGISTER_COMMAND("HelloWorld", HelloWorld)
 
 using namespace RED_LILIUM_NAMESPACE;
 
-int HelloWorld(const ptr<ArgsParser>& parser)
+int HelloWorld(ptr<ArgsParser> parser)
 {
 	return 0;
 }

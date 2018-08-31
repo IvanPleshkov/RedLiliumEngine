@@ -5,7 +5,7 @@
 
 namespace RED_LILIUM_NAMESPACE
 {
-	typedef std::function<int(const ptr<ArgsParser>&)> RegisteredCommand;
+	typedef std::function<int(ptr<ArgsParser>)> RegisteredCommand;
 
 	class UtilCommands
 	{
@@ -60,7 +60,7 @@ namespace RED_LILIUM_NAMESPACE
 
 #define REGISTER_COMMAND(name, command)\
 \
-int command(const RED_LILIUM_NAMESPACE::ptr<RED_LILIUM_NAMESPACE::ArgsParser>& parser);\
+int command(RED_LILIUM_NAMESPACE::ptr<RED_LILIUM_NAMESPACE::ArgsParser> parser);\
 \
 namespace \
 {\
@@ -69,8 +69,8 @@ RED_LILIUM_NAMESPACE::UtilCommands r(name, RED_LILIUM_NAMESPACE::RegisteredComma
 
 #define REGISTER_COMMAND_WITH_HELP(name, command, help_command)\
 \
-int command(const RED_LILIUM_NAMESPACE::ptr<RED_LILIUM_NAMESPACE::ArgsParser>& parser);\
-int help_command(const RED_LILIUM_NAMESPACE::ptr<RED_LILIUM_NAMESPACE::ArgsParser>& parser);\
+int command(RED_LILIUM_NAMESPACE::ptr<RED_LILIUM_NAMESPACE::ArgsParser> parser);\
+int help_command(RED_LILIUM_NAMESPACE::ptr<RED_LILIUM_NAMESPACE::ArgsParser> parser);\
 \
 namespace \
 {\

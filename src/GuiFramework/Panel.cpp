@@ -5,7 +5,7 @@
 
 using namespace RED_LILIUM_NAMESPACE;
 
-Panel::Panel(const ptr<GuiManager>& guiManager)
+Panel::Panel(ptr<GuiManager> guiManager)
 	: m_guiManager(guiManager)
 	, m_nativeWindow(nullptr)
 {
@@ -143,7 +143,7 @@ ptr<Widget> Panel::GetWidgetUnderPoint(vec2 position, bool onlyHoverableWidgets)
 	return GetWidgetUnderPointRecursive(m_topWidget, position, onlyHoverableWidgets);
 }
 
-void Panel::DrawRecursive(const ptr<Widget>& widget, mat3 transform)
+void Panel::DrawRecursive(ptr<Widget> widget, mat3 transform)
 {
 	mat3 widgetTransform = transform * widget->GetTransform();
 
@@ -252,7 +252,7 @@ ptr<Widget> Panel::GetWidgetUnderPointRecursive(const uptr<Widget>& widget, vec2
 	}
 }
 
-void Panel::SetWidgetScissor(const ptr<Widget>& widget, mat3 transform)
+void Panel::SetWidgetScissor(ptr<Widget> widget, mat3 transform)
 {
 	nvgResetTransform(GetNvgContext());
 

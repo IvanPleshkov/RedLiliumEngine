@@ -316,7 +316,7 @@ template<class T>
 using ptr = RedLiliumWeakPointer<T>;
 
 template<class T, class R>
-ptr<T> Cast(const ptr<R>& ref)
+ptr<T> Cast(ptr<R> ref)
 {
 	T* pointer = dynamic_cast<T*>(ref.Get());
 	return ptr<T>(pointer);

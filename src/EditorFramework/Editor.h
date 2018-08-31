@@ -12,7 +12,7 @@ class Editor : public RedLiliumObject
 public:
 	Editor();
 
-	void HandleEvent(const ptr<Event>& event);
+	void HandleEvent(ptr<Event> event);
 	void Undo();
 	void Redo();
 	bool IsModified() const;

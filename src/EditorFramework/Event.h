@@ -12,7 +12,7 @@ class Editor;
 class Event : public RedLiliumObject
 {
 public:
-	virtual uptr<ActionBase> TriggerAction(const ptr<Editor>& editor)
+	virtual uptr<ActionBase> TriggerAction(ptr<Editor> editor)
 	{
 		return nullptr;
 	}
@@ -24,7 +24,7 @@ template<class IAction>
 class ActionEvent : public Event
 {
 public:
-	uptr<ActionBase> TriggerAction(const ptr<Editor>& editor) override
+	uptr<ActionBase> TriggerAction(ptr<Editor> editor) override
 	{
 		return umake<IAction>(editor);
 	}

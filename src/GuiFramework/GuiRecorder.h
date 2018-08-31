@@ -27,7 +27,7 @@ public:
 	void PushLogMessage(const std::string& message);
 
 	ptr<GuiReplayData> GetReplayData();
-	const ptr<GuiReplayData> GetReplayData() const;
+	ptr<const GuiReplayData> GetReplayData() const;
 
 private:
 	GuiRecordingMode m_recordingMode;

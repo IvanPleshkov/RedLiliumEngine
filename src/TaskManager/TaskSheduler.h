@@ -18,9 +18,9 @@ public:
 	bool RemoveTask(const sptr<Task>& tasks);
 	bool RemoveTasks(const std::vector<sptr<Task>>& tasks);
 
-	const sptr<Task>& PopTask(const ptr<TaskManagerThread>& thread);
-	void OnStartTask(const sptr<Task>& task, const ptr<TaskManagerThread>& thread);
-	void OnFinishTask(const sptr<Task>& task, const ptr<TaskManagerThread>& thread);
+	const sptr<Task>& PopTask(ptr<TaskManagerThread> thread);
+	void OnStartTask(const sptr<Task>& task, ptr<TaskManagerThread> thread);
+	void OnFinishTask(const sptr<Task>& task, ptr<TaskManagerThread> thread);
 
 };
 

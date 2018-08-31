@@ -19,7 +19,7 @@ using EventHandleResultFlags = Flags<EventHandleResult>;
 class ActionBase : public RedLiliumObject
 {
 public:
-	virtual EventHandleResultFlags HandleEvent(const ptr<Event>& event);
+	virtual EventHandleResultFlags HandleEvent(ptr<Event> event);
 	virtual bool Undo() const;
 	virtual bool Redo() const;
 	virtual bool IsEmpty() const;
@@ -37,7 +37,7 @@ template<class IEditor>
 class Action : public ActionBase
 {
 public:
-	Action(const ptr<Editor>& editor)
+	Action(ptr<Editor> editor)
 		: m_editor(Cast<IEditor>(editor))
 	{}
 

@@ -14,7 +14,7 @@ public:
 
 	ptr<Style> GetStyle();
 	ptr<Panel> AddPanel();
-	void RemovePanel(const ptr<Panel>& panel);
+	void RemovePanel(ptr<Panel> panel);
 
 	void BeginFrame(const Time& timeFromStart, const MouseState& mouseState, const KeyState& keyState);
 	void EndFrame();
@@ -47,8 +47,8 @@ private:
 	bool HandleMouseEvent(const MouseEvent& mouseEventType);
 	bool HandleKeyEvent(const KeyEvent& keyEventType);
 
-	void SetFocusedWidget(const ptr<Widget>& focusedWidget);
-	void SetHoveredWidget(const ptr<Widget>& hoveredWidget);
+	void SetFocusedWidget(ptr<Widget> focusedWidget);
+	void SetHoveredWidget(ptr<Widget> hoveredWidget);
 
 private:
 	ptr<INativeEnvironment> m_nativeEnvironment;

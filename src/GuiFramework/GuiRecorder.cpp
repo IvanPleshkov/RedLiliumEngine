@@ -59,7 +59,7 @@ ptr<GuiReplayData> GuiRecorder::GetReplayData()
 	return m_data.get();
 }
 
-const ptr<GuiReplayData> GuiRecorder::GetReplayData() const
+ptr<const GuiReplayData> GuiRecorder::GetReplayData() const
 {
 	return m_data.get();
 }

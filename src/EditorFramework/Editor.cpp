@@ -9,7 +9,7 @@ Editor::Editor()
 {
 }
 
-void Editor::HandleEvent(const ptr<Event>& event)
+void Editor::HandleEvent(ptr<Event> event)
 {
 	bool eventHandled = false;
 
