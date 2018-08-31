@@ -2,9 +2,11 @@
 #include "TaskManager.h"
 #include "Task.h"
 #include "TaskManagerThread.h"
-#include "TaskSheduler.h"
+#include "TaskScheduler.h"
 
 using namespace RED_LILIUM_NAMESPACE;
+
+thread_local std::vector<sptr<Task>> TaskManager::g_tasksPool;
 
 TaskManager::TaskManager()
 {
@@ -31,12 +33,17 @@ void TaskManager::SetThreadsCount(std::optional<u32> threadsCount)
 
 void TaskManager::AddTask(const sptr<Task>& task)
 {
-	throw std::exception();
+	g_tasksPool.push_back(task);
+}
+
+void TaskManager::AddTask(sptr<Task>&& task)
+{
+	g_tasksPool.push_back(std::move(task));
 }
 
 bool TaskManager::RemoveTask(const sptr<Task>& task)
 {
-	throw std::exception();
+	return RemoveTasks({ task });
 }
 
 bool TaskManager::RemoveTasks(const std::vector<sptr<Task>>& tasks)

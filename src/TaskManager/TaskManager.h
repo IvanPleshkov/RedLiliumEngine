@@ -7,7 +7,7 @@ namespace RED_LILIUM_NAMESPACE
 
 class Task;
 class TaskManagerThread;
-class TaskSheduler;
+class TaskScheduler;
 
 class TaskManager : public RedLiliumObject
 {
@@ -20,15 +20,18 @@ public:
 
 	static void SetThreadsCount(std::optional<u32> threadsCount);
 	static void AddTask(const sptr<Task>& task);
+	static void AddTask(sptr<Task>&& task);
 	static bool RemoveTask(const sptr<Task>& task);
 	static bool RemoveTasks(const std::vector<sptr<Task>>& tasks);
 
 private:
 	friend class TaskManagerThread;
 
+	static thread_local std::vector<sptr<Task>> g_tasksPool;
+
 	std::vector<uptr<TaskManagerThread>> m_threads;
-	uptr<TaskSheduler> m_taskGraph;
-	std::mutex m_taskGraphAccessMutex;
+	uptr<TaskScheduler> m_taskScheduler;
+	std::mutex m_mutex;
 };
 
 } // namespace RED_LILIUM_NAMESPACE

@@ -16,6 +16,7 @@
 #include <memory>
 #include <vector>
 #include <list>
+#include <forward_list>
 #include <string>
 #include <iostream>
 #include <map>
