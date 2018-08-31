@@ -1,7 +1,4 @@
-cmake_minimum_required (VERSION 3.2.3)
-
-set(PROJECT_NAME GuiBgfxAdapter)
-PROJECT("${PROJECT_NAME}")
+project("GuiBgfxAdapter")
 
 include("../common.cmake")
 

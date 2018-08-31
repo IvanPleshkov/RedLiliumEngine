@@ -11,8 +11,8 @@ GuiManager::GuiManager(ptr<INativeEnvironment> nativeEnvironment, GuiRecordingMo
 	, m_hoveredWidget(nullptr)
 	, m_draggableWidget(nullptr)
 {
-	m_style = std::make_unique<Style>();
-	m_recorder = std::make_unique<GuiRecorder>(recordingData);
+	m_style = umake<Style>();
+	m_recorder = umake<GuiRecorder>(recordingData);
 }
 
 ptr<Style> GuiManager::GetStyle()
@@ -150,7 +150,7 @@ void GuiManager::CheckMouseKeyEvent(
 
 ptr<Panel> GuiManager::AddPanel()
 {
-	uptr<Panel> newPanel = std::make_unique<Panel>(this);
+	uptr<Panel> newPanel = umake<Panel>(this);
 	ptr<Panel> result = newPanel.get();
 	m_panels.insert(std::move(newPanel));
 	return result;

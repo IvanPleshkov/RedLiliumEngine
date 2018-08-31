@@ -9,7 +9,7 @@ int main(int argc, char** argv)
 	if (argc < 2)
 		return -1;
 
-	uptr<ArgsParser> parser = std::make_unique<ArgsParser>(argc, argv);
+	uptr<ArgsParser> parser = umake<ArgsParser>(argc, argv);
 	auto& commands = UtilCommands::GetCommands();
 	auto& help_commands = UtilCommands::GetHelpCommands();
 

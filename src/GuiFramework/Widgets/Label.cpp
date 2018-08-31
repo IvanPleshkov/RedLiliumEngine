@@ -4,7 +4,7 @@
 using namespace RED_LILIUM_NAMESPACE;
 
 Label::Label()
-	: m_textWidgetsHelper(std::move(std::make_unique<TextWidgetsHelper>()))
+	: m_textWidgetsHelper(std::move(umake<TextWidgetsHelper>()))
 	, m_disaplyedText()
 {}
 

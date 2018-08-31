@@ -61,9 +61,9 @@ BgfxGuiApplication::BgfxGuiApplication(
 {
 	InitDataPath();
 
-	m_impl = std::make_unique<Impl>(this, m_name.c_str(), m_description.c_str());
-	m_nativeWindow = std::make_unique<BgfxWindow>();
-	m_nativeEnvironment = std::make_unique<BgfxEnvironment>();
+	m_impl = umake<Impl>(this, m_name.c_str(), m_description.c_str());
+	m_nativeWindow = umake<BgfxWindow>();
+	m_nativeEnvironment = umake<BgfxEnvironment>();
 }
 
 BgfxGuiApplication::~BgfxGuiApplication()
@@ -71,7 +71,7 @@ BgfxGuiApplication::~BgfxGuiApplication()
 
 void BgfxGuiApplication::Run(GuiRecordingMode recordingMode)
 {
-	m_guiManager = std::make_unique<GuiManager>(m_nativeEnvironment.get(), recordingMode);
+	m_guiManager = umake<GuiManager>(m_nativeEnvironment.get(), recordingMode);
 
 	std::vector<const char*> argv;
 	argv.reserve(m_args.size());

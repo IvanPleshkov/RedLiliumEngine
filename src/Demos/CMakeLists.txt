@@ -1,4 +1,4 @@
-PROJECT("Demos")
+project("Demos")
 
 include("../common.cmake")
 

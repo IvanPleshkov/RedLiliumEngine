@@ -26,7 +26,7 @@ class ActionEvent : public Event
 public:
 	uptr<ActionBase> TriggerAction(const ptr<Editor>& editor) override
 	{
-		return std::make_unique<IAction>(editor);
+		return umake<IAction>(editor);
 	}
 };
 

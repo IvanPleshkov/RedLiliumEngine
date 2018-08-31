@@ -26,6 +26,8 @@ public:
 int TaskManagerDemo(const ptr<ArgsParser>& parser)
 {
 	sptr<InitialTask> initialTask = std::make_shared<InitialTask>();
-	uptr<TaskManager> taskManager = std::make_unique<TaskManager>(initialTask, 2);
+	uptr<TaskManager> taskManager = umake<TaskManager>();
+	taskManager->Start(initialTask, 2);
+	taskManager->Wait();
 	return 0;
 }

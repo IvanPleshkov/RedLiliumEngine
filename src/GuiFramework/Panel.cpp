@@ -10,7 +10,7 @@ Panel::Panel(const ptr<GuiManager>& guiManager)
 	, m_nativeWindow(nullptr)
 {
 	m_currentGuiPipelineState = GuiPipelineStep::Idle;
-	m_topWidget = std::make_unique<Widget>();
+	m_topWidget = umake<Widget>();
 	m_topWidget->m_panel = this;
 }
 

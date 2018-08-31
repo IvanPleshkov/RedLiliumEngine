@@ -59,6 +59,8 @@ using i32 = int32_t;
 using u32 = uint32_t;
 using i64 = int64_t;
 using u64 = uint64_t;
+using f32 = float;
+using f64 = double;
 
 const i8  i8_max = std::numeric_limits<i8>::max();
 const u8  u8_max = std::numeric_limits<u8>::max();
@@ -75,6 +77,25 @@ template<class T>
 using wptr = std::weak_ptr<T>;
 template<class T>
 using uptr = std::unique_ptr<T>;
+
+template<class T, class... _Types>
+[[nodiscard]] inline uptr<T> umake(_Types&&... _Args)
+{
+	return std::make_unique<T>(std::forward<_Types>(_Args)...);
+}
+
+template<class T, class... _Types>
+[[nodiscard]] inline sptr<T> smake(_Types&&... _Args)
+{
+	return std::make_shared<T>(std::forward<_Types>(_Args)...);
+}
+
+/*
+template<class T>
+using vector = std::vector<T>;
+template<class T>
+using set = std::set<T>;
+*/
 
 using vec2 = glm::vec2;
 using vec3 = glm::vec3;

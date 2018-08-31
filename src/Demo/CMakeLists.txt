@@ -1,7 +1,4 @@
-cmake_minimum_required (VERSION 3.2.3)
-
-set(PROJECT_NAME Demo)
-PROJECT("Demo")
+project("Demo")
 
 include("../common.cmake")
 

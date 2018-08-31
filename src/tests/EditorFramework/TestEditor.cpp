@@ -169,30 +169,30 @@ bool ChangeSelectionAction::NeedUndoAfterFinishing() const
 //======================== Events
 uptr<ActionBase> SetCursorPositionEvent::TriggerAction(const ptr<Editor>& editor)
 {
-	return std::make_unique<ChangeCursorPositionAction>(editor);
+	return umake<ChangeCursorPositionAction>(editor);
 }
 
 uptr<ActionBase> SetSelectionCursorEvent::TriggerAction(const ptr<Editor>& editor)
 {
-	return std::make_unique<ChangeSelectionAction>(editor);
+	return umake<ChangeSelectionAction>(editor);
 }
 
 uptr<ActionBase> InputSymbolEvent::TriggerAction(const ptr<Editor>& editor)
 {
-	return std::make_unique<InsertTextAction>(editor);
+	return umake<InsertTextAction>(editor);
 }
 
 uptr<ActionBase> PasteTextEvent::TriggerAction(const ptr<Editor>& editor)
 {
-	return std::make_unique<InsertTextAction>(editor);
+	return umake<InsertTextAction>(editor);
 }
 
 uptr<ActionBase> DeleteEvent::TriggerAction(const ptr<Editor>& editor)
 {
-	return std::make_unique<DeleteTextAction>(editor);
+	return umake<DeleteTextAction>(editor);
 }
 
 uptr<ActionBase> BackspaceEvent::TriggerAction(const ptr<Editor>& editor)
 {
-	return std::make_unique<DeleteTextAction>(editor);
+	return umake<DeleteTextAction>(editor);
 }

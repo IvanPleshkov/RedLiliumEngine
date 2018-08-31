@@ -47,7 +47,7 @@ ptr<TWidget> Widget::AddNewChild()
 	// remove obsolete childs
 	m_children.erase(m_children.begin() + m_childAddingCursor, m_children.end());
 
-	uptr<TWidget> widget = std::make_unique<TWidget>();
+	uptr<TWidget> widget = umake<TWidget>();
 	ptr<TWidget> result = widget.get();
 	result->m_parent = this;
 	result->m_panel = m_panel;

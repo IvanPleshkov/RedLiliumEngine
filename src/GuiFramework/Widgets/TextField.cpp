@@ -7,7 +7,7 @@
 using namespace RED_LILIUM_NAMESPACE;
 
 TextField::TextField()
-	: m_textWidgetsHelper(std::move(std::make_unique<TextWidgetsHelper>()))
+	: m_textWidgetsHelper(std::move(umake<TextWidgetsHelper>()))
 	, m_disaplyedText()
 	, m_cursorPosition(m_disaplyedText.end())
 	, m_cursorDrawPosition(0)

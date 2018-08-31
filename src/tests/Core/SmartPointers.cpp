@@ -17,25 +17,25 @@ struct TestClass : TestBaseClass
 
 TEST(RedLiliumWeakPointer, PointerConstructor_1)
 {
-	uptr<TestClass> u = std::make_unique<TestClass>();
+	uptr<TestClass> u = umake<TestClass>();
 	ptr<TestClass> p = u.get();
 }
 
 TEST(RedLiliumWeakPointer, ConstPointerConstructor_1)
 {
-	uptr<TestClass> u = std::make_unique<TestClass>();
+	uptr<TestClass> u = umake<TestClass>();
 	const ptr<const TestClass> p = u.get();
 }
 
 TEST(RedLiliumWeakPointer, PointerConstructor_2)
 {
-	uptr<TestClass> u = std::make_unique<TestClass>();
+	uptr<TestClass> u = umake<TestClass>();
 	ptr<TestBaseClass> p = u.get();
 }
 
 TEST(RedLiliumWeakPointer, ConstPointerConstructor_2)
 {
-	uptr<TestClass> u = std::make_unique<TestClass>();
+	uptr<TestClass> u = umake<TestClass>();
 	const ptr<const TestBaseClass> p = u.get();
 }
 
