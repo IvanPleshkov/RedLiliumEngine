@@ -38,7 +38,7 @@ static std::vector<sptr<Task>> GetTasksOrder(ptr<TaskScheduler> scheduler, u8 th
 	return std::move(result);
 }
 
-TEST(TaskScheduler, Construct)
+TEST(TaskScheduler, Construct_0)
 {
 	uptr<TaskScheduler> taskSheduler = umake<TaskScheduler>();
 
@@ -49,8 +49,31 @@ TEST(TaskScheduler, Construct)
 	task2->AddDependTask(task1);
 	task1->AddDependTask(task0);
 
-	taskSheduler->PushTasks({ task2, task1, task0 });
+    taskSheduler->PushTasks({ task0, task1, task2 });
 
 	auto order = GetTasksOrder(taskSheduler.get());
 
+    ASSERT_TRUE(order[0] == task0);
+    ASSERT_TRUE(order[1] == task1);
+    ASSERT_TRUE(order[2] == task2);
+}
+
+TEST(TaskScheduler, Construct_1)
+{
+    uptr<TaskScheduler> taskSheduler = umake<TaskScheduler>();
+
+    sptr<Task> task0 = smake<TestTask>();
+    sptr<Task> task1 = smake<TestTask>();
+    sptr<Task> task2 = smake<TestTask>();
+
+    task2->AddDependTask(task1);
+    task1->AddDependTask(task0);
+
+    taskSheduler->PushTasks({ task2, task1, task0 });
+
+    auto order = GetTasksOrder(taskSheduler.get());
+
+    ASSERT_TRUE(order[0] == task0);
+    ASSERT_TRUE(order[1] == task1);
+    ASSERT_TRUE(order[2] == task2);
 }
