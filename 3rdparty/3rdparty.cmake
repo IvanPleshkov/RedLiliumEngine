@@ -12,3 +12,6 @@ set_target_properties (gtest_main PROPERTIES FOLDER 3rdparty)
 
 #==================== BGFX
 add_subdirectory("3rdparty/bgfx")
+
+add_subdirectory("3rdparty/glfw")
+set_target_properties (glfw PROPERTIES FOLDER 3rdparty)
