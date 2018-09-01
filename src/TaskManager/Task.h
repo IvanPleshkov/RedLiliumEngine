@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Core/Common.h>
+#include "TaskManagerForward.h"
 
 namespace RED_LILIUM_NAMESPACE
 {

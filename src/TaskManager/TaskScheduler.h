@@ -1,13 +1,9 @@
 #pragma once
 
-#include <Core/Common.h>
+#include "TaskManagerForward.h"
 
 namespace RED_LILIUM_NAMESPACE
 {
-
-class Task;
-class TaskManager;
-class TaskManagerThread;
 
 class TaskScheduler : public RedLiliumObject
 {

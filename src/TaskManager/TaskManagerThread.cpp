@@ -1,4 +1,7 @@
 #include "pch.h"
+
+#if !RED_LILIUM_SINGLE_THREAD_MODE
+
 #include "TaskManager.h"
 #include "Task.h"
 #include "TaskManagerThread.h"
@@ -71,3 +74,5 @@ void TaskManagerThread::StartLoopIteration()
 		m_taskManager->g_tasksPool.clear();
 	}
 }
+
+#endif // RED_LILIUM_SINGLE_THREAD_MODE

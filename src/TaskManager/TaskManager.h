@@ -1,13 +1,9 @@
 #pragma once
 
-#include <Core/Common.h>
+#include "TaskManagerForward.h"
 
 namespace RED_LILIUM_NAMESPACE
 {
-
-class Task;
-class TaskManagerThread;
-class TaskScheduler;
 
 class TaskManager : public RedLiliumObject
 {
@@ -28,10 +24,12 @@ private:
 	friend class TaskManagerThread;
 
 	static thread_local std::vector<sptr<Task>> g_tasksPool;
-
-	std::vector<uptr<TaskManagerThread>> m_threads;
 	uptr<TaskScheduler> m_taskScheduler;
+
+#if !RED_LILIUM_SINGLE_THREAD_MODE
+	std::vector<uptr<TaskManagerThread>> m_threads;
 	std::mutex m_mutex;
+#endif
 };
 
 } // namespace RED_LILIUM_NAMESPACE

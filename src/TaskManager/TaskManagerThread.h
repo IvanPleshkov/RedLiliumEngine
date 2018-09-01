@@ -1,11 +1,11 @@
 #pragma once
 
-#include <Core/Common.h>
+#if !RED_LILIUM_SINGLE_THREAD_MODE
+
+#include "TaskManagerForward.h"
 
 namespace RED_LILIUM_NAMESPACE
 {
-
-class Task;
 
 class TaskManagerThread : public RedLiliumObject
 {
@@ -32,3 +32,5 @@ private:
 };
 
 } // namespace RED_LILIUM_NAMESPACE
+
+#endif

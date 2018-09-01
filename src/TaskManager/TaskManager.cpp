@@ -1,15 +1,18 @@
 #include "pch.h"
 #include "TaskManager.h"
 #include "Task.h"
-#include "TaskManagerThread.h"
 #include "TaskScheduler.h"
+#include "TaskManagerThread.h"
 
 using namespace RED_LILIUM_NAMESPACE;
 
 thread_local std::vector<sptr<Task>> TaskManager::g_tasksPool;
 
+#if RED_LILIUM_SINGLE_THREAD_MODE
+
 TaskManager::TaskManager()
 {
+	m_taskScheduler = umake<TaskScheduler>();
 }
 
 TaskManager::~TaskManager()
@@ -18,17 +21,32 @@ TaskManager::~TaskManager()
 
 void TaskManager::Start(const sptr<Task>& firstTask, std::optional<u32> threadsCount)
 {
-	throw std::exception();
+	sptr<Task> currentTask;
+	m_taskScheduler->PushTasks({ firstTask });
+	do
+	{
+		currentTask = m_taskScheduler->PopTask();
+
+		if (currentTask)
+		{
+			m_taskScheduler->OnStartTask(currentTask);
+			currentTask->Run();
+			m_taskScheduler->OnFinishTask(currentTask);
+			m_taskScheduler->PushTasks(g_tasksPool);
+		}
+	} while (currentTask != nullptr);
 }
 
 void TaskManager::Wait()
 {
-	throw std::exception();
 }
 
 void TaskManager::SetThreadsCount(std::optional<u32> threadsCount)
 {
-	throw std::exception();
+	if (threadsCount && threadsCount.value() != 1)
+	{
+		throw std::exception();
+	}
 }
 
 void TaskManager::AddTask(const sptr<Task>& task)
@@ -49,4 +67,7 @@ bool TaskManager::RemoveTask(const sptr<Task>& task)
 bool TaskManager::RemoveTasks(const std::vector<sptr<Task>>& tasks)
 {
 	throw std::exception();
+	// return m_taskScheduler->RemoveTasks(tasks);
 }
+
+#endif // RED_LILIUM_SINGLE_THREAD_MODE
