@@ -17,11 +17,17 @@ public:
 
 template<class... T>
 class TaskReadClosure : public TaskClosureImpl<ptr<const T>...>
-{};
+{
+public:
+    TaskReadClosure(ptr<const T>... args);
+};
 
 template<class... T>
 class TaskWriteClosure : public TaskClosureImpl<ptr<T>...>
-{};
+{
+public:
+    TaskWriteClosure(ptr<T>... args);
+};
 
 template<class ReadClosure = TaskReadClosure<>, class WriteClosure = TaskWriteClosure<>>
 class CapturedTask : public Task
@@ -50,7 +56,7 @@ inline TaskClosureImpl<T...>::TaskClosureImpl(const T& ...args)
 template<class I, class ...T>
 inline const I& TaskClosureImpl<T...>::Get()
 {
-	// TODO: insert return statement here
+    return std::get<I>(*static_cast<std::tuple<T...>*>(this));
 }
 
 //====================== CapturedTask
@@ -70,13 +76,13 @@ inline CapturedTask<ReadClosure, WriteClosure>::~CapturedTask()
 template<class ReadClosure, class WriteClosure, class T>
 inline ptr<const T>& CapturedTask<ReadClosure, WriteClosure>::GetRead()
 {
-	// TODO: insert return statement here
+    return m_readClosure.Get<T>();
 }
 
 template<class ReadClosure, class WriteClosure, class T>
 inline ptr<T>& CapturedTask<ReadClosure, WriteClosure>::GetWrite()
 {
-	// TODO: insert return statement here
+    return m_writeClosure.Get<T>();
 }
 
 } // namespace RED_LILIUM_NAMESPACE

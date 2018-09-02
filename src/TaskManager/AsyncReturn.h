@@ -14,7 +14,7 @@ public:
 	bool IsReady() const;
 
 private:
-	template<class T>
+    template<class I>
 	friend class AsyncReturn;
 
 	using SharedResult = std::pair<T, std::atomic<bool>>;
