@@ -6,83 +6,99 @@ namespace RED_LILIUM_NAMESPACE
 {
 
 template<class... T>
-class TaskClosureImpl : private std::tuple<T...>
+class TaskClosureImpl : private std::tuple<ptr<T>...>
 {
 public:
-	TaskClosureImpl(const T&... args);
+	TaskClosureImpl() : std::tuple<ptr<T>...>(ptr<T>(nullptr)...)
+	{}
 
 	template<class I>
-	const I& Get();
+	ptr<I>& Get()
+	{
+		return std::get<ptr<I>>(*static_cast<std::tuple<ptr<T>...>*>(this));
+	}
 };
 
 template<class... T>
-class TaskReadClosure : public TaskClosureImpl<ptr<const T>...>
+class TaskReadClosure : public TaskClosureImpl<const T...>
 {
 public:
-    TaskReadClosure(ptr<const T>... args);
+    TaskReadClosure() : TaskClosureImpl<const T...>()
+	{}
 };
 
 template<class... T>
-class TaskWriteClosure : public TaskClosureImpl<ptr<T>...>
+class TaskWriteClosure : public TaskClosureImpl<T...>
 {
 public:
-    TaskWriteClosure(ptr<T>... args);
+    TaskWriteClosure() : TaskClosureImpl<T...>()
+	{}
 };
 
 template<class ReadClosure = TaskReadClosure<>, class WriteClosure = TaskWriteClosure<>>
 class CapturedTask : public Task
 {
 public:
-    CapturedTask(const std::string& name, const ReadClosure& readClosure, const WriteClosure& writeClosure);
-	~CapturedTask() override;
+	using Read = ReadClosure;
+	using Write = WriteClosure;
+	using CapturedTaskType = CapturedTask<ReadClosure, WriteClosure>;
+
+    CapturedTask(const std::string& name)
+		: Task(name)
+		, m_readClosure()
+		, m_writeClosure()
+	{ }
+
+	~CapturedTask() override {}
 
 	template <class T>
-	ptr<const T>& GetRead();
+	ptr<const T>& GetRead()
+	{
+		return m_readClosure.Get<const T>();
+	}
 
 	template <class T>
-	ptr<T>& GetWrite();
+	ptr<T>& GetWrite()
+	{
+		return m_writeClosure.Get<T>();
+	}
+
+	template <class T>
+	void SetRead(ptr<const T> resource)
+	{
+		RED_LILIUM_ASSERT(GetRead<T>() == nullptr);
+		m_readClosure.Get<const T>() = resource;
+		AddReadResource(resource);
+	}
+
+	template <class T>
+	void SetRead(const uptr<T>& resource)
+	{
+		RED_LILIUM_ASSERT(GetRead<T>() == nullptr);
+		m_readClosure.Get<const T>() = resource.get();
+		AddReadResource(resource.get());
+	}
+
+	template <class T>
+	void SetWrite(ptr<T> resource)
+	{
+		RED_LILIUM_ASSERT(GetWrite<T>() == nullptr);
+		m_writeClosure.Get<T>() = resource;
+		AddWriteResource(resource);
+	}
+
+	template <class T>
+	void SetWrite(const uptr<T>& resource)
+	{
+		RED_LILIUM_ASSERT(GetWrite<T>() == nullptr);
+		m_writeClosure.Get<T>() = resource.get();
+		AddWriteResource(resource.get());
+	}
+
 
 private:
 	ReadClosure m_readClosure;
 	WriteClosure m_writeClosure;
 };
-
-//====================== TaskClosureImpl
-template<class ...T>
-inline TaskClosureImpl<T...>::TaskClosureImpl(const T& ...args)
-{
-}
-
-template<class I, class ...T>
-inline const I& TaskClosureImpl<T...>::Get()
-{
-    return std::get<I>(*static_cast<std::tuple<T...>*>(this));
-}
-
-//====================== CapturedTask
-template<class ReadClosure, class WriteClosure>
-inline CapturedTask<ReadClosure, WriteClosure>::CapturedTask(const std::string& name, const ReadClosure& readClosure, const WriteClosure& writeClosure)
-	: Task(name)
-	, m_readClosure(readClosure)
-	, m_writeClosure(writeClosure)
-{
-
-}
-
-template<class ReadClosure, class WriteClosure>
-inline CapturedTask<ReadClosure, WriteClosure>::~CapturedTask()
-{}
-
-template<class ReadClosure, class WriteClosure, class T>
-inline ptr<const T>& CapturedTask<ReadClosure, WriteClosure>::GetRead()
-{
-    return m_readClosure.Get<T>();
-}
-
-template<class ReadClosure, class WriteClosure, class T>
-inline ptr<T>& CapturedTask<ReadClosure, WriteClosure>::GetWrite()
-{
-    return m_writeClosure.Get<T>();
-}
 
 } // namespace RED_LILIUM_NAMESPACE
