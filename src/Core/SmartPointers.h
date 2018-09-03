@@ -25,7 +25,7 @@ public:
 	RedLiliumWeakPointer(U* pointer)
 	{
 		static_assert(std::is_convertible<U*, T*>::value, "Cannot convert pointer from U to T");
-		static_assert(std::is_convertible<U*, RedLiliumObject*>::value, "Smart pointer supports only RedLiliumObject class");
+		static_assert(std::is_convertible<U*, const RedLiliumObject*>::value, "Smart pointer supports only RedLiliumObject class");
 
 		if (pointer)
 		{
@@ -329,6 +329,13 @@ ptr<T> Cast(const uptr<R>& ref)
 	return ptr<T>(pointer);
 }
 
+template<class T, class R>
+ptr<T> ConstCast(ptr<R> ref)
+{
+	T* pointer = const_cast<T*>(ref.Get());
+	return ptr<T>(pointer);
+}
+
 #else
 
 template<class T>
@@ -345,6 +352,13 @@ template<class T, class R>
 ptr<T> Cast(uptr<R>& ref)
 {
 	T* pointer = dynamic_cast<T*>(ref.get());
+	return ptr<T>(pointer);
+}
+
+template<class T, class R>
+ptr<T> ConstCast(ptr<R> ref)
+{
+	T* pointer = const_cast<T*>(ref);
 	return ptr<T>(pointer);
 }
 

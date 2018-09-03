@@ -23,8 +23,8 @@ public:
 	virtual bool Run() = 0;
 
 	void AddDependTask(const sptr<Task>& task);
-	void AddReadResource(ptr<RedLiliumObject> resource);
-	void AddWriteResource(ptr<RedLiliumObject> resource);
+	void AddReadResource(ptr<const RedLiliumObject> resource);
+	void AddWriteResource(ptr<const RedLiliumObject> resource);
 
 private:
 	friend class TaskScheduler;
@@ -33,8 +33,8 @@ private:
 	std::atomic<TaskState> m_taskState;
 
 	std::vector<wptr<Task>> m_dependTasks;
-	std::vector<ptr<RedLiliumObject>> m_readResources;
-	std::vector<ptr<RedLiliumObject>> m_writeResources;
+	std::vector<ptr<const RedLiliumObject>> m_readResources;
+	std::vector<ptr<const RedLiliumObject>> m_writeResources;
 };
 
 } // namespace RED_LILIUM_NAMESPACE

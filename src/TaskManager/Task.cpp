@@ -23,14 +23,14 @@ void Task::AddDependTask(const sptr<Task>& task)
 	m_dependTasks.push_back(task);
 }
 
-void Task::AddReadResource(ptr<RedLiliumObject> resource)
+void Task::AddReadResource(ptr<const RedLiliumObject> resource)
 {
 	RED_LILIUM_ASSERT(m_taskState == TaskState::NotRegistered);
 
 	m_readResources.push_back(resource);
 }
 
-void Task::AddWriteResource(ptr<RedLiliumObject> resource)
+void Task::AddWriteResource(ptr<const RedLiliumObject> resource)
 {
 	RED_LILIUM_ASSERT(m_taskState == TaskState::NotRegistered);
 

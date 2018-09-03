@@ -5,9 +5,11 @@
 namespace RED_LILIUM_NAMESPACE
 {
 
-class IWindow
+class IWindow : public RedLiliumObject
 {
 public:
+	IWindow() {}
+	~IWindow() override {}
 };
 
 } // namespace RED_LILIUM_NAMESPACE

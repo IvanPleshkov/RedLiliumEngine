@@ -21,8 +21,8 @@ public:
 private:
 	bool CanPopTask(const sptr<Task>& task) const;
 
-	std::unordered_set<ptr<RedLiliumObject>> m_writeResources;
-	std::multiset<ptr<RedLiliumObject>> m_readResources;
+	std::unordered_set<ptr<const RedLiliumObject>> m_writeResources;
+	std::multiset<ptr<const RedLiliumObject>> m_readResources;
 	std::list<sptr<Task>> m_tasks;	
 };
 
