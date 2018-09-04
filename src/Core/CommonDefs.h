@@ -1,6 +1,6 @@
 #pragma once
 
-#if 1
+#if _DEBUG
 #define RED_LILIUM_POINTER_COUNTERS 1
 #define RED_LILIUM_USE_ASSERTS 1
 #define RED_LILIUM_USE_TELEMETRY 1

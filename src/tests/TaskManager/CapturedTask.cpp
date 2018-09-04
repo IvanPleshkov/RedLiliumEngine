@@ -108,17 +108,18 @@ TEST(CapturedTask, Compilation_0)
 		}
 	};
 
-	uptr<CapturedTaskSample> task = umake<CapturedTaskSample>();
+	if (false)
+	{
+		uptr<CapturedTaskSample> task = umake<CapturedTaskSample>();
 
-	uptr<ReadResourceSample0> read0 = umake<ReadResourceSample0>();
-	uptr<ReadResourceSample1> read1 = umake<ReadResourceSample1>();
-	uptr<WriteResourceSample0> write0 = umake<WriteResourceSample0>();
+		uptr<ReadResourceSample0> read0 = umake<ReadResourceSample0>();
+		uptr<ReadResourceSample1> read1 = umake<ReadResourceSample1>();
+		uptr<WriteResourceSample0> write0 = umake<WriteResourceSample0>();
 
-	task->SetRead(read0.get());
-	task->SetRead(read1.get());
-	task->SetWrite(write0.get());
-
-	task->Run();
+		task->SetRead(read0.get());
+		task->SetRead(read1.get());
+		task->SetWrite(write0.get());
+	}
 }
 
 TEST(CapturedTask, Compilation_1)
@@ -145,15 +146,16 @@ TEST(CapturedTask, Compilation_1)
 		}
 	};
 
-	uptr<CapturedTaskSample> task = umake<CapturedTaskSample>();
+	if (false)
+	{
+		uptr<CapturedTaskSample> task = umake<CapturedTaskSample>();
 
-	uptr<ReadResourceSample0> read0 = umake<ReadResourceSample0>();
-	uptr<ReadResourceSample1> read1 = umake<ReadResourceSample1>();
+		uptr<ReadResourceSample0> read0 = umake<ReadResourceSample0>();
+		uptr<ReadResourceSample1> read1 = umake<ReadResourceSample1>();
 
-	task->SetRead(read0.get());
-	task->SetRead(read1.get());
-
-	task->Run();
+		task->SetRead(read0.get());
+		task->SetRead(read1.get());
+	}
 }
 
 TEST(CapturedTask, Compilation_2)
@@ -183,15 +185,16 @@ TEST(CapturedTask, Compilation_2)
 		}
 	};
 
-	uptr<CapturedTaskSample> task = umake<CapturedTaskSample>();
+	if (false)
+	{
+		uptr<CapturedTaskSample> task = umake<CapturedTaskSample>();
 
-	uptr<ReadResourceSample0> read0 = umake<ReadResourceSample0>();
-	uptr<ReadResourceSample1> read1 = umake<ReadResourceSample1>();
-	uptr<WriteResourceSample0> write0 = umake<WriteResourceSample0>();
+		uptr<ReadResourceSample0> read0 = umake<ReadResourceSample0>();
+		uptr<ReadResourceSample1> read1 = umake<ReadResourceSample1>();
+		uptr<WriteResourceSample0> write0 = umake<WriteResourceSample0>();
 
-	task->Set(read0.get());
-	task->Set(read1.get());
-	task->Set(write0.get());
-
-	task->Run();
+		task->Set(read0.get());
+		task->Set(read1.get());
+		task->Set(write0.get());
+	}
 }
