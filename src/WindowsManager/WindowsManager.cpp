@@ -7,6 +7,30 @@
 
 using namespace RED_LILIUM_NAMESPACE;
 
+class WindowsManager::WindowsManagerTickTask : public CapturedTask<
+	TaskReadClosure<>,
+	TaskWriteClosure<WindowsManager>>
+{
+public:
+	WindowsManagerTickTask()
+		: CapturedTaskType("WindowsManagerTick")
+	{}
+
+	~WindowsManagerTickTask() override {}
+
+	bool Run() override
+	{
+		// Get<WindowsManager>()->Tick();
+
+		// Next Tick
+		sptr<WindowsManagerTickTask> nextTickTask = smake<WindowsManagerTickTask>();
+		nextTickTask->Set(Get<WindowsManager>());
+		TaskManager::AddTask(nextTickTask);
+
+		return true;
+	}
+};
+
 class WindowsManager::CreateWindowTask : public CapturedTask<
 	TaskReadClosure<>,
 	TaskWriteClosure<WindowsManager>>
@@ -44,8 +68,6 @@ AsyncResult<ptr<IWindow>> WindowsManager::CreateWindowAsync() const
 	AsyncResult<ptr<IWindow>> asyncResult = asyncReturn.GetResult();
 
 	sptr<CreateWindowTask> task = smake<CreateWindowTask>(std::move(asyncReturn));
-
-	WindowsManager* t = const_cast<WindowsManager*>(this);
 	task->Set(this);
 	TaskManager::AddTask(task);
 

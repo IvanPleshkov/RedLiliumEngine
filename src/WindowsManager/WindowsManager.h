@@ -15,9 +15,14 @@ public:
 	AsyncResult<ptr<IWindow>> CreateWindowAsync() const;
 	void DeleteWindowAsync(ptr<IWindow> window) const;
 
+protected:
+
 private:
 	class CreateWindowTask;
 	friend class CreateWindowTask;
+
+	class WindowsManagerTickTask;
+	friend class WindowsManagerTickTask;
 
 	ptr<IWindow> CreateWindowImpl();
 	void DeleteWindowImpl(ptr<IWindow> window);
