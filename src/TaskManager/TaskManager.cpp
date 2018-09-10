@@ -33,6 +33,7 @@ void TaskManager::Start(const sptr<Task>& firstTask, std::optional<u32> threadsC
 			currentTask->Run();
 			m_taskScheduler->OnFinishTask(currentTask);
 			m_taskScheduler->PushTasks(g_tasksPool);
+			g_tasksPool.clear();
 		}
 	} while (currentTask != nullptr);
 }

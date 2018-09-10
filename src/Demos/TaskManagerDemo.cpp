@@ -8,8 +8,12 @@ REGISTER_COMMAND("TaskManagerDemo", TaskManagerDemo)
 
 using namespace RED_LILIUM_NAMESPACE;
 
+namespace
+{
+
 class InitialTask : public Task
 {
+
 public:
 	InitialTask()
 		: Task("Initial Task")
@@ -22,6 +26,8 @@ public:
 		return true;
 	}
 };
+
+}
 
 int TaskManagerDemo(ptr<ArgsParser> parser)
 {

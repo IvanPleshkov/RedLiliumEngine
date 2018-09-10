@@ -20,13 +20,9 @@ public:
 
 	bool Run() override
 	{
-		// Get<WindowsManager>()->Tick();
-
-		// Next Tick
-		sptr<WindowsManagerTickTask> nextTickTask = smake<WindowsManagerTickTask>();
-		nextTickTask->Set(Get<WindowsManager>());
-		TaskManager::AddTask(nextTickTask);
-
+		ptr<WindowsManager> windowsManager = Get<WindowsManager>();
+		windowsManager->Tick();
+		windowsManager->CreateTickTask();
 		return true;
 	}
 };
@@ -80,6 +76,23 @@ void WindowsManager::DeleteWindowAsync(ptr<IWindow> window) const
 
 void WindowsManager::SwapBuffers()
 {
+}
+
+void WindowsManager::Start()
+{
+	CreateTickTask();
+}
+
+void WindowsManager::Tick()
+{
+
+}
+
+void WindowsManager::CreateTickTask()
+{
+	sptr<WindowsManagerTickTask> nextTickTask = smake<WindowsManagerTickTask>();
+	nextTickTask->Set(this);
+	TaskManager::AddTask(nextTickTask);
 }
 
 ptr<IWindow> WindowsManager::CreateWindowImpl()

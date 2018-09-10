@@ -12,6 +12,7 @@ public:
 	WindowsManager();
 	~WindowsManager() override;
 
+	void Start();
 	AsyncResult<ptr<IWindow>> CreateWindowAsync() const;
 	void DeleteWindowAsync(ptr<IWindow> window) const;
 
@@ -26,7 +27,10 @@ private:
 
 	ptr<IWindow> CreateWindowImpl();
 	void DeleteWindowImpl(ptr<IWindow> window);
+	void Tick();
 	void SwapBuffers();
+
+	void CreateTickTask();
 
 	std::set<uptr<IWindow>> m_windows;
 };
