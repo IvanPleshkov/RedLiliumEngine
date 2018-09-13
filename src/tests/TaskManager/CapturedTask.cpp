@@ -198,3 +198,22 @@ TEST(CapturedTask, Compilation_2)
 		task->Set(write0.get());
 	}
 }
+
+template<class ReadClosure = TaskReadClosure<>, class WriteClosure = TaskWriteClosure<>>
+static void ResourcesClosureTestFunc(ReadClosure readClosure, WriteClosure writeClosure)
+{
+}
+
+TEST(CapturedTask, Compilation_3)
+{
+    ptr<ReadResourceSample0> readPtr0(nullptr);
+    ptr<ReadResourceSample1> readPtr1(nullptr);
+    ptr<WriteResourceSample0> writePtr(nullptr);
+    auto readClosure = TaskReadClosure(readPtr0, readPtr1);
+    auto writeClosure = TaskWriteClosure(writePtr);
+    ResourcesClosureTestFunc(readClosure, writeClosure);
+
+    auto emptyReadClosure = TaskReadClosure<>();
+    auto emptyWriteClosure = TaskWriteClosure<>();
+    ResourcesClosureTestFunc(emptyReadClosure, emptyWriteClosure);
+}
