@@ -209,8 +209,8 @@ TEST(CapturedTask, Compilation_3)
     ptr<ReadResourceSample0> readPtr0(nullptr);
     ptr<ReadResourceSample1> readPtr1(nullptr);
     ptr<WriteResourceSample0> writePtr(nullptr);
-    auto readClosure = TaskReadClosure(readPtr0, readPtr1);
-    auto writeClosure = TaskWriteClosure(writePtr);
+    auto readClosure = TaskReadClosure<ReadResourceSample0, ReadResourceSample1>(readPtr0, readPtr1);
+    auto writeClosure = TaskWriteClosure<WriteResourceSample0>(writePtr);
     ResourcesClosureTestFunc(readClosure, writeClosure);
 
     auto emptyReadClosure = TaskReadClosure<>();
