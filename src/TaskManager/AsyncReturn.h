@@ -26,6 +26,7 @@ class AsyncReturn
 {
 public:
 	AsyncReturn(const T& waitingValue);
+	AsyncReturn(AsyncReturn&& asyncReturn);
 	AsyncReturn(const AsyncReturn&) = delete; // non construction-copyable
 	AsyncReturn& operator=(const AsyncReturn&) = delete; // non copyable
 
@@ -41,6 +42,13 @@ template<class T>
 inline AsyncResult<T>::AsyncResult(const T& waitingValue)
 {
 	m_result = smake<SharedResult>(waitingValue, false);
+}
+
+template<class T>
+inline AsyncReturn<T>::AsyncReturn(AsyncReturn&& asyncReturn)
+{
+	m_result = asyncReturn.m_result;
+	asyncReturn.m_result.m_result = nullptr;
 }
 
 template<class T>

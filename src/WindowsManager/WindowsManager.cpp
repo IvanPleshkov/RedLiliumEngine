@@ -34,7 +34,7 @@ class WindowsManager::CreateWindowTask : public CapturedTask<
 public:
 	CreateWindowTask(AsyncReturn<ptr<IWindow>>&& returnWindow)
 		: CapturedTaskType("CreateWindowTask")
-		//, m_return(std::move(returnWindow))
+		, m_return(std::move(returnWindow))
 	{}
 
 	~CreateWindowTask() override {}
@@ -42,12 +42,12 @@ public:
 	bool Run() override
 	{
 		Get<WindowsManager>()->CreateWindowImpl();
-		//m_return.SetReturn(GetWrite<WindowsManager>()->CreateWindowImpl());
+		m_return.SetReturn(GetWrite<WindowsManager>()->CreateWindowImpl());
 		return true;
 	}
 
 private:
-	//AsyncReturn<ptr<IWindow>> m_return;
+	AsyncReturn<ptr<IWindow>> m_return;
 };
 
 WindowsManager::WindowsManager()
