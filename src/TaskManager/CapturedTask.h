@@ -23,6 +23,8 @@ struct TupleHasType<T, std::tuple<T, Ts...>>
 	using Result = std::true_type;
 };
 
+class EmptyClass {};
+
 template<class... T>
 class TaskClosureImpl : private std::tuple<ptr<T>...>
 {
@@ -30,8 +32,8 @@ public:
 	template<class I>
 	using HasType = TupleHasType<I, std::tuple<T...>>;
 
-	TaskClosureImpl() : std::tuple<ptr<T>...>(ptr<T>(nullptr)...)
-	{}
+    explicit TaskClosureImpl(ptr<T>... args) : std::tuple<ptr<T>...>(args...)
+    {}
 
 	template<class I>
 	ptr<I>& Get()
@@ -56,16 +58,22 @@ template<class... T>
 class TaskReadClosure : public TaskClosureImpl<const T...>
 {
 public:
-    TaskReadClosure() : TaskClosureImpl<const T...>()
+    explicit TaskReadClosure(EmptyClass) : TaskClosureImpl<const T...>(ptr<const T>(nullptr)...)
 	{}
+
+    TaskReadClosure(ptr<const T>... args) : TaskClosureImpl<const T...>(args...)
+    {}
 };
 
 template<class... T>
 class TaskWriteClosure : public TaskClosureImpl<T...>
 {
 public:
-	TaskWriteClosure() : TaskClosureImpl<T...>()
+    explicit TaskWriteClosure(EmptyClass) : TaskClosureImpl<T...>(ptr<T>(nullptr)...)
 	{}
+
+    TaskWriteClosure(ptr<T>... args) : TaskClosureImpl<T...>(args...)
+    {}
 };
 
 template<class ReadClosure = TaskReadClosure<>, class WriteClosure = TaskWriteClosure<>>
@@ -87,22 +95,28 @@ public:
 public:
     CapturedTask(const std::string& name)
 		: Task(name)
-		, m_readClosure()
-		, m_writeClosure()
+        , m_readClosure(EmptyClass())
+        , m_writeClosure(EmptyClass())
 	{ }
+
+    CapturedTask(const std::string& name, ReadClosure readClosure, WriteClosure writeClosure)
+        : Task(name)
+        , m_readClosure(readClosure)
+        , m_writeClosure(writeClosure)
+    { }
 
 	~CapturedTask() override {}
 
 	template <class T>
 	ptr<const T> GetRead()
 	{
-		return m_readClosure.Get<const T>();
+        return m_readClosure.template Get<const T>();
 	}
 
 	template <class T>
 	ptr<T> GetWrite()
 	{
-		return m_writeClosure.Get<T>();
+        return m_writeClosure.template Get<T>();
 	}
 
 	template <class T>
@@ -115,7 +129,7 @@ public:
 	void SetRead(ptr<const T> resource)
 	{
 		RED_LILIUM_ASSERT(GetRead<T>() == nullptr);
-		m_readClosure.Get<const T>() = resource;
+        m_readClosure.template Get<const T>() = resource;
 		AddReadResource(resource);
 	}
 
@@ -123,7 +137,7 @@ public:
 	void SetWrite(ptr<const T> resource)
 	{
 		RED_LILIUM_ASSERT(GetWrite<T>() == nullptr);
-		m_writeClosure.Get<T>() = ConstCast<T>(resource);
+        m_writeClosure.template Get<T>() = ConstCast<T>(resource);
 		AddWriteResource(resource);
 	}
 
@@ -202,5 +216,37 @@ private:
 	ReadClosure m_readClosure;
 	WriteClosure m_writeClosure;
 };
+
+
+template<class ReadClosure = TaskReadClosure<>, class WriteClosure = TaskWriteClosure<>>
+void AddAsyncTask(
+        const std::string& name,
+        ReadClosure readClosure,
+        WriteClosure writeClosure,
+        std::function<void()> lambda)
+{
+    class CapturedTaskImpl : public CapturedTask<ReadClosure, WriteClosure>
+    {
+    public:
+        CapturedTaskImpl(
+                    const std::string& name,
+                    ReadClosure readClosure,
+                    WriteClosure writeClosure,
+                    std::function<void()> lambda)
+            : CapturedTask<ReadClosure, WriteClosure>(name, readClosure, writeClosure)
+            , m_lambda(lambda)
+        {}
+        ~CapturedTaskImpl() override {}
+
+        bool Run() override
+        {
+            m_lambda();
+            return true;
+        }
+
+    private:
+        std::function<void()> m_lambda;
+    };
+}
 
 } // namespace RED_LILIUM_NAMESPACE
