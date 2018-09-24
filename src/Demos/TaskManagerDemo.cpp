@@ -29,6 +29,8 @@ public:
 
 }
 
+class Users {};
+
 int TaskManagerDemo(ptr<ArgsParser> parser)
 {
 	sptr<InitialTask> initialTask = std::make_shared<InitialTask>();

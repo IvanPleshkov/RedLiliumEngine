@@ -4,6 +4,8 @@
 #include <TaskManager/Task.h>
 #include <TaskManager/TaskManager.h>
 #include <TaskManager/CapturedTask.h>
+#include <TaskManager/ScopedTask.h>
+
 
 using namespace RED_LILIUM_NAMESPACE;
 
@@ -27,29 +29,6 @@ public:
 	}
 };
 
-class WindowsManager::CreateWindowTask : public CapturedTask<
-	TaskReadClosure<>,
-	TaskWriteClosure<WindowsManager>>
-{
-public:
-	CreateWindowTask(AsyncReturn<ptr<IWindow>>&& returnWindow)
-		: CapturedTaskType("CreateWindowTask")
-		, m_return(std::move(returnWindow))
-	{}
-
-	~CreateWindowTask() override {}
-
-	bool Run() override
-	{
-		Get<WindowsManager>()->CreateWindowImpl();
-		m_return.SetReturn(GetWrite<WindowsManager>()->CreateWindowImpl());
-		return true;
-	}
-
-private:
-	AsyncReturn<ptr<IWindow>> m_return;
-};
-
 WindowsManager::WindowsManager()
 {
 }
@@ -61,13 +40,16 @@ WindowsManager::~WindowsManager()
 AsyncResult<ptr<IWindow>> WindowsManager::CreateWindowAsync() const
 {
 	AsyncReturn<ptr<IWindow>> asyncReturn(nullptr);
-	AsyncResult<ptr<IWindow>> asyncResult = asyncReturn.GetResult();
 
-	sptr<CreateWindowTask> task = smake<CreateWindowTask>(std::move(asyncReturn));
-	task->Set(this);
-	TaskManager::AddTask(task);
+	ScopedTask::Add("CreateWindowTask", {}, { this }, {}, 
+		[asyncReturn](const sptr<ScopedTask>& task)
+	{
+		ptr<IWindow> window = this->CreateWindowSync();
+		asyncReturn.SetReturn(window);
+		return true;
+	});
 
-	return asyncResult;
+	return asyncReturn.GetResult();
 }
 
 void WindowsManager::DeleteWindowAsync(ptr<IWindow> window) const
@@ -95,7 +77,7 @@ void WindowsManager::CreateTickTask()
 	TaskManager::AddTask(nextTickTask);
 }
 
-ptr<IWindow> WindowsManager::CreateWindowImpl()
+ptr<IWindow> WindowsManager::CreateWindowSync()
 {
 	return nullptr;
 }
