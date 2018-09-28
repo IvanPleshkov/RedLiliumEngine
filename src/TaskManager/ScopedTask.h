@@ -19,12 +19,38 @@ public:
 		LambdaType lambda);
 
 public:
+	ScopedTask(const std::string& name, LambdaType lambda);
 	~ScopedTask() override {}
 
 	bool Run() override;
 
-private:
-	 ScopedTask(const std::string& name, LambdaType lambda);
+	template<class T>
+	ptr<const T> GetRead() const
+	{
+		for (auto resource : m_readResources)
+		{
+			ptr<const T> castedResource = Cast<const T>(resource);
+			if (castedResource != nullptr)
+			{
+				return castedResource;
+			}
+		}
+		return nullptr;
+	}
+
+	template<class T>
+	ptr<T> GetWrite() const
+	{
+		for (auto resource : m_writeResources)
+		{
+			ptr<const T> castedResource = Cast<const T>(resource);
+			if (castedResource != nullptr)
+			{
+				return ConstCast<T>(castedResource);
+			}
+		}
+		return nullptr;
+	}
 
 private:
 	LambdaType m_lambda;

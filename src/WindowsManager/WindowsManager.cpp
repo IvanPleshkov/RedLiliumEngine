@@ -44,15 +44,16 @@ AsyncResult<ptr<IWindow>> WindowsManager::CreateWindowAsync() const
 	ScopedTask::Add("CreateWindowTask", {}, { this }, {}, 
 		[asyncReturn](const sptr<ScopedTask>& task)
 	{
-		ptr<IWindow> window = this->CreateWindowSync();
-		asyncReturn.SetReturn(window);
+		auto windowsManager = task->GetWrite<WindowsManager>();
+		ptr<IWindow> window = windowsManager->CreateWindowSync();
+		// asyncReturn.SetReturn(window);
 		return true;
 	});
 
 	return asyncReturn.GetResult();
 }
 
-void WindowsManager::DeleteWindowAsync(ptr<IWindow> window) const
+void WindowsManager::DestroyWindowAsync(ptr<IWindow> window) const
 {
 }
 

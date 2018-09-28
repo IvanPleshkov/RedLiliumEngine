@@ -26,9 +26,6 @@ class AsyncReturn
 {
 public:
 	AsyncReturn(const T& waitingValue);
-	//AsyncReturn(AsyncReturn&& asyncReturn);
-	//AsyncReturn(const AsyncReturn&) = delete; // non construction-copyable
-	//AsyncReturn& operator=(const AsyncReturn&) = delete; // non copyable
 
 	const AsyncResult<T>& GetResult();
 	void SetReturn(const T& value);
@@ -43,20 +40,6 @@ inline AsyncResult<T>::AsyncResult(const T& waitingValue)
 {
 	m_result = smake<SharedResult>(waitingValue, false);
 }
-
-//template<class T>
-//inline AsyncReturn<T>::AsyncReturn(AsyncReturn && asyncReturn)
-//{
-//	m_result = asyncReturn.m_result;
-//	asyncReturn.m_result.m_result = nullptr;
-//}
-
-//template<class T>
-//inline AsyncReturn<T>::AsyncReturn(AsyncReturn&& asyncReturn)
-//{
-//	m_result = asyncReturn.m_result;
-//	asyncReturn.m_result.m_result = nullptr;
-//}
 
 template<class T>
 inline const T& AsyncResult<T>::Get() const
@@ -87,8 +70,8 @@ inline void AsyncReturn<T>::SetReturn(const T& value)
 {
 	RED_LILIUM_ASSERT(!m_result->IsReady());
 
-	m_result->m_result->first = value;
-	m_result->m_result->second = true;
+	m_result.m_result->first = value;
+	m_result.m_result->second = true;
 }
 
 template<class T>
@@ -96,8 +79,8 @@ inline void AsyncReturn<T>::SetReturn(T&& value)
 {
 	RED_LILIUM_ASSERT(!m_result->IsReady());
 
-	m_result->m_result->first = std::move(value);
-	m_result->m_result->second = true;
+	m_result.m_result->first = std::move(value);
+	m_result.m_result->second = true;
 }
 
 } // namespace RED_LILIUM_NAMESPACE

@@ -26,7 +26,7 @@ public:
 	void AddReadResource(ptr<const RedLiliumObject> resource);
 	void AddWriteResource(ptr<const RedLiliumObject> resource);
 
-private:
+protected:
 	friend class TaskScheduler;
 
 	std::string m_name;

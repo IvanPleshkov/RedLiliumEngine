@@ -15,7 +15,7 @@ public:
 	void Start();
 	AsyncResult<ptr<IWindow>> CreateWindowAsync() const;
 	ptr<IWindow> CreateWindowSync();
-	void DeleteWindowAsync(ptr<IWindow> window) const;
+	void DestroyWindowAsync(ptr<IWindow> window) const;
 
 protected:
 
