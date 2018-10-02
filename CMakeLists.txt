@@ -14,6 +14,8 @@ add_custom_target(common SOURCES ${COMMON_SRC})
 
 add_subdirectory("src/Core")
 add_subdirectory("src/TaskManager")
+add_subdirectory("src/ResourceManager")
+add_subdirectory("src/Render")
 add_subdirectory("src/WindowsManager")
 add_subdirectory("src/EditorFramework")
 add_subdirectory("src/GuiFramework")

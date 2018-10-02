@@ -15,3 +15,4 @@ add_subdirectory("3rdparty/bgfx")
 
 add_subdirectory("3rdparty/glfw")
 set_target_properties (glfw PROPERTIES FOLDER 3rdparty)
+add_subdirectory("3rdparty/glew")
