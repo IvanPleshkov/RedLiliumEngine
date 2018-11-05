@@ -5,6 +5,6 @@
 namespace RED_LILIUM_NAMESPACE
 {
 
-class Resource;
+class IResource;
 
 } // namespace RED_LILIUM_NAMESPACE

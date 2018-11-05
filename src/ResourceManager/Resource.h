@@ -5,7 +5,10 @@
 namespace RED_LILIUM_NAMESPACE
 {
 
-class Resource : public RedLiliumObject
+class IResource {};
+
+template<class TResourceType, class TResourceManager>
+class Resource : public RedLiliumObject, public IResource
 {
 public:
 
@@ -19,12 +22,21 @@ public:
 	};
 
 public:
+	Resource() {}
 	~Resource() override {}
 
-	virtual const std::string& Name() const = 0;
+	const std::string& Name() const;
+
+	template<class TModifyParameters>
+	void Modify(const TModifyParameters& modifyParameters) const;
+
+	template<class TModifyParameters>
+	void Modify(std::function<void(ptr<TResourceType>)>) const;
 
 protected:
-	std::atomic<Status> m_status;
+	std::string m_name;
+	Status m_status;
+	ptr<TResourceManager> m_resourceManager;
 };
 
 } // namespace RED_LILIUM_NAMESPACE
