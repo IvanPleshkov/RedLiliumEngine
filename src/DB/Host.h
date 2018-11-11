@@ -119,6 +119,11 @@ class NodeString : public NodeBase
 	NodeType GetType() { return NodeType::String; }
 };
 
+class NodeBinaryData : public NodeBase
+{
+	NodeType GetType() { return NodeType::BinaryData; }
+};
+
 using Node = std::variant<
 	NodeNull,
 	NodeEmpty,
@@ -134,7 +139,8 @@ using Node = std::variant<
 	NodeDate,
 	NodeTime,
 	NodeDateTime,
-	NodeString>;
+	NodeString,
+	NodeBinaryData>;
 
 class Transaction
 {
