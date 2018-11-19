@@ -8,10 +8,11 @@ namespace RED_LILIUM_NAMESPACE
 class Window : public RedLiliumObject
 {
 public:
-	void HandleEvents();
-	uptr<Context> CreateContext();
-	
+	ptr<Widget> GetTopWidget();
+	ptr<const Widget> GetTopWidget() const;
+
 private:
+	uptr<Widget> m_topWidget;
 };
 
 } // namespace RED_LILIUM_NAMESPACE

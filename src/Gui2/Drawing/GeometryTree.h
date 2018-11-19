@@ -5,6 +5,13 @@
 namespace RED_LILIUM_NAMESPACE
 {
 
+struct Rectangle
+{
+
+};
+
+using Shape = std::variant<>;
+
 struct FillByColor
 {
 	Color32 Color;
@@ -12,16 +19,16 @@ struct FillByColor
 
 struct FillByTexture
 {
-	vec2 Min;
-	vec2 Max;
+	vec2 UvMin;
+	vec2 UvMax;
 };
 
 using FillMode = std::variant<FillByColor, FillByTexture>;
 
-struct GeometryNode
+class GeometryNode
 {
-	FillMode FillMode;
-
+	FillMode m_fillMode;
+	mat3 m_localTRansform;
 };
 
 } // namespace RED_LILIUM_NAMESPACE
