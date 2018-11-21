@@ -5,18 +5,19 @@
 namespace RED_LILIUM_NAMESPACE
 {
 
-class WidgetComponent : public RedLiliumObject
-{};
-
-class Widget : public RedLiliumObject
+class Entity final : public RedLiliumObject
 {
 public:
+	~Entity() override;
 
 	template<class TComponent>
 	ptr<TComponent> GetComponent();
 
+	template<class TComponent>
+	ptr<TComponent> AddComponent();
+
 private:
-	std::vector<uptr<WidgetComponent>> m_components;
+	std::vector<uptr<Component>> m_components;
 };
 
 } // namespace RED_LILIUM_NAMESPACE

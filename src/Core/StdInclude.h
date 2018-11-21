@@ -46,6 +46,7 @@
 #include <glm/gtx/matrix_decompose.hpp>
 
 #include <spdlog/spdlog.h>
+#include <nlohmann/json.hpp>
 
 #define RED_LILIUM_NAMESPACE rl
 
@@ -78,6 +79,8 @@ template<class T>
 using wptr = std::weak_ptr<T>;
 template<class T>
 using uptr = std::unique_ptr<T>;
+
+using json = nlohmann::json;
 
 template<class T, class... _Types>
 [[nodiscard]] inline uptr<T> umake(_Types&&... _Args)
