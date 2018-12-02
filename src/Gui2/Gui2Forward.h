@@ -10,4 +10,6 @@ namespace RED_LILIUM_NAMESPACE
 	class Component;
 	class Context;
 
+	using StyleId = u32;
+
 } // namespace RED_LILIUM_NAMESPACE
