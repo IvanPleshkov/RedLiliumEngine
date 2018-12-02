@@ -140,7 +140,7 @@ template<template<typename...> class Ref, typename... Args>
 struct IsSpecialization<Ref<Args...>, Ref> : std::true_type {};
 
 template <class T>
-inline void ClearStruct(T* data) {
+inline void MemsetZero(T* data) {
 	std::memset(data, 0, sizeof(T));
 }
 

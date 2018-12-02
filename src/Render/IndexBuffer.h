@@ -8,7 +8,8 @@ namespace RED_LILIUM_NAMESPACE
 class IndexBuffer : public RedLiliumObject
 {
 public:
-	~IndexBuffer(sptr<Device> device) override = default;
+	IndexBuffer(sptr<Device> device);
+	~IndexBuffer() override = default;
 
 	void Update(std::vector<u32>& indicies);
 

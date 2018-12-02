@@ -47,13 +47,11 @@ file(GLOB_RECURSE SRC_FILES
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 include_directories("..")
+include_directories("../../3rdparty/nlohmann")
 include_directories("../../3rdparty/pbhogan")
 include_directories("../../3rdparty/glm")
 include_directories("../../3rdparty/spdlog/include")
-include_directories("../../3rdparty/bgfx/bgfx/include")
-include_directories("../../3rdparty/bgfx/bimg/include")
-include_directories("../../3rdparty/bgfx/bx/include")
-include_directories("../../3rdparty/bgfx/bgfx/examples/common")
+include_directories("${Vulkan_INCLUDE_DIRS}")
 
 # генерация MSVC фильтров
 foreach(SRC_FILE IN LISTS SRC_FILES)

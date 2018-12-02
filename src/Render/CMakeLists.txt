@@ -4,7 +4,4 @@ include("../common.cmake")
 
 add_library(${PROJECT_NAME} ${SRC_FILES})	
 
-target_link_libraries(${PROJECT_NAME} bgfx)
-target_link_libraries(${PROJECT_NAME} example-common)
-target_link_libraries(${PROJECT_NAME} bimg)
-target_link_libraries(${PROJECT_NAME} bx)
+target_link_libraries( ${PROJECT_NAME} "${Vulkan_LIBRARIES}" )

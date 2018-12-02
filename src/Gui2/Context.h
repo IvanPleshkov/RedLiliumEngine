@@ -18,11 +18,11 @@ class Context : public RedLiliumObject
 {
 public:
 
-	void SetDirty(ptr<Widget> widget);
+	void SetDirty(ptr<Entity> widget);
 
 	
 private:
-	std::unordered_set<ptr<Widget>> m_dirtyWidgets;
+	std::unordered_set<ptr<Entity>> m_dirtyWidgets;
 };
 
 } // namespace RED_LILIUM_NAMESPACE

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RenderTarget.h"
+#include "RenderForward.h"
 
 namespace RED_LILIUM_NAMESPACE
 {
@@ -11,8 +11,6 @@ public:
 
 
 private:
-	bgfx::VertexBufferHandle m_handle;
-	sptr<bgfx::VertexDecl> m_vertexDeclaration;
 };
 
 } // namespace RED_LILIUM_NAMESPACE
