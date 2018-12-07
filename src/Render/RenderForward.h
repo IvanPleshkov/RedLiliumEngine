@@ -5,8 +5,13 @@
 
 namespace RED_LILIUM_NAMESPACE
 {
+namespace Render
+{
 
+class System;
 class Device;
-class Context;
+class DeviceMemoryHeap;
+class DeviceMemoryType;
 
+} // namespace Render
 } // namespace RED_LILIUM_NAMESPACE

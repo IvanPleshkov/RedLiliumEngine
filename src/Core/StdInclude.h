@@ -49,6 +49,7 @@
 #include <nlohmann/json.hpp>
 
 #define RED_LILIUM_NAMESPACE rl
+#define RED_LILIUM_INTERNAL public
 
 namespace RED_LILIUM_NAMESPACE
 {
