@@ -7,6 +7,8 @@ using namespace RED_LILIUM_NAMESPACE::Render;
 
 System::System()
 {
+	RED_LILIUM_GUARD;
+
 	FindLayers();
 	FindExtensions();
 
@@ -50,6 +52,8 @@ System::System()
 
 System::~System()
 {
+	RED_LILIUM_GUARD;
+
 	if (m_vkInstance != VK_NULL_HANDLE)
 	{
 		m_devices.clear();
@@ -64,9 +68,12 @@ System::~System()
 
 void System::InitDevices()
 {
+	RED_LILIUM_GUARD;
+
 	u32 physicalDevicesCount = 0;
 	VkResult result = vkEnumeratePhysicalDevices(m_vkInstance, &physicalDevicesCount, nullptr);
 	RED_LILIUM_ASSERT(result == VK_SUCCESS);
+	RED_LILIUM_ASSERT(physicalDevicesCount > 0);
 
 	std::vector<VkPhysicalDevice> physicalDevicesHandle(physicalDevicesCount);
 	result = vkEnumeratePhysicalDevices(m_vkInstance, &physicalDevicesCount, &physicalDevicesHandle[0]);
@@ -81,7 +88,10 @@ void System::InitDevices()
 
 void System::FindExtensions()
 {
+	RED_LILIUM_GUARD;
+
 	// VKTODO: extensions of layers
+	m_vkEnabledExtensionProperties.clear();
 	u32 extensionPropertiesCount;
 	vkEnumerateInstanceExtensionProperties(nullptr, &extensionPropertiesCount, nullptr);
 	if (extensionPropertiesCount > 0)
@@ -93,11 +103,36 @@ void System::FindExtensions()
 
 void System::SelectExtensions()
 {
+	RED_LILIUM_GUARD;
+
 	m_vkSelectedExtensionProperties.clear();
+
+#if RED_LILIUM_RENDER_VALIDATION
+	// select debug layer
+	{
+		VkLayerProperties validationLayer;
+		MemsetZero(&validationLayer);
+		for (const auto& layer : m_vkEnabledLayerProperties)
+		{
+			if (!std::strcmp(layer.layerName, "VK_LAYER_LUNARG_standard_validation") && 
+				layer.implementationVersion > validationLayer.implementationVersion)
+			{
+				validationLayer = layer;
+			}
+		}
+		if (validationLayer.implementationVersion > 0)
+		{
+			m_vkSelectedLayerProperties.push_back(validationLayer);
+		}
+	}
+#endif
 }
 
 void System::FindLayers()
 {
+	RED_LILIUM_GUARD;
+
+	m_vkEnabledLayerProperties.clear();
 	u32 vkInstancePropertiesCount;
 	vkEnumerateInstanceLayerProperties(&vkInstancePropertiesCount, nullptr);
 	if (vkInstancePropertiesCount > 0)
@@ -109,6 +144,8 @@ void System::FindLayers()
 
 void System::SelectLayers()
 {
+	RED_LILIUM_GUARD;
+
 	m_vkSelectedLayerProperties.clear();
 }
 

@@ -24,8 +24,8 @@ private:
 	void FindLayers();
 	void SelectLayers();
 
-	VkInstance m_vkInstance;
-	std::vector<uptr<Device>> m_devices;
+	VkInstance								m_vkInstance;
+	std::vector<uptr<Device>>				m_devices;
 	std::vector<VkLayerProperties>			m_vkEnabledLayerProperties;
 	std::vector<VkExtensionProperties>		m_vkEnabledExtensionProperties;
 	std::vector<VkLayerProperties>			m_vkSelectedLayerProperties;

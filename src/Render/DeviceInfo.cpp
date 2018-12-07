@@ -9,10 +9,8 @@ using namespace RED_LILIUM_NAMESPACE::Render;
 DeviceInfo::DeviceInfo(ptr<Device> device)
 	: m_device(device)
 {
-	VkPhysicalDeviceProperties vkPhysicalDeviceProperties;
-	vkGetPhysicalDeviceProperties(device->GetVkPhysicalDevice(), &vkPhysicalDeviceProperties);
-	VkPhysicalDeviceFeatures vkPhysicalDeviceFeatures;
-	vkGetPhysicalDeviceFeatures(device->GetVkPhysicalDevice(), &vkPhysicalDeviceFeatures);
+	vkGetPhysicalDeviceProperties(device->GetVkPhysicalDevice(), &m_vkPhysicalDeviceProperties);
+	vkGetPhysicalDeviceFeatures(device->GetVkPhysicalDevice(), &m_vkPhysicalDeviceFeatures);
 }
 
 DeviceInfo::~DeviceInfo()
