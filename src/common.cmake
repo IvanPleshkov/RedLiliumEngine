@@ -44,14 +44,7 @@ file(GLOB_RECURSE SRC_FILES
 	"*.hpp"
 	"*.h"
 	"*.inl")
-
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
-include_directories("..")
-include_directories("../../3rdparty/nlohmann")
-include_directories("../../3rdparty/pbhogan")
-include_directories("../../3rdparty/glm")
-include_directories("../../3rdparty/spdlog/include")
-include_directories("${Vulkan_INCLUDE_DIRS}")
 
 # генерация MSVC фильтров
 foreach(SRC_FILE IN LISTS SRC_FILES)
@@ -68,3 +61,6 @@ endforeach()
 
 ADD_PRECOMPILED_HEADER("pch.h" "../pch.cpp" SRC_FILES)
 source_group("" FILES "../pch.cpp")
+
+include(${CMAKE_CURRENT_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup()

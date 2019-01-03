@@ -1,0 +1,13 @@
+Core:
+    folder: src/Core
+    includedirs: src/Core
+    cmakedir: .
+    
+EditorFramework:
+    folder: src/EditorFramework
+    includedirs: src/EditorFramework
+    cmakedir: .
+
+root: EditorFramework
+generator: cmake
+name: RedLiliumEngine

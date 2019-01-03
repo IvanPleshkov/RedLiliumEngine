@@ -1,5 +1,6 @@
 #pragma once
 
+/*
 #include "StdInclude.h"
 #include <signals/Delegate.h>
 #include <signals/Signal.h>
@@ -74,3 +75,5 @@ template<class ...T>
 class Delegate : public DelegateImpl<sizeof...(T), T...> {};
 
 } // RED_LILIUM_NAMESPACE
+
+*/
