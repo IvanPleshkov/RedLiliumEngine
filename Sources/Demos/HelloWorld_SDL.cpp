@@ -22,8 +22,8 @@ namespace HelloWorldSdl
 
 		r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 
-		// glClearColor(r, 0.4f, 0.1f, 1.0f);
-		// glClear(GL_COLOR_BUFFER_BIT);
+		glClearColor(r, 0.4f, 0.1f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
 
 		SDL_GL_SwapWindow(window);
 	}
