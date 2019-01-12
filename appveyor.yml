@@ -31,11 +31,11 @@ build:
     parallel: true
 
 test_script:
-    - '%APPVEYOR_BUILD_FOLDER%\build\src\tests\%CONFIGURATION%\Tests.exe'
+    - '%APPVEYOR_BUILD_FOLDER%\build\Sources\Tests\%CONFIGURATION%\Tests.exe'
     
 only_commits:
   files:
     - CMakeLists.txt
     - appveyor.yml
-    - src/
+    - Sources/
     - 3rdparty/
