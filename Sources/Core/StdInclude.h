@@ -36,3 +36,4 @@
 #include <functional>
 #include <optional>
 #include <exception>
+#include <stdlib.h>

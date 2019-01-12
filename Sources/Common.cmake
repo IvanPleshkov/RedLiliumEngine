@@ -49,6 +49,18 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 include_directories("..")
 include_directories("../../3rdparty/Include")
 
+if (MSVC)
+	set(THIRD_PARTY_DEBUG_LIBS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/Lib/msvc141.debug")
+	set(THIRD_PARTY_OPTIMIZED_LIBS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/Lib/msvc141.release")
+	
+	link_libraries(
+		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/SDL2.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/SDL2.lib
+		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/SDL2main.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/SDL2main.lib)
+	
+else()
+	message("Only MSVC")
+endif()
+
 # генерация MSVC фильтров
 foreach(SRC_FILE IN LISTS SRC_FILES)
 	if(IS_ABSOLUTE "${SRC_FILE}")
@@ -64,6 +76,8 @@ endforeach()
 
 ADD_PRECOMPILED_HEADER("pch.h" "../pch.cpp" SRC_FILES)
 source_group("" FILES "../pch.cpp")
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUT_DIR})
 
 get_filename_component(DATA_ABSOLUTE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../Data" ABSOLUTE)
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/paths.json" "${DATA_ABSOLUTE_PATH}")
