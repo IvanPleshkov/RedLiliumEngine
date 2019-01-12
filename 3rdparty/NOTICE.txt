@@ -1,1 +1,2 @@
 googletest: release 1.8.1
+freetype: 2.9.1

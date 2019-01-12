@@ -62,7 +62,8 @@ if (MSVC)
 		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/gtest_maind.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/gtest_main.lib
 		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/glew32d.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/glew32.lib
 		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/GlU32.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/GlU32.lib
-		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/OpenGL32.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/OpenGL32.lib)
+		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/OpenGL32.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/OpenGL32.lib
+		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/freetype.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/freetype.lib)
 	
 else()
 	message("Only MSVC")
