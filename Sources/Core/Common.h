@@ -110,4 +110,10 @@ inline void ClearStruct(T* data) {
 	std::memset(data, 0, sizeof(T));
 }
 
+class RedLiliumObject
+{
+public:
+	virtual ~RedLiliumObject() {}
+};
+
 }
