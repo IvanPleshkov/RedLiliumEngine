@@ -4,11 +4,15 @@
 //
 
 #pragma once
+
+#ifndef SPDLOG_H
+#error "spdlog.h must be included before this file."
+#endif
+
 #include "spdlog/details/file_helper.h"
 #include "spdlog/details/null_mutex.h"
 #include "spdlog/fmt/fmt.h"
 #include "spdlog/sinks/base_sink.h"
-#include "spdlog/spdlog.h"
 
 #include <cerrno>
 #include <chrono>
@@ -24,7 +28,7 @@ namespace sinks {
 // Rotating file sink based on size
 //
 template<typename Mutex>
-class rotating_file_sink SPDLOG_FINAL : public base_sink<Mutex>
+class rotating_file_sink final : public base_sink<Mutex>
 {
 public:
     rotating_file_sink(filename_t base_filename, std::size_t max_size, std::size_t max_files)
@@ -44,7 +48,7 @@ public:
         if (index != 0u)
         {
             filename_t basename, ext;
-            std::tie(basename, ext) = details::file_helper::split_by_extenstion(filename);
+            std::tie(basename, ext) = details::file_helper::split_by_extension(filename);
             fmt::format_to(w, SPDLOG_FILENAME_T("{}.{}{}"), basename, index, ext);
         }
         else
@@ -101,6 +105,7 @@ private:
                 if (!rename_file(src, target))
                 {
                     file_helper_.reopen(true); // truncate the log file anyway to prevent it to grow beyond its limit!
+                    current_size_ = 0;
                     throw spdlog_ex(
                         "rotating_file_sink: failed renaming " + filename_to_str(src) + " to " + filename_to_str(target), errno);
                 }

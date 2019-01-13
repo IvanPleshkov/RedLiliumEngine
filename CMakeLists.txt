@@ -29,6 +29,12 @@ foreach( EXTERNAL_OPTIMIZED_BINARY ${EXTERNAL_OPTIMIZED_BINARIES} )
 	file(COPY ${EXTERNAL_OPTIMIZED_BINARY} DESTINATION ${BINARY_OUT_OPTIMIZED_DIR})
 endforeach( EXTERNAL_OPTIMIZED_BINARY )
 
+get_filename_component(RESOURCES_ABSOLUTE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Resources" ABSOLUTE)
+message("Resources path: ${RESOURCES_ABSOLUTE_PATH}")
+set(RESOURCES_PATHS_JSON "{ \"resourcesPath\" : \"${RESOURCES_ABSOLUTE_PATH}\" }")
+file(WRITE "${BINARY_OUT_DEBUG_DIR}/paths.json" ${RESOURCES_PATHS_JSON})
+file(WRITE "${BINARY_OUT_OPTIMIZED_DIR}/paths.json" ${RESOURCES_PATHS_JSON})
+
 set(CMAKE_SRC
 		Sources/common.cmake)
 add_custom_target(CmakeProject SOURCES ${CMAKE_SRC})
@@ -40,3 +46,4 @@ add_subdirectory("Sources/Tests")
 
 # setup default startup project
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Demos)
+

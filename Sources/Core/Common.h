@@ -116,4 +116,10 @@ public:
 	virtual ~RedLiliumObject() {}
 };
 
+#define RED_LILIUM_LOG_INFO(message) spdlog::info(message);
+#define RED_LILIUM_LOG_WARNING(message) spdlog::warn(message);
+#define RED_LILIUM_LOG_ERROR(message) spdlog::error(message);
+#define RED_LILIUM_LOG_CRITICAL(message) spdlog::critical(message);
+#define RED_LILIUM_LOG_DEBUG(message) spdlog::debug(message);
+
 }

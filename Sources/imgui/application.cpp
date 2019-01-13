@@ -112,12 +112,14 @@ i32 ImguiApplication::Start(ptr<ApplicationSettings> applicationSettings)
 	// - Read 'misc/fonts/README.txt' for more instructions and details.
 	// - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
 	//io.Fonts->AddFontDefault();
-	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
+	std::string fontName = applicationSettings->GetResourcesPath() + std::string("\\Fonts\\roboto-bold.ttf");
+	ImFont* font = io.Fonts->AddFontFromFileTTF(fontName.c_str(), 16.0f);
 	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
 	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
 	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/ProggyTiny.ttf", 10.0f);
 	//ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
 	//IM_ASSERT(font != NULL);
+	RED_LILIUM_ASSERT(font != nullptr);
 
 	bool show_demo_window = true;
 	bool show_another_window = false;
