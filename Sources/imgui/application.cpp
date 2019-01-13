@@ -25,7 +25,7 @@
 
 using namespace RED_LILIUM_NAMESPACE;
 
-i32 ImguiApplication::Start(const argh::parser& parser, const std::string& resourcesPath)
+i32 ImguiApplication::Start(ptr<ApplicationSettings> applicationSettings)
 {
 	// Setup SDL
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)

@@ -75,7 +75,7 @@ namespace HelloWorldSdl
 	}
 }
 
-int HelloWorld_SDL(argh::parser& parser)
+int HelloWorld_SDL(ptr<ApplicationSettings> settings)
 {
 	return HelloWorldSdl::run();
 }

@@ -9,13 +9,13 @@ int main(int argc, char** argv)
 	if (argc < 2)
 		return -1;
 
-	argh::parser parser(argv);
+	uptr<ApplicationSettings> applicationSettings = umake<ApplicationSettings>(argc, argv);
 	auto& commands = UtilCommands::GetCommands();
 
 	const std::string command = argv[1];
 	if (commands.find(command) != commands.end())
 	{
-		return commands.at(command)(parser);
+		return commands.at(command)(applicationSettings.get());
 	}
 
 	return 0;

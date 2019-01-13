@@ -1,10 +1,11 @@
 #pragma once
 
 #include <Core/Common.h>
+#include <Core/ApplicationSettings.h>
 
 namespace RED_LILIUM_NAMESPACE
 {
-	typedef std::function<int(argh::parser&)> RegisteredCommand;
+	typedef std::function<int(ptr<ApplicationSettings>)> RegisteredCommand;
 
 	class UtilCommands
 	{
@@ -38,7 +39,7 @@ namespace RED_LILIUM_NAMESPACE
 
 #define REGISTER_COMMAND(name, command)\
 \
-int command(argh::parser& parser);\
+int command(RED_LILIUM_NAMESPACE::ptr<RED_LILIUM_NAMESPACE::ApplicationSettings> parser);\
 \
 namespace \
 {\

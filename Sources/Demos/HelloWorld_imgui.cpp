@@ -7,8 +7,8 @@ REGISTER_COMMAND("HelloWorld_imgui", HelloWorld_imgui)
 
 using namespace RED_LILIUM_NAMESPACE;
 
-int HelloWorld_imgui(argh::parser& parser)
+int HelloWorld_imgui(ptr<ApplicationSettings> settings)
 {
 	uptr<ImguiDemoApplication> application = umake<ImguiDemoApplication>();
-	return application->Start(parser, "");
+	return application->Start(settings);
 }
