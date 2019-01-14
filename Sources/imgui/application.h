@@ -3,6 +3,7 @@
 #include <Core/Common.h>
 #include <Core/ApplicationSettings.h>
 #include <SDL/SDL.h>
+#include "imgui.h"
 
 namespace RED_LILIUM_NAMESPACE
 {
@@ -21,8 +22,10 @@ public:
 protected:
 	void Stop();
 	ptr<SDL_Window> GetMainWindow();
+	ptr<const ApplicationSettings> GetApplicationSettings() const;
 
 private:
+	ptr<ApplicationSettings> m_applicationSettings;
 	ptr<SDL_Window> m_mainWindow;
 	bool m_isRunning = true;
 };

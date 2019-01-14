@@ -33,6 +33,9 @@ i32 ImguiApplication::Start(ptr<ApplicationSettings> applicationSettings)
 		return -1;
 	}
 
+	m_applicationSettings = applicationSettings;
+	Init();
+
 	// Decide GL+GLSL versions
 #if __APPLE__
 	// GL 3.2 Core + GLSL 150
@@ -188,6 +191,11 @@ void ImguiApplication::Stop()
 ptr<SDL_Window> ImguiApplication::GetMainWindow()
 {
 	return m_mainWindow;
+}
+
+ptr<const ApplicationSettings> ImguiApplication::GetApplicationSettings() const
+{
+	return m_applicationSettings;
 }
 
 void ImguiDemoApplication::Init()
