@@ -41,6 +41,7 @@ add_custom_target(CmakeProject SOURCES ${CMAKE_SRC})
 
 add_subdirectory("Sources/imgui")
 add_subdirectory("Sources/Core")
+add_subdirectory("Sources/Editor")
 add_subdirectory("Sources/Demos")
 add_subdirectory("Sources/Tests")
 

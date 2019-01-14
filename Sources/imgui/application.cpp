@@ -8,7 +8,6 @@
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
-#include <SDL/SDL.h>
 
 // About OpenGL function loaders: modern OpenGL doesn't have a standard header file and requires individual function pointers to be loaded manually. 
 // Helper libraries are often used for this purpose! Here we are supporting a few common ones: gl3w, glew, glad.
@@ -57,9 +56,9 @@ i32 ImguiApplication::Start(ptr<ApplicationSettings> applicationSettings)
 	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 	SDL_DisplayMode current;
 	SDL_GetCurrentDisplayMode(0, &current);
-	SDL_Window* window = SDL_CreateWindow("Dear ImGui SDL2+OpenGL3 example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
-	SDL_GLContext gl_context = SDL_GL_CreateContext(window);
-	SDL_GL_MakeCurrent(window, gl_context);
+	m_mainWindow = SDL_CreateWindow("Dear ImGui SDL2+OpenGL3 example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+	SDL_GLContext gl_context = SDL_GL_CreateContext(m_mainWindow);
+	SDL_GL_MakeCurrent(m_mainWindow, gl_context);
 	SDL_GL_SetSwapInterval(1); // Enable vsync
 
 	// Initialize OpenGL loader
@@ -101,7 +100,7 @@ i32 ImguiApplication::Start(ptr<ApplicationSettings> applicationSettings)
 	}
 
 	// Setup Platform/Renderer bindings
-	ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
+	ImGui_ImplSDL2_InitForOpenGL(m_mainWindow, gl_context);
 	ImGui_ImplOpenGL3_Init(glsl_version);
 
 	// Load Fonts
@@ -121,13 +120,11 @@ i32 ImguiApplication::Start(ptr<ApplicationSettings> applicationSettings)
 	//IM_ASSERT(font != NULL);
 	RED_LILIUM_ASSERT(font != nullptr);
 
-	bool show_demo_window = true;
-	bool show_another_window = false;
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 	// Main loop
-	bool done = false;
-	while (!done)
+	m_isRunning = true;
+	while (m_isRunning)
 	{
 		// Poll and handle events (inputs, window resize, etc.)
 		// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
@@ -138,53 +135,15 @@ i32 ImguiApplication::Start(ptr<ApplicationSettings> applicationSettings)
 		while (SDL_PollEvent(&event))
 		{
 			ImGui_ImplSDL2_ProcessEvent(&event);
-			if (event.type == SDL_QUIT)
-				done = true;
-			if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
-				done = true;
+			PollEvent(&event);
 		}
 
 		// Start the Dear ImGui frame
 		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplSDL2_NewFrame(window);
+		ImGui_ImplSDL2_NewFrame(m_mainWindow);
 		ImGui::NewFrame();
 
-		// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-		if (show_demo_window)
-			ImGui::ShowDemoWindow(&show_demo_window);
-
-		// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
-		{
-			static float f = 0.0f;
-			static int counter = 0;
-
-			ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-			ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-			ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-			ImGui::Checkbox("Another Window", &show_another_window);
-
-			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f    
-			ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-			if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-				counter++;
-			ImGui::SameLine();
-			ImGui::Text("counter = %d", counter);
-
-			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-			ImGui::End();
-		}
-
-		// 3. Show another simple window.
-		if (show_another_window)
-		{
-			ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-			ImGui::Text("Hello from another window!");
-			if (ImGui::Button("Close Me"))
-				show_another_window = false;
-			ImGui::End();
-		}
+		Tick(1000.0f / ImGui::GetIO().Framerate);
 
 		// Rendering
 		ImGui::Render();
@@ -205,7 +164,7 @@ i32 ImguiApplication::Start(ptr<ApplicationSettings> applicationSettings)
 			SDL_GL_MakeCurrent(backup_current_window, backup_current_context);
 		}
 
-		SDL_GL_SwapWindow(window);
+		SDL_GL_SwapWindow(m_mainWindow);
 	}
 
 	// Cleanup
@@ -214,10 +173,21 @@ i32 ImguiApplication::Start(ptr<ApplicationSettings> applicationSettings)
 	ImGui::DestroyContext();
 
 	SDL_GL_DeleteContext(gl_context);
-	SDL_DestroyWindow(window);
+	SDL_DestroyWindow(m_mainWindow);
+	m_mainWindow = nullptr;
 	SDL_Quit();
 
 	return 0;
+}
+
+void ImguiApplication::Stop()
+{
+	m_isRunning = false;
+}
+
+ptr<SDL_Window> ImguiApplication::GetMainWindow()
+{
+	return m_mainWindow;
 }
 
 void ImguiDemoApplication::Init()
@@ -226,4 +196,55 @@ void ImguiDemoApplication::Init()
 
 void ImguiDemoApplication::Tick(f32 dTime)
 {
+	// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
+	if (m_showDemoWindow)
+		ImGui::ShowDemoWindow(&m_showDemoWindow);
+
+	// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
+	{
+		static float f = 0.0f;
+		static int counter = 0;
+
+		ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+
+		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+		ImGui::Checkbox("Demo Window", &m_showDemoWindow);      // Edit bools storing our window open/close state
+		ImGui::Checkbox("Another Window", &m_showAnotherWindow);
+
+		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f    
+		// ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+
+		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+			counter++;
+		ImGui::SameLine();
+		ImGui::Text("counter = %d", counter);
+
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::End();
+	}
+
+	// 3. Show another simple window.
+	if (m_showAnotherWindow)
+	{
+		ImGui::Begin("Another Window", &m_showAnotherWindow);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+		ImGui::Text("Hello from another window!");
+		if (ImGui::Button("Close Me"))
+			m_showAnotherWindow = false;
+		ImGui::End();
+	}
+}
+
+void ImguiDemoApplication::PollEvent(ptr<SDL_Event> event)
+{
+	if (event->type == SDL_QUIT)
+	{
+		Stop();
+	}
+
+	if (event->type == SDL_WINDOWEVENT &&
+		event->window.event == SDL_WINDOWEVENT_CLOSE &&
+		event->window.windowID == SDL_GetWindowID(GetMainWindow()))
+	{
+		Stop();
+	}
 }
