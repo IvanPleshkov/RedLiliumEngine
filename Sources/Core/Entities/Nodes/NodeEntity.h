@@ -8,7 +8,7 @@ namespace RED_LILIUM_NAMESPACE
 class NodeEntity : public Entity
 {
 public:
-	NodeEntity();
+	NodeEntity(ptr<Entity> parent);
 	~NodeEntity() override = default;
 
 };

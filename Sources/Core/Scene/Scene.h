@@ -17,7 +17,6 @@ public:
 	ptr<Entity> Root();
 
 private:
-	u64 m_maxId = 0;
 	uptr<Entity> m_root;
 };
 

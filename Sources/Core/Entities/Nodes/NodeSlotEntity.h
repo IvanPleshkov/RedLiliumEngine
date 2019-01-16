@@ -1,19 +1,17 @@
 #pragma once
 
-#include <Core/Common.h>
-#include <Core/Flags.h>
+#include "Scene/Entity.h"
 
 namespace RED_LILIUM_NAMESPACE
 {
 
-class Entity : public RedLiliumObject
+class NodeSlotEntity : public Entity
 {
 public:
-	Entity();
-	~Entity() override = default;
+	NodeSlotEntity(ptr<Entity> parent);
+	~NodeSlotEntity() override = default;
 
 private:
-	std::vector<uptr<Entity>> m_children;
 };
 
 }  // namespace RED_LILIUM_NAMESPACE
