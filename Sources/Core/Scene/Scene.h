@@ -7,7 +7,6 @@ namespace RED_LILIUM_NAMESPACE
 {
 
 class Entity;
-class Component;
 
 class Scene final : public Restorable
 {
@@ -15,11 +14,11 @@ public:
 	Scene();
 	~Scene() override = default;
 
-	rptr<Entity> Root();
+	ptr<Entity> Root();
 
 private:
 	u64 m_maxId = 0;
-	std::unordered_map<u64, uptr<Entity>> m_entities;
+	uptr<Entity> m_root;
 };
 
 }  // namespace RED_LILIUM_NAMESPACE

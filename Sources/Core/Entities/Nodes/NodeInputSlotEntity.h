@@ -6,13 +6,14 @@
 namespace RED_LILIUM_NAMESPACE
 {
 
-class Component : public RedLiliumObject
+class Entity : public RedLiliumObject
 {
 public:
-	Component();
-	~Component() override = default;
+	Entity();
+	~Entity() override = default;
 
 private:
+	std::vector<uptr<Entity>> m_children;
 };
 
 }  // namespace RED_LILIUM_NAMESPACE
