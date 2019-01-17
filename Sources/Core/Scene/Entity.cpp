@@ -1,3 +1,4 @@
+#include "Entity.h"
 #include "pch.h"
 #include "Entity.h"
 
@@ -12,6 +13,14 @@ Entity::Entity(ptr<Entity> parent)
 Entity::Entity(ptr<Scene> scene)
 	: m_parent(nullptr)
 	, m_scene(scene)
+{
+}
+
+void Entity::Serialize(ptr<Serializator> serializator) const
+{
+}
+
+void Entity::Deserialize(ptr<const Serializator> serializator)
 {
 }
 

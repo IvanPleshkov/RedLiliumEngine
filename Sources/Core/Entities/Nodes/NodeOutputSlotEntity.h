@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Scene/Entity.h"
+#include <Core/Scene/Entity.h>
 
 namespace RED_LILIUM_NAMESPACE
 {
@@ -8,6 +8,8 @@ namespace RED_LILIUM_NAMESPACE
 class NodeOutputSlotEntity : public Entity
 {
 public:
+	RED_LILIUM_CLASS(NodeOutputSlotEntity, Entity);
+
 	NodeOutputSlotEntity(ptr<Entity> parent);
 	~NodeOutputSlotEntity() override = default;
 

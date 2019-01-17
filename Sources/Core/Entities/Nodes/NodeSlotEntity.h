@@ -8,6 +8,8 @@ namespace RED_LILIUM_NAMESPACE
 class NodeSlotEntity : public Entity
 {
 public:
+	RED_LILIUM_CLASS(NodeSlotEntity, Entity);
+
 	NodeSlotEntity(ptr<Entity> parent);
 	~NodeSlotEntity() override = default;
 
