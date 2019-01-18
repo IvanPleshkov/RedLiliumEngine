@@ -4,7 +4,7 @@
 #include "ExternalInclude.h"
 
 #define RED_LILIUM_POINTER_COUNTERS 1
-#define RED_LILIUM_USE_RESTORABLE_POINTERS 1
+// #define RED_LILIUM_USE_RESTORABLE_POINTERS 0
 #define RED_LILIUM_USE_ASSERTS 1
 #define RED_LILIUM_USE_TELEMETRY 1
 #define RED_LILIUM_USE_GPU_MEMORY_PROFILER 1
@@ -115,6 +115,12 @@ class RedLiliumObject
 {
 public:
 	virtual ~RedLiliumObject() {}
+};
+
+class RestorableObject : public RedLiliumObject
+{
+public:
+	~RestorableObject() override = default;
 };
 
 #define RED_LILIUM_LOG_INFO(message) spdlog::info(message);

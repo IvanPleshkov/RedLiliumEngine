@@ -7,7 +7,7 @@ namespace RED_LILIUM_NAMESPACE
 
 class Serializator;
 
-class Serializable : public RedLiliumObject
+class Serializable : public RestorableObject
 {
 public:
 	~Serializable() override = default;

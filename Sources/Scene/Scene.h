@@ -1,7 +1,8 @@
 #pragma once
 
 #include <Core/Common.h>
-#include <Core/Reflection/Serialization.h>
+#include <Reflection/Serialization.h>
+#include "Entity.h"
 
 namespace RED_LILIUM_NAMESPACE
 {
