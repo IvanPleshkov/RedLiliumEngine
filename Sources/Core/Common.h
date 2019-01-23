@@ -92,8 +92,10 @@ using Color32 = u32;
 
 #if RED_LILIUM_USE_ASSERTS
 #define RED_LILIUM_ASSERT(condition) assert(condition);
+#define RED_LILIUM_NOT_IMPLEMENTED() assert(false && "Not Implemented!");
 #else
 #define RED_LILIUM_ASSERT(condition)
+#define RED_LILIUM_NOT_IMPLEMENTED(message)
 #endif // RED_LILIUM_USE_ASSERTS
 
 #define RED_LILIUM_CRITICAL_ERROR() assert(false)
@@ -128,5 +130,34 @@ public:
 #define RED_LILIUM_LOG_ERROR(message) spdlog::error(message);
 #define RED_LILIUM_LOG_CRITICAL(message) spdlog::critical(message);
 #define RED_LILIUM_LOG_DEBUG(message) spdlog::debug(message);
+
+
+template<class T, class R>
+ptr<T> Cast(ptr<R> ref)
+{
+	T* pointer = dynamic_cast<T*>(ref);
+	return ptr<T>(pointer);
+}
+
+template<class T, class R>
+ptr<T> Cast(uptr<R>& ref)
+{
+	T* pointer = dynamic_cast<T*>(ref.get());
+	return ptr<T>(pointer);
+}
+
+template<class T, class R>
+ptr<T> ConstCast(ptr<R> ref)
+{
+	T* pointer = const_cast<T*>(ref);
+	return ptr<T>(pointer);
+}
+
+template<class T, class R>
+ptr<T> ConstCast(uptr<R> ref)
+{
+	T* pointer = const_cast<T*>(ref.get());
+	return ptr<T>(pointer);
+}
 
 }

@@ -14,6 +14,7 @@ class Component : public Serializable
 public:
 	RED_LILIUM_CLASS(Component, Serializable);
 
+	Component();
 	Component(ptr<Entity> parent);
 	~Component() override = default;
 	void Serialize(ptr<Serializator> serializator) const override;
@@ -23,4 +24,4 @@ private:
 	ptr<Entity> m_parent;
 };
 
-}  // namespace RED_LILIUM_NAMESPACE
+} // namespace RED_LILIUM_NAMESPACE

@@ -1,7 +1,7 @@
 #include "pch.h"
 
 #include "Commands.h"
-#include <Editor/ImguiView/EditorImguiApplication.h>
+#include <NodesEditorImgui/EditorImguiApplication.h>
 
 REGISTER_COMMAND("editor", StartEditor)
 

@@ -3,16 +3,18 @@
 
 using namespace RED_LILIUM_NAMESPACE;
 
-Editor::Editor()
+Editor::Editor(ptr<TypesManager> typesManager)
 	: m_isModified(false)
 	, m_currentAction(nullptr)
+	, m_typesManager(typesManager)
 {
 }
 
 void Editor::HandleEvent(ptr<Event> event)
 {
-	bool eventHandled = false;
+	RED_LILIUM_ASSERT(m_typesManager->GetType(event) != nullptr);
 
+	bool eventHandled = false;
 	while (!eventHandled)
 	{
 		if (m_currentAction == nullptr)
@@ -20,10 +22,17 @@ void Editor::HandleEvent(ptr<Event> event)
 			m_currentAction = std::move(event->TriggerAction(this));
 			if (m_currentAction == nullptr)
 			{
+				RED_LILIUM_LOG_INFO("Skip event: " + m_typesManager->GetType(event)->GetName());
 				eventHandled = true;
 				break;
 			}
+			else
+			{
+				RED_LILIUM_LOG_INFO("Create Action: " + m_currentAction->GetName());
+			}
 		}
+
+		RED_LILIUM_LOG_INFO("Handle event " + m_typesManager->GetType(event)->GetName() + " by Action: " + m_currentAction->GetName());
 
 		EventHandleResultFlags handleResult = m_currentAction->HandleEvent(event);
 		if (handleResult.Test(EventHandleResult::ActionFinished))

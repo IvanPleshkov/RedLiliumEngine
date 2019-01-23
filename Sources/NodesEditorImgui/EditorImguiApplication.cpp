@@ -1,5 +1,8 @@
 #include "pch.h"
 #include "EditorImguiApplication.h"
+#include "NodesCollectionWindow.h"
+#include "NodesEditorWindow.h"
+#include "PropertyGridWindow.h"
 
 using namespace RED_LILIUM_NAMESPACE;
 
@@ -22,12 +25,21 @@ void EditorImguiWindow::Tick()
 
 void EditorImguiApplication::Init()
 {
-	m_windows.push_back(umake<EditorImguiWindow>());
-	m_windows.back()->SetCaption("Window 1");
-	m_windows.push_back(umake<EditorImguiWindow>());
-	m_windows.back()->SetCaption("Window 2");
-	m_windows.push_back(umake<EditorImguiWindow>());
-	m_windows.back()->SetCaption("Window 3");
+	m_editorSystem = umake<NodesEditorSystem>();
+
+	m_windows.push_back(umake<NodesCollectionWindow>(this));
+	m_windows.push_back(umake<PropertyGridWindow>(this));
+	m_windows.push_back(umake<NodesEditorWindow>(this));
+}
+
+ptr<const NodesEditorSystem> EditorImguiApplication::GetEditorSystem() const
+{
+	return m_editorSystem.get();
+}
+
+ptr<NodesEditorSystem> EditorImguiApplication::GetEditorSystem()
+{
+	return m_editorSystem.get();
 }
 
 void EditorImguiApplication::Tick(f32 dTime)

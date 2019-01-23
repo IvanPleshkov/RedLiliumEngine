@@ -20,4 +20,4 @@ private:
 	std::string m_resourcesPath;
 };
 
-}
+} // namespace RED_LILIUM_NAMESPACE

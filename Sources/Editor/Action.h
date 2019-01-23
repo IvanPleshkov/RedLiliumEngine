@@ -46,4 +46,4 @@ protected:
 	ptr<IEditor> m_editor;
 };
 
-}  // namespace RED_LILIUM_NAMESPACE
+} // namespace RED_LILIUM_NAMESPACE

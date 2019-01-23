@@ -19,10 +19,11 @@ public:
 	void Serialize(ptr<Serializator> serializator) const override;
 	void Deserialize(ptr<const Serializator> serializator) override;
 
-	ptr<Entity> Root();
+	ptr<Entity> GetRoot();
+	ptr<const Entity> GetRoot() const;
 
 private:
 	uptr<Entity> m_root;
 };
 
-}  // namespace RED_LILIUM_NAMESPACE
+} // namespace RED_LILIUM_NAMESPACE

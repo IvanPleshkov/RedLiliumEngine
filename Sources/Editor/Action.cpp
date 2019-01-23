@@ -9,7 +9,6 @@ EventHandleResultFlags ActionBase::HandleEvent(ptr<Event> event)
 {
 	EventHandleResultFlags result;
 	result.Add(EventHandleResult::ActionFinished);
-	result.Add(EventHandleResult::EventHandled);
 	return result;
 }
 

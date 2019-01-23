@@ -2,6 +2,7 @@
 
 #include <Core/Common.h>
 #include <imgui/application.h>
+#include <NodesEditor/NodesEditorSystem.h>
 
 namespace RED_LILIUM_NAMESPACE
 {
@@ -26,11 +27,15 @@ public:
 	void Tick(f32 dTime) override;
 	void PollEvent(ptr<SDL_Event> event) override;
 
+	ptr<const NodesEditorSystem> GetEditorSystem() const;
+	ptr<NodesEditorSystem> GetEditorSystem();
+
 private:
 	void WindowTick(ImGuiID dockspaceId, ptr<EditorImguiWindow> window);
 
+	uptr<NodesEditorSystem> m_editorSystem;
 	ImGuiWindowClass m_guiWindowClass;
 	std::vector<uptr<EditorImguiWindow>> m_windows;
 };
 
-}  // namespace RED_LILIUM_NAMESPACE
+} // namespace RED_LILIUM_NAMESPACE

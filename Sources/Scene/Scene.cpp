@@ -16,7 +16,12 @@ void Scene::Serialize(ptr<Serializator> serializator) const
 void Scene::Deserialize(ptr<const Serializator> serializator)
 {}
 
-ptr<Entity> Scene::Root()
+ptr<Entity> Scene::GetRoot()
+{
+	return m_root.get();
+}
+
+ptr<const Entity> Scene::GetRoot() const
 {
 	return m_root.get();
 }
