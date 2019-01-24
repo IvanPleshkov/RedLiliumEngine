@@ -18,7 +18,10 @@ public:
 	void Serialize(ptr<Serializator> serializator) const override;
 	void Deserialize(ptr<const Serializator> serializator) override;
 
-	// uptr<ActionBase> TriggerAction(ptr<Editor> editor) override;
+	uptr<ActionBase> TriggerAction(ptr<Editor> editor) override;
+
+	MouseState GetMouseState() const;
+	float GetScrollDelta() const;
 
 private:
 	MouseState m_mouseState;

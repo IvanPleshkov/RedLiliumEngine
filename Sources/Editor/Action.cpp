@@ -34,7 +34,7 @@ bool ActionBase::NeedPushToUndoStack() const
 
 bool ActionBase::NeedSetModifiedFlag() const
 {
-	return true;
+	return NeedPushToUndoStack() && IsEmpty();
 }
 
 bool ActionBase::NeedUndoAfterFinishing() const

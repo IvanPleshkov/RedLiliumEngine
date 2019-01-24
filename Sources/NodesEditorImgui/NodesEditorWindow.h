@@ -14,8 +14,8 @@ public:
 	void Tick() override;
 
 private:
-	vec2 GetScreenPosition(vec2 documentPosition) const;
-	vec2 GetDocumentPosition(vec2 screenPosition) const;
+	vec2 GetScreenPosition(vec2 globalPosition);
+	vec2 GetGlobalPosition(vec2 screenPosition);
 
 	void DrawNode(ptr<ImDrawList> imguiDrawList, ptr<const Entity> nodeEntity);
 

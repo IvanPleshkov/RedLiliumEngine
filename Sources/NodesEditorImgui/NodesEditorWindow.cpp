@@ -24,14 +24,14 @@ NodesEditorWindow::NodesEditorWindow(ptr<EditorImguiApplication> application)
 	SetCaption("Nodes");
 }
 
-vec2 NodesEditorWindow::GetScreenPosition(vec2 documentPosition) const
+vec2 NodesEditorWindow::GetScreenPosition(vec2 globalPosition)
 {
-	return { m_canvasPos.x + m_scale * (m_translate.x + documentPosition.x), m_canvasPos.y + m_scale * (m_translate.y + documentPosition.y) };
+	return globalPosition - m_canvasPos - m_canvasSize / 2;
 }
 
-vec2 NodesEditorWindow::GetDocumentPosition(vec2 screenPosition) const
+vec2 NodesEditorWindow::GetGlobalPosition(vec2 screenPosition)
 {
-	return {(screenPosition.x - m_canvasPos.x) / m_scale - m_translate.x, (screenPosition.y - m_canvasPos.y) / m_scale - m_translate.y};
+	return screenPosition + m_canvasPos + m_canvasSize / 2;
 }
 
 void NodesEditorWindow::Tick()
@@ -48,8 +48,7 @@ void NodesEditorWindow::Tick()
 	auto canvasSize = ImGui::GetContentRegionAvail();
 	m_canvasSize = { canvasSize.x, canvasSize.y };
 
-	imguiDrawList->AddRect(canvasPos, ImVec2(m_canvasPos.x + m_canvasSize.x, m_canvasPos.y + m_canvasSize.y), IM_COL32(255, 255, 255, 255));
-
+	imguiDrawList->AddRect(canvasPos, ImVec2(m_canvasPos.x + m_canvasSize.x, m_canvasPos.y + m_canvasSize.y), IM_COL32(100, 0, 0, 255));
 	ImGui::InvisibleButton("canvas", { m_canvasSize.x, m_canvasSize.y });
 
 	MouseState currentMouseState;
@@ -66,11 +65,6 @@ void NodesEditorWindow::Tick()
 	if (ImGui::IsMouseDown(2))
 	{
 		currentMouseState.pressedKeys.Add(MouseKey::Middle);
-	}
-
-	if (ImGui::GetIO().MouseWheel != 0.0f && ImGui::IsMousePosValid(&ImGui::GetMousePos()) && ImGui::IsItemHovered())
-	{
-		RED_LILIUM_LOG_INFO("Mouse Wheel");
 	}
 
 	{
@@ -129,13 +123,16 @@ void NodesEditorWindow::Tick()
 
 void NodesEditorWindow::DrawNode(ptr<ImDrawList> imguiDrawList, ptr<const Entity> nodeEntity)
 {
+	const ImU32 nodeFillColor = ImColor(ImVec4(1.0f, 1.0f, 0.4f, 1.0f));
+	const ImU32 nodeStrokeColor = ImColor(ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+
+	ptr<const NodesViewComponent> viewComponent = nodeEntity->GetParent()->GetComponent<NodesViewComponent>();
+	RED_LILIUM_ASSERT(viewComponent != nullptr);
 	ptr<const NodeComponent> nodeComponent = nodeEntity->GetComponent<NodeComponent>();
 	RED_LILIUM_ASSERT(nodeComponent != nullptr);
 
-	const ImU32 nodeFillColor = ImColor(ImVec4(1.0f, 1.0f, 0.4f, 1.0f));
-	const ImU32 nodeStrokeColor = ImColor(ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-	vec2 positionStart = GetScreenPosition(nodeComponent->GetPosition());
-	vec2 positionEnd = GetScreenPosition(nodeComponent->GetPosition() + nodeComponent->GetSize());
+	vec2 positionStart = GetGlobalPosition(viewComponent->GetScreenPosition(nodeComponent->GetPosition()));
+	vec2 positionEnd = GetGlobalPosition(viewComponent->GetScreenPosition(nodeComponent->GetPosition() + nodeComponent->GetSize()));
 	imguiDrawList->AddRectFilled({ positionStart.x, positionStart.y }, { positionEnd.x, positionEnd.y }, nodeFillColor);
 	imguiDrawList->AddRect({ positionStart.x, positionStart.y }, { positionEnd.x, positionEnd.y }, nodeStrokeColor);
 }

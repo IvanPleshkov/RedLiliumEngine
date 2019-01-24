@@ -29,6 +29,6 @@ void NodesEditor::NewScene()
 
 	ptr<Entity> nodeEntity = nodesRoot->AddChild("Node");
 	ptr<NodeComponent> nodeComponent = nodeEntity->AddComponent<NodeComponent>();
-	nodeComponent->SetPosition({ 100.0f, 100.0f });
+	nodeComponent->SetPosition({ 0.0f, 0.0f });
 	nodeComponent->SetSize({ 100.0f, 100.0f });
 }

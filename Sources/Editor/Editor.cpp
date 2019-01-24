@@ -7,6 +7,8 @@ Editor::Editor(ptr<TypesManager> typesManager)
 	: m_isModified(false)
 	, m_currentAction(nullptr)
 	, m_typesManager(typesManager)
+	, m_undoStack()
+	, m_undoStackPosition(m_undoStack.end())
 {
 }
 
@@ -72,7 +74,10 @@ void Editor::ResetModifiedStatus()
 
 void Editor::MoveCurrentActionToUndoStack()
 {
-	m_undoStack.erase(m_undoStackPosition, m_undoStack.end());
+	if (m_undoStackPosition != m_undoStack.end())
+	{
+		m_undoStack.erase(m_undoStackPosition, m_undoStack.end());
+	}
 	m_undoStack.push_back(std::move(m_currentAction));
 
 	m_undoStackPosition = std::prev(m_undoStack.end());
