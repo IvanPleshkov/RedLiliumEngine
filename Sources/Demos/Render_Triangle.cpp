@@ -43,7 +43,7 @@ namespace RenderTriangleNamespace
 		return 1;
 	}
 
-	int run()
+	int run(ptr<ApplicationSettings> settings)
 	{
 		if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
 			SDL_Log("Failed to initialize SDL: %s", SDL_GetError());
@@ -64,14 +64,14 @@ namespace RenderTriangleNamespace
 
 		SDL_AddEventWatch(watch, NULL);
 
-		renderDevice = umake<RenderDevice>();
+		renderDevice = umake<RenderDevice>(settings);
 		sptr<Shader> vertexShader = smake<Shader>(renderDevice.get());
 		vertexShader->CompileFromString(ShaderType::Vertex, vertexShaderSource);
 		sptr<Shader> fragmentShader = smake<Shader>(renderDevice.get());
 		fragmentShader->CompileFromString(ShaderType::Fragment, fragmentShaderSource);
 		sptr<ShaderProgram> shaderProgram = smake<ShaderProgram>(renderDevice.get());
 		shaderProgram->Link(vertexShader, fragmentShader);
-		sptr<Material> material = smake<Material>();
+		sptr<Material> material = smake<Material>(renderDevice.get(), "Resources\\Shaders\\ColoredTriangle\\material.json");
 		material->SetShaderProgram(shaderProgram);
 		material->SetVertexDeclaration(renderDevice->GetVertexDeclarationP());
 
@@ -115,5 +115,5 @@ namespace RenderTriangleNamespace
 
 int Render_Triangle(ptr<ApplicationSettings> settings)
 {
-	return RenderTriangleNamespace::run();
+	return RenderTriangleNamespace::run(settings);
 }

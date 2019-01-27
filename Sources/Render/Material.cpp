@@ -3,8 +3,11 @@
 
 using namespace RED_LILIUM_NAMESPACE;
 
-Material::Material()
-	: m_vertexDeclaration(nullptr)
+Material::Material(ptr<RenderDevice> renderDevice, const std::string& filename)
+	: RedLiliumObject()
+	, m_renderDevice(renderDevice)
+	, m_filename(filename)
+	, m_vertexDeclaration(nullptr)
 {}
 
 Material::~Material()

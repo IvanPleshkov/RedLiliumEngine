@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RenderCommon.h"
+#include <Core/ApplicationSettings.h>
 
 namespace RED_LILIUM_NAMESPACE
 {
@@ -8,7 +9,7 @@ namespace RED_LILIUM_NAMESPACE
 class RenderDevice : public RedLiliumObject
 {
 public:
-	RenderDevice();
+	RenderDevice(ptr<ApplicationSettings> applicationSettings);
 	~RenderDevice() override;
 
 	uptr<RenderContext> CreateRenderContext();
@@ -25,6 +26,7 @@ public:
 private:
 	void InitStandardVertexDeclarations();
 
+	ptr<ApplicationSettings> m_applicationSettings;
 	uptr<VertexDeclaration> m_declP;
 	uptr<VertexDeclaration> m_declPN;
 	uptr<VertexDeclaration> m_declPC;

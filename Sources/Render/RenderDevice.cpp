@@ -5,7 +5,9 @@
 
 using namespace RED_LILIUM_NAMESPACE;
 
-RenderDevice::RenderDevice()
+RenderDevice::RenderDevice(ptr<ApplicationSettings> applicationSettings)
+	: RedLiliumObject()
+	, m_applicationSettings(applicationSettings)
 {
 	InitStandardVertexDeclarations();
 }

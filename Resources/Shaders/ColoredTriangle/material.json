@@ -1,0 +1,28 @@
+{
+    "VertexShader": 
+    {
+        "Language" : "glsl",
+        "ApiVersion" : "450",
+        "Filename" : "Resources\\Shaders\\ColoredTriangle\\vert.glsl",
+        "Uniforms" :
+        {
+
+        },
+        "VertexDeclaration" :
+        [
+            "Position",
+            "Color0"
+        ]
+    },
+
+    "FragmentShader" : 
+    {
+        "Language" : "glsl",
+        "ApiVersion" : "450",
+        "Filename" : "Resources\\Shaders\\ColoredTriangle\\frag.glsl",
+        "Uniforms" :
+        {
+            
+        }
+    }
+}
