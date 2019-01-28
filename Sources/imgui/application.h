@@ -21,6 +21,7 @@ public:
 
 protected:
 	void Stop();
+	void SetStyle();
 	ptr<SDL_Window> GetMainWindow();
 	ptr<const ApplicationSettings> GetApplicationSettings() const;
 

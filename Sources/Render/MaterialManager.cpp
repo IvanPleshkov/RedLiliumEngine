@@ -25,7 +25,7 @@ sptr<Material> MaterialManager::Get(const std::string& filename, bool createCopy
 {
 	if (createCopy)
 	{
-		RED_LILIUM_NOT_IMPLEMENTED();
+		return NewMaterial(filename);
 	}
 
 	auto i = m_materials.find(filename);
