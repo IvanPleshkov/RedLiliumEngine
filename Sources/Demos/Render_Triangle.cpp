@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include <Render/RenderDevice.h>
+#include <Render/MaterialManager.h>
 #include <Render/Shader.h>
 #include <Render/Material.h>
 #include <Render/GpuMesh.h>
@@ -19,20 +20,6 @@ namespace RenderTriangleNamespace
 	static bool quitting = false;
 	static SDL_Window *window = NULL;
 	static SDL_GLContext gl_context;
-	static uptr<RenderDevice> renderDevice;
-
-	static std::string vertexShaderSource = "#version 330 core\n"
-		"layout (location = 0) in vec3 position;\n"
-		"void main()\n"
-		"{\n"
-		"gl_Position = vec4(position.x, position.y, position.z, 1.0);\n"
-		"}\0";
-	static std::string fragmentShaderSource = "#version 330 core\n"
-		"out vec4 color;\n"
-		"void main()\n"
-		"{\n"
-		"color = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-		"}\n\0";
 
 	int SDLCALL watch(void *userdata, SDL_Event* event) {
 
@@ -64,16 +51,12 @@ namespace RenderTriangleNamespace
 
 		SDL_AddEventWatch(watch, NULL);
 
-		renderDevice = umake<RenderDevice>(settings);
-		sptr<Shader> vertexShader = smake<Shader>(renderDevice.get());
-		vertexShader->CompileFromString(ShaderType::Vertex, vertexShaderSource);
-		sptr<Shader> fragmentShader = smake<Shader>(renderDevice.get());
-		fragmentShader->CompileFromString(ShaderType::Fragment, fragmentShaderSource);
-		sptr<ShaderProgram> shaderProgram = smake<ShaderProgram>(renderDevice.get());
-		shaderProgram->Link(vertexShader, fragmentShader);
-		sptr<Material> material = smake<Material>(renderDevice.get(), "Resources\\Shaders\\ColoredTriangle\\material.json");
-		material->SetShaderProgram(shaderProgram);
-		material->SetVertexDeclaration(renderDevice->GetVertexDeclarationP());
+		uptr<RenderDevice> renderDevice = umake<RenderDevice>(settings);
+		uptr<FileSystem> fileSystem = umake<FileSystem>(settings);
+		uptr<MaterialManager> materialManager = umake<MaterialManager>(renderDevice.get(), fileSystem.get());
+		renderDevice->Init(materialManager.get());
+
+		sptr<Material> material = materialManager->Get("Shaders\\ColoredTriangle\\material.json");
 
 		uptr<Mesh> mesh = Mesh::GenerateTriangle();
 		sptr<GpuMesh> gpuMesh = smake<GpuMesh>(renderDevice.get());

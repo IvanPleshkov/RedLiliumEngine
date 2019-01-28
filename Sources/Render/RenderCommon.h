@@ -22,6 +22,7 @@ namespace RED_LILIUM_NAMESPACE
 	class Material;
 	class VertexDeclaration;
 	class VertexArrayObject;
+	class MaterialManager;
 
 	enum class VertexAttribute : u32
 	{

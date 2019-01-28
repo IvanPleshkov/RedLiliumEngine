@@ -9,22 +9,20 @@ RenderDevice::RenderDevice(ptr<ApplicationSettings> applicationSettings)
 	: RedLiliumObject()
 	, m_applicationSettings(applicationSettings)
 {
-	InitStandardVertexDeclarations();
 }
 
 RenderDevice::~RenderDevice()
 {
 }
 
+void RenderDevice::Init(ptr<MaterialManager> materialManager)
+{
+	m_materialManager = materialManager;
+}
+
 uptr<RenderContext> RenderDevice::CreateRenderContext()
 {
 	return std::move(umake<RenderContext>(this));
-}
-
-void RenderDevice::InitStandardVertexDeclarations()
-{
-	m_declP = umake<VertexDeclaration>(this, std::vector<VertexAttribute>({ VertexAttribute::Position }));
-	m_declPN = umake<VertexDeclaration>(this, std::vector<VertexAttribute>({ VertexAttribute::Position, VertexAttribute::Normal }));
 }
 
 void RenderDevice::CheckErrors()
@@ -35,4 +33,14 @@ void RenderDevice::CheckErrors()
 	{
 		RED_LILIUM_ASSERT(false && "gl error!");
 	}
+}
+
+ptr<ApplicationSettings> RenderDevice::GetApplicationSettings()
+{
+	return m_applicationSettings;
+}
+
+ptr<MaterialManager> RenderDevice::GetMaterialManager()
+{
+	return m_materialManager;
 }

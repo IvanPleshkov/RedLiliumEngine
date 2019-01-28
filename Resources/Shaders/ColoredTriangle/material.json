@@ -3,15 +3,14 @@
     {
         "Language" : "glsl",
         "ApiVersion" : "450",
-        "Filename" : "Resources\\Shaders\\ColoredTriangle\\vert.glsl",
+        "Filename" : "Shaders\\ColoredTriangle\\vert.glsl",
         "Uniforms" :
         {
 
         },
         "VertexDeclaration" :
         [
-            "Position",
-            "Color0"
+            "Position"
         ]
     },
 
@@ -19,7 +18,7 @@
     {
         "Language" : "glsl",
         "ApiVersion" : "450",
-        "Filename" : "Resources\\Shaders\\ColoredTriangle\\frag.glsl",
+        "Filename" : "Shaders\\ColoredTriangle\\frag.glsl",
         "Uniforms" :
         {
             
