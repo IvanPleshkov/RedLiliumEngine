@@ -45,12 +45,20 @@ ptr<MaterialManager> RenderDevice::GetMaterialManager()
 	return m_materialManager;
 }
 
-ptr<VertexDeclaration> RenderDevice::GetVertexDeclaration(const std::vector<VertexAttribute>& attributes)
+ptr<VertexDeclaration> RenderDevice::GetVertexDeclaration(const std::vector<VertexInput>& attributes)
 {
-	auto i = m_vertexDeclarations.find(attributes);
+	std::string hashString;
+	hashString.reserve(attributes.size() * 2);
+	for (auto& a : attributes)
+	{
+		hashString.push_back(static_cast<char>(a.layout));
+		hashString.push_back(static_cast<char>(a.vertexAttribute));
+	}
+
+	auto i = m_vertexDeclarations.find(hashString);
 	if (i == m_vertexDeclarations.end())
 	{
-		auto j = m_vertexDeclarations.insert({ attributes, umake<VertexDeclaration>(this, attributes) });
+		auto j = m_vertexDeclarations.insert({ std::move(hashString), umake<VertexDeclaration>(this, attributes) });
 		RED_LILIUM_ASSERT(j.second);
 		i = j.first;
 	}

@@ -14,7 +14,6 @@ public:
 
 	void Update(ptr<const Mesh> mesh);
 	ptr<VertexArrayObject> GetVertexArrayObject(ptr<VertexDeclaration> vertexDeclaration);
-	VertexAttributeFlags GetEnabledData();
 	u32 GetIndicesSize() const;
 
 private:

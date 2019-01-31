@@ -24,34 +24,29 @@ namespace RED_LILIUM_NAMESPACE
 	class VertexArrayObject;
 	class MaterialManager;
 
-	enum class VertexAttribute : u32
+	enum class VertexAttribute : u8
 	{
-		Position = 1 << 0,
-		Normal = 1 << 1,
-		Tangent = 1 << 2,
-		Bitangent = 1 << 3,
-		Color0 = 1 << 4,
-		Color1 = 1 << 5,
-		Color2 = 1 << 6,
-		Color3 = 1 << 7,
-		TexCoord0 = 1 << 10,
-		TexCoord1 = 1 << 11,
-		TexCoord2 = 1 << 12,
-		TexCoord3 = 1 << 13,
-		TexCoord4 = 1 << 14,
-		TexCoord5 = 1 << 15,
-		TexCoord6 = 1 << 16,
-		TexCoord7 = 1 << 17,
+		Position,
+		Normal,
+		Tangent,
+		Bitangent,
+		Color0,
+		Color1,
+		Color2,
+		Color3,
+		TexCoord0,
+		TexCoord1,
+		TexCoord2,
+		TexCoord3,
+		TexCoord4,
+		TexCoord5,
+		TexCoord6,
+		TexCoord7,
 	};
-	using VertexAttributeFlags = Flags<VertexAttribute>;
-
-	enum class VertexType : u32
+	struct VertexInput
 	{
-		Uint8 = 1 << 0,
-		Uint10 = 1 << 1, // Todo: Check capability
-		Int16 = 1 << 2,
-		Half = 1 << 3, // Todo: Check capability
-		Float = 1 << 4,
+		VertexAttribute vertexAttribute;
+		u8 layout;
 	};
 
 } // namespace RED_LILIUM_NAMESPACE

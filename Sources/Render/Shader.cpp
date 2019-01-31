@@ -51,8 +51,10 @@ void Shader::CompileFromString(ShaderType type, const std::string& shader, const
 
 ShaderProgram::ShaderProgram(ptr<RenderDevice> renderDevice)
 	: GpuResource(renderDevice)
-{
-}
+	, m_vertexDeclaration(nullptr)
+	, m_vertexShader(nullptr)
+	, m_fragmentShader(nullptr)
+{ }
 
 ShaderProgram::~ShaderProgram()
 {
@@ -83,7 +85,7 @@ void ShaderProgram::Link(const sptr<Shader>& vertexShader, const  sptr<Shader>& 
 		RED_LILIUM_ASSERT("Shader Compilation Error!");
 	}
 
-	std::vector<VertexAttribute> attributes;
+	std::vector<VertexInput> attributes;
 	std::vector<std::string> uniforms;
 	GetNames(attributes, uniforms);
 
@@ -95,7 +97,7 @@ ptr<VertexDeclaration> ShaderProgram::GetVertexDeclaration()
 	return m_vertexDeclaration;
 }
 
-void ShaderProgram::GetNames(std::vector<VertexAttribute>& verts, std::vector<std::string>& uniforms)
+void ShaderProgram::GetNames(std::vector<VertexInput>& verts, std::vector<std::string>& uniforms)
 {
 	verts.clear();
 	uniforms.clear();
@@ -111,16 +113,22 @@ void ShaderProgram::GetNames(std::vector<VertexAttribute>& verts, std::vector<st
 	GLsizei length; // name length
 
 	glGetProgramiv(m_handler, GL_ACTIVE_ATTRIBUTES, &count);
-	verts.resize(count, VertexAttribute::Position);
 	for (i = 0; i < count; i++)
 	{
 		glGetActiveAttrib(m_handler, (GLuint)i, bufSize, &length, &size, &type, name);
 
 		std::string s(name, name + length);
 		std::transform(s.begin(), s.end(), s.begin(), std::tolower);
-		size_t pos = glGetAttribLocation(m_handler, name);
-		verts[pos] = GetVertexAttribute(s, type);
+		VertexInput vertexInput;
+		vertexInput.layout = glGetAttribLocation(m_handler, name);
+		vertexInput.vertexAttribute = GetVertexAttribute(s, type);
+		verts.push_back(vertexInput);
 	}
+
+	std::sort(verts.begin(), verts.end(), [](const VertexInput& lhs, const VertexInput& rhs)
+	{
+		return lhs.layout < rhs.layout;
+	});
 
 	glGetProgramiv(m_handler, GL_ACTIVE_UNIFORMS, &count);
 	for (i = 0; i < count; i++)

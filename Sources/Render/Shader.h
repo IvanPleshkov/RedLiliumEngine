@@ -43,7 +43,7 @@ public:
 	ptr<VertexDeclaration> GetVertexDeclaration();
 
 private:
-	void GetNames(std::vector<VertexAttribute>& verts, std::vector<std::string>& uniforms);
+	void GetNames(std::vector<VertexInput>& verts, std::vector<std::string>& uniforms);
 	VertexAttribute GetVertexAttribute(const std::string& name, GLenum glType);
 
 	ptr<VertexDeclaration> m_vertexDeclaration;

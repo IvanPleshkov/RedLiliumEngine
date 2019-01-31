@@ -10,25 +10,21 @@ namespace RED_LILIUM_NAMESPACE
 class VertexDeclaration : public RedLiliumObject
 {
 public:
-	VertexDeclaration(ptr<RenderDevice> renderDevice, const std::vector<VertexAttribute>& vertexElements);
+	VertexDeclaration(ptr<RenderDevice> renderDevice, const std::vector<VertexInput>& verts);
 	~VertexDeclaration() override;
 
-	const std::vector<VertexAttribute>& GetVertexElements() const;
+	const std::vector<VertexInput>& GetVertexElements() const;
 
 private:
 	ptr<RenderDevice> m_renderDevice;
-	std::vector<VertexAttribute> m_vertexElements;
+	std::vector<VertexInput> m_vertexElements;
 };
-
 
 class VertexArrayObject : public GpuResource
 {
 public:
 	VertexArrayObject(ptr<RenderDevice> renderDevice, ptr<VertexDeclaration> vertexDeclaration);
 	~VertexArrayObject() override;
-
-private:
-	VertexAttributeFlags m_vertexAttributeFlags;
 };
 
 } // namespace RED_LILIUM_NAMESPACE
