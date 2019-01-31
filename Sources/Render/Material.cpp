@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Material.h"
+#include "Shader.h"
 
 using namespace RED_LILIUM_NAMESPACE;
 
@@ -19,11 +20,6 @@ ptr<VertexDeclaration> Material::GetVertexDeclaration()
 	return m_vertexDeclaration;
 }
 
-void Material::SetVertexDeclaration(ptr<VertexDeclaration> vertexDeclaration)
-{
-	m_vertexDeclaration = vertexDeclaration;
-}
-
 const sptr<ShaderProgram>& Material::GetShaderProgram()
 {
 	RED_LILIUM_ASSERT(m_shaderProgram != nullptr);
@@ -33,4 +29,5 @@ const sptr<ShaderProgram>& Material::GetShaderProgram()
 void Material::SetShaderProgram(const sptr<ShaderProgram>& shaderProgram)
 {
 	m_shaderProgram = shaderProgram;
+	m_vertexDeclaration = m_shaderProgram->GetVertexDeclaration();
 }

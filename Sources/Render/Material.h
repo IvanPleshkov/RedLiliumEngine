@@ -11,8 +11,8 @@ public:
 	Material(ptr<RenderDevice> renderDevice, const std::string& filename);
 	~Material() override;
 	ptr<VertexDeclaration> GetVertexDeclaration();
-	void SetVertexDeclaration(ptr<VertexDeclaration> vertexDeclaration);
 	const sptr<ShaderProgram>& GetShaderProgram();
+
 	void SetShaderProgram(const sptr<ShaderProgram>& shaderProgram);
 
 private:

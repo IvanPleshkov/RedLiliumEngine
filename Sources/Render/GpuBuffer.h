@@ -10,6 +10,7 @@ class GpuResource : public RedLiliumObject
 public:
 	GpuResource(ptr<RenderDevice> renderDevice)
 		: m_renderDevice(renderDevice)
+		, m_handler(0)
 	{}
 	~GpuResource() override = default;
 

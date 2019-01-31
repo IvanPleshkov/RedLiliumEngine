@@ -44,3 +44,15 @@ ptr<MaterialManager> RenderDevice::GetMaterialManager()
 {
 	return m_materialManager;
 }
+
+ptr<VertexDeclaration> RenderDevice::GetVertexDeclaration(const std::vector<VertexAttribute>& attributes)
+{
+	auto i = m_vertexDeclarations.find(attributes);
+	if (i == m_vertexDeclarations.end())
+	{
+		auto j = m_vertexDeclarations.insert({ attributes, umake<VertexDeclaration>(this, attributes) });
+		RED_LILIUM_ASSERT(j.second);
+		i = j.first;
+	}
+	return i->second.get();
+}

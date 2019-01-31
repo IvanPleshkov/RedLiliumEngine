@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Shader.h"
+#include "RenderDevice.h"
 
 using namespace RED_LILIUM_NAMESPACE;
 
@@ -10,6 +11,11 @@ Shader::Shader(ptr<RenderDevice> renderDevice)
 
 Shader::~Shader()
 {
+	if (m_handler != 0)
+	{
+		glDeleteShader(m_handler);
+		m_handler = 0;
+	}
 }
 
 void Shader::CompileFromString(ShaderType type, const std::string& shader, const std::string& includeFilename)
@@ -43,11 +49,6 @@ void Shader::CompileFromString(ShaderType type, const std::string& shader, const
 	}
 }
 
-void Shader::Compile(ShaderType type, const std::string& shaderFilename)
-{
-	RED_LILIUM_NOT_IMPLEMENTED();
-}
-
 ShaderProgram::ShaderProgram(ptr<RenderDevice> renderDevice)
 	: GpuResource(renderDevice)
 {
@@ -55,6 +56,11 @@ ShaderProgram::ShaderProgram(ptr<RenderDevice> renderDevice)
 
 ShaderProgram::~ShaderProgram()
 {
+	if (m_handler != 0)
+	{
+		glDeleteProgram(m_handler);
+		m_handler = 0;
+	}
 }
 
 void ShaderProgram::Link(const sptr<Shader>& vertexShader, const  sptr<Shader>& fragmentShader)
@@ -76,4 +82,138 @@ void ShaderProgram::Link(const sptr<Shader>& vertexShader, const  sptr<Shader>& 
 		RED_LILIUM_LOG_ERROR("Shader Compilation Error: " + errorMessage);
 		RED_LILIUM_ASSERT("Shader Compilation Error!");
 	}
+
+	std::vector<VertexAttribute> attributes;
+	std::vector<std::string> uniforms;
+	GetNames(attributes, uniforms);
+
+	m_vertexDeclaration = m_renderDevice->GetVertexDeclaration(attributes);
+}
+
+ptr<VertexDeclaration> ShaderProgram::GetVertexDeclaration()
+{
+	return m_vertexDeclaration;
+}
+
+void ShaderProgram::GetNames(std::vector<VertexAttribute>& verts, std::vector<std::string>& uniforms)
+{
+	verts.clear();
+	uniforms.clear();
+
+	GLint i;
+	GLint count;
+
+	GLint size; // size of the variable
+	GLenum type; // type of the variable (float, vec3 or mat4, etc)
+
+	const GLsizei bufSize = 64; // maximum name length
+	GLchar name[bufSize]; // variable name in GLSL
+	GLsizei length; // name length
+
+	glGetProgramiv(m_handler, GL_ACTIVE_ATTRIBUTES, &count);
+	verts.resize(count, VertexAttribute::Position);
+	for (i = 0; i < count; i++)
+	{
+		glGetActiveAttrib(m_handler, (GLuint)i, bufSize, &length, &size, &type, name);
+
+		std::string s(name, name + length);
+		std::transform(s.begin(), s.end(), s.begin(), std::tolower);
+		size_t pos = glGetAttribLocation(m_handler, name);
+		verts[pos] = GetVertexAttribute(s, type);
+	}
+
+	glGetProgramiv(m_handler, GL_ACTIVE_UNIFORMS, &count);
+	for (i = 0; i < count; i++)
+	{
+		glGetActiveUniform(m_handler, (GLuint)i, bufSize, &length, &size, &type, name);
+
+		std::string s(name, name + length);
+		uniforms.push_back(std::move(s));
+	}
+}
+
+VertexAttribute ShaderProgram::GetVertexAttribute(const std::string& name, GLenum glType)
+{
+	if (name == "position")
+	{
+		RED_LILIUM_ASSERT(glType == GL_FLOAT_VEC3);
+		return VertexAttribute::Position;
+	}
+	else if (name == "normal")
+	{
+		RED_LILIUM_ASSERT(glType == GL_FLOAT_VEC3);
+		return VertexAttribute::Normal;
+	}
+	else if (name == "tangent")
+	{
+		RED_LILIUM_ASSERT(glType == GL_FLOAT_VEC3);
+		return VertexAttribute::Tangent;
+	}
+	else if (name == "bitangent")
+	{
+		RED_LILIUM_ASSERT(glType == GL_FLOAT_VEC3);
+		return VertexAttribute::Bitangent;
+	}
+	else if (name == "color0")
+	{
+		RED_LILIUM_ASSERT(glType == GL_FLOAT_VEC4);
+		return VertexAttribute::Color0;
+	}
+	else if (name == "color1")
+	{
+		RED_LILIUM_ASSERT(glType == GL_FLOAT_VEC4);
+		return VertexAttribute::Color1;
+	}
+	else if (name == "color2")
+	{
+		RED_LILIUM_ASSERT(glType == GL_FLOAT_VEC4);
+		return VertexAttribute::Color2;
+	}
+	else if (name == "color3")
+	{
+		RED_LILIUM_ASSERT(glType == GL_FLOAT_VEC4);
+		return VertexAttribute::Color3;
+	}
+	else if (name == "texcoord0")
+	{
+		RED_LILIUM_ASSERT(glType == GL_FLOAT_VEC2);
+		return VertexAttribute::TexCoord0;
+	}
+	else if (name == "texcoord1")
+	{
+		RED_LILIUM_ASSERT(glType == GL_FLOAT_VEC2);
+		return VertexAttribute::TexCoord1;
+	}
+	else if (name == "texcoord2")
+	{
+		RED_LILIUM_ASSERT(glType == GL_FLOAT_VEC2);
+		return VertexAttribute::TexCoord2;
+	}
+	else if (name == "texcoord3")
+	{
+		RED_LILIUM_ASSERT(glType == GL_FLOAT_VEC2);
+		return VertexAttribute::TexCoord3;
+	}
+	else if (name == "texcoord4")
+	{
+		RED_LILIUM_ASSERT(glType == GL_FLOAT_VEC2);
+		return VertexAttribute::TexCoord4;
+	}
+	else if (name == "texcoord5")
+	{
+		RED_LILIUM_ASSERT(glType == GL_FLOAT_VEC2);
+		return VertexAttribute::TexCoord5;
+	}
+	else if (name == "texcoord6")
+	{
+		RED_LILIUM_ASSERT(glType == GL_FLOAT_VEC2);
+		return VertexAttribute::TexCoord6;
+	}
+	else if (name == "texcoord7")
+	{
+		RED_LILIUM_ASSERT(glType == GL_FLOAT_VEC2);
+		return VertexAttribute::TexCoord7;
+	}
+	RED_LILIUM_ASSERT(false && "Wrong vertex declaration!");
+	return VertexAttribute::Position;
 }

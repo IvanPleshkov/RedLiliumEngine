@@ -10,7 +10,6 @@ MaterialManager::MaterialManager(ptr<RenderDevice> renderDevice, ptr<FileSystem>
 	: RedLiliumObject()
 	, m_renderDevice(renderDevice)
 	, m_fileSystem(fileSystem)
-	, m_vertexDeclarations()
 	, m_shaders()
 	, m_shaderPrograms()
 	, m_materials()
@@ -86,116 +85,13 @@ sptr<ShaderProgram> MaterialManager::GetShaderProgram(const std::string& filenam
 	return std::move(shaderProgram);
 }
 
-ptr<VertexDeclaration> MaterialManager::GetVertexDeclaration(const json& materialJson)
-{
-	const json& vertexShaderJson = materialJson["VertexShader"];
-	RED_LILIUM_ASSERT(!vertexShaderJson.is_null());
-	const json& vertexDeclarationJson = vertexShaderJson["VertexDeclaration"];
-	RED_LILIUM_ASSERT(!vertexDeclarationJson.is_null());
-
-	std::string vertexString;
-	for (auto& vertexData : vertexDeclarationJson)
-	{
-		vertexString += vertexData.get<std::string>();
-	}
-	std::transform(vertexString.begin(), vertexString.end(), vertexString.begin(), std::tolower);
-
-	auto i = m_vertexDeclarations.find(vertexString);
-	if (i != m_vertexDeclarations.end())
-	{
-		return i->second.get();
-	}
-
-	std::vector<VertexAttribute> attributes;
-	for (auto& vertexData : vertexDeclarationJson)
-	{
-		auto name = vertexData.get<std::string>();
-		std::transform(name.begin(), name.end(), name.begin(), std::tolower);
-
-		if (name == "position")
-		{
-			attributes.push_back(VertexAttribute::Position);
-		}
-		else if (name == "normal")
-		{
-			attributes.push_back(VertexAttribute::Normal);
-		}
-		else if (name == "tangent")
-		{
-			attributes.push_back(VertexAttribute::Tangent);
-		}
-		else if (name == "bitangent")
-		{
-			attributes.push_back(VertexAttribute::Bitangent);
-		}
-		else if (name == "color0")
-		{
-			attributes.push_back(VertexAttribute::Color0);
-		}
-		else if (name == "color1")
-		{
-			attributes.push_back(VertexAttribute::Color1);
-		}
-		else if (name == "color2")
-		{
-			attributes.push_back(VertexAttribute::Color2);
-		}
-		else if (name == "color3")
-		{
-			attributes.push_back(VertexAttribute::Color3);
-		}
-		else if (name == "texcoord0")
-		{
-			attributes.push_back(VertexAttribute::TexCoord0);
-		}
-		else if (name == "texcoord1")
-		{
-			attributes.push_back(VertexAttribute::TexCoord1);
-		}
-		else if (name == "texcoord2")
-		{
-			attributes.push_back(VertexAttribute::TexCoord2);
-		}
-		else if (name == "texcoord3")
-		{
-			attributes.push_back(VertexAttribute::TexCoord3);
-		}
-		else if (name == "texcoord4")
-		{
-			attributes.push_back(VertexAttribute::TexCoord4);
-		}
-		else if (name == "texcoord5")
-		{
-			attributes.push_back(VertexAttribute::TexCoord5);
-		}
-		else if (name == "texcoord6")
-		{
-			attributes.push_back(VertexAttribute::TexCoord6);
-		}
-		else if (name == "texcoord7")
-		{
-			attributes.push_back(VertexAttribute::TexCoord7);
-		}
-		else
-		{
-			RED_LILIUM_ASSERT(false && "Wrong vertex declaration!");
-		}
-	}
-	uptr<VertexDeclaration> vertexDeclaration = umake<VertexDeclaration>(m_renderDevice, attributes);
-	ptr<VertexDeclaration> result = vertexDeclaration.get();
-	m_vertexDeclarations.insert({ vertexString, std::move(vertexDeclaration) });
-	return result;
-}
-
 sptr<Material> MaterialManager::NewMaterial(const std::string& filename)
 {
 	json materialJson = m_fileSystem->ReadJson(filename);
-	ptr<VertexDeclaration> vertexDeclaration = GetVertexDeclaration(materialJson);
 	sptr<ShaderProgram> shaderProgram = GetShaderProgram(filename, materialJson);
 
 	sptr<Material> material = smake<Material>(m_renderDevice, filename);
 	material->SetShaderProgram(shaderProgram);
-	material->SetVertexDeclaration(vertexDeclaration);
 
 	return std::move(material);
 }

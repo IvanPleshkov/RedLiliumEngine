@@ -20,10 +20,12 @@ public:
 	void CheckErrors();
 	ptr<ApplicationSettings> GetApplicationSettings();
 	ptr<MaterialManager> GetMaterialManager();
+	ptr<VertexDeclaration> GetVertexDeclaration(const std::vector<VertexAttribute>& attributes);
 
 private:
 	ptr<ApplicationSettings> m_applicationSettings;
 	ptr<MaterialManager> m_materialManager;
+	std::map<std::vector<VertexAttribute>, uptr<VertexDeclaration>> m_vertexDeclarations;
 };
 
 } // namespace RED_LILIUM_NAMESPACE

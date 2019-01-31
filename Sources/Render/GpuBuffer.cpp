@@ -13,7 +13,11 @@ GpuBuffer::GpuBuffer(ptr<RenderDevice> renderDevice, GLenum bufferType, GpuBuffe
 
 GpuBuffer::~GpuBuffer()
 {
-	glDeleteBuffers(1, &m_handler);
+	if (m_handler != 0)
+	{
+		glDeleteBuffers(1, &m_handler);
+		m_handler = 0;
+	}
 }
 
 bool GpuBuffer::SendData(const void* data, u64 size)

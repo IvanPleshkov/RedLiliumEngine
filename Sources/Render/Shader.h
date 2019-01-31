@@ -27,7 +27,6 @@ public:
 	~Shader() override;
 
 	void CompileFromString(ShaderType type, const std::string& shader, const std::string& includeFilename = "");
-	void Compile(ShaderType type, const std::string& shaderFilename);
 
 private:
 	ShaderType m_type;
@@ -41,8 +40,13 @@ public:
 	~ShaderProgram() override;
 
 	void Link(const sptr<Shader>& vertexShader, const sptr<Shader>& fragmentShader);
+	ptr<VertexDeclaration> GetVertexDeclaration();
 
 private:
+	void GetNames(std::vector<VertexAttribute>& verts, std::vector<std::string>& uniforms);
+	VertexAttribute GetVertexAttribute(const std::string& name, GLenum glType);
+
+	ptr<VertexDeclaration> m_vertexDeclaration;
 	sptr<Shader> m_vertexShader;
 	sptr<Shader> m_fragmentShader;
 };
