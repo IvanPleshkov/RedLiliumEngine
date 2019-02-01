@@ -18,7 +18,7 @@ RenderContext::~RenderContext()
 
 void RenderContext::Draw(const sptr<GpuMesh>& mesh, const sptr<Material>& material)
 {
-	glUseProgram(material->GetShaderProgram()->GetNative());
+	material->Use();
 
 	ptr<VertexArrayObject> vao = mesh->GetVertexArrayObject(material->GetVertexDeclaration());
 	glBindVertexArray(vao->GetNative());

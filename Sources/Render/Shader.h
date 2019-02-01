@@ -6,20 +6,6 @@
 namespace RED_LILIUM_NAMESPACE
 {
 
-enum class UniformType : u8
-{
-	Int1			= 1 << 0, // Int, used for samplers only.
-	Vec4			= 1 << 1,
-	Mat3			= 1 << 2,
-	Mat4			= 1 << 3,
-};
-
-enum class ShaderType : u8
-{
-	Vertex			= 1 << 0,
-	Fragment		= 1 << 1,
-};
-
 class Shader : public GpuResource
 {
 public:
@@ -41,11 +27,14 @@ public:
 
 	void Link(const sptr<Shader>& vertexShader, const sptr<Shader>& fragmentShader);
 	ptr<VertexDeclaration> GetVertexDeclaration();
+	const std::vector<Uniform>& GetUniforms() const;
 
 private:
-	void GetNames(std::vector<VertexInput>& verts, std::vector<std::string>& uniforms);
+	void ParseProgram();
 	VertexAttribute GetVertexAttribute(const std::string& name, GLenum glType);
+	Uniform GetUniform(const std::string& name, GLenum glType, GLint size);
 
+	std::vector<Uniform> m_uniforms;
 	ptr<VertexDeclaration> m_vertexDeclaration;
 	sptr<Shader> m_vertexShader;
 	sptr<Shader> m_fragmentShader;

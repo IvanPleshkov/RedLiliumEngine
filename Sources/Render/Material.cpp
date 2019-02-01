@@ -30,4 +30,22 @@ void Material::SetShaderProgram(const sptr<ShaderProgram>& shaderProgram)
 {
 	m_shaderProgram = shaderProgram;
 	m_vertexDeclaration = m_shaderProgram->GetVertexDeclaration();
+
+	m_uniforms = shaderProgram->GetUniforms();
+	m_nameToUniform.clear();
+	for (size_t i = 0; i < m_uniforms.size(); i++)
+	{
+		auto& uniform = m_uniforms[i];
+		m_nameToUniform.insert({ uniform.name, i });
+	}
+}
+
+void Material::Use()
+{
+	glUseProgram(GetShaderProgram()->GetNative());
+
+	for (auto& uniform : m_uniforms)
+	{
+
+	}
 }

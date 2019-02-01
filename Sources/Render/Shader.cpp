@@ -85,11 +85,7 @@ void ShaderProgram::Link(const sptr<Shader>& vertexShader, const  sptr<Shader>& 
 		RED_LILIUM_ASSERT("Shader Compilation Error!");
 	}
 
-	std::vector<VertexInput> attributes;
-	std::vector<std::string> uniforms;
-	GetNames(attributes, uniforms);
-
-	m_vertexDeclaration = m_renderDevice->GetVertexDeclaration(attributes);
+	ParseProgram();
 }
 
 ptr<VertexDeclaration> ShaderProgram::GetVertexDeclaration()
@@ -97,24 +93,26 @@ ptr<VertexDeclaration> ShaderProgram::GetVertexDeclaration()
 	return m_vertexDeclaration;
 }
 
-void ShaderProgram::GetNames(std::vector<VertexInput>& verts, std::vector<std::string>& uniforms)
+const std::vector<Uniform>& ShaderProgram::GetUniforms() const
 {
-	verts.clear();
-	uniforms.clear();
+	return m_uniforms;
+}
 
-	GLint i;
+void ShaderProgram::ParseProgram()
+{
+	m_uniforms.clear();
+
 	GLint count;
-
-	GLint size; // size of the variable
-	GLenum type; // type of the variable (float, vec3 or mat4, etc)
-
 	const GLsizei bufSize = 64; // maximum name length
 	GLchar name[bufSize]; // variable name in GLSL
 	GLsizei length; // name length
 
+	std::vector<VertexInput> attributes;
 	glGetProgramiv(m_handler, GL_ACTIVE_ATTRIBUTES, &count);
-	for (i = 0; i < count; i++)
+	for (GLint i = 0; i < count; i++)
 	{
+		GLint size;
+		GLenum type;
 		glGetActiveAttrib(m_handler, (GLuint)i, bufSize, &length, &size, &type, name);
 
 		std::string s(name, name + length);
@@ -122,22 +120,29 @@ void ShaderProgram::GetNames(std::vector<VertexInput>& verts, std::vector<std::s
 		VertexInput vertexInput;
 		vertexInput.layout = glGetAttribLocation(m_handler, name);
 		vertexInput.vertexAttribute = GetVertexAttribute(s, type);
-		verts.push_back(vertexInput);
+		attributes.push_back(vertexInput);
 	}
 
-	std::sort(verts.begin(), verts.end(), [](const VertexInput& lhs, const VertexInput& rhs)
+	std::sort(attributes.begin(), attributes.end(), [](const VertexInput& lhs, const VertexInput& rhs)
 	{
 		return lhs.layout < rhs.layout;
 	});
+	m_vertexDeclaration = m_renderDevice->GetVertexDeclaration(attributes);
 
 	glGetProgramiv(m_handler, GL_ACTIVE_UNIFORMS, &count);
-	for (i = 0; i < count; i++)
+	for (GLint i = 0; i < count; i++)
 	{
+		GLint size;
+		GLenum type;
 		glGetActiveUniform(m_handler, (GLuint)i, bufSize, &length, &size, &type, name);
 
 		std::string s(name, name + length);
-		uniforms.push_back(std::move(s));
+		m_uniforms.push_back(std::move(GetUniform(s, type, size)));
 	}
+	std::sort(m_uniforms.begin(), m_uniforms.end(), [](const Uniform& lhs, const Uniform& rhs)
+	{
+		return lhs.location < rhs.location;
+	});
 }
 
 VertexAttribute ShaderProgram::GetVertexAttribute(const std::string& name, GLenum glType)
@@ -222,6 +227,92 @@ VertexAttribute ShaderProgram::GetVertexAttribute(const std::string& name, GLenu
 		RED_LILIUM_ASSERT(glType == GL_FLOAT_VEC2);
 		return VertexAttribute::TexCoord7;
 	}
-	RED_LILIUM_ASSERT(false && "Wrong vertex declaration!");
+	RED_LILIUM_ASSERT(false && "Unsupported vertex type!");
 	return VertexAttribute::Position;
+}
+
+Uniform ShaderProgram::GetUniform(const std::string& name, GLenum glType, GLint size)
+{
+	Uniform uniform;
+	uniform.name = name;
+	uniform.value.resize(size, char(0));
+	switch (glType)
+	{
+	case GL_SAMPLER_1D:
+		uniform.type = UniformType::Sampler1D;
+		break;
+	case GL_SAMPLER_2D:
+		uniform.type = UniformType::Sampler2D;
+		break;
+	case GL_SAMPLER_3D:
+		uniform.type = UniformType::Sampler3D;
+		break;
+	case GL_FLOAT:
+		uniform.type = UniformType::Float;
+		break;
+	case GL_FLOAT_VEC2:
+		uniform.type = UniformType::Vec2;
+		break;
+	case GL_FLOAT_VEC3:
+		uniform.type = UniformType::Vec3;
+		break;
+	case GL_FLOAT_VEC4:
+		uniform.type = UniformType::Vec4;
+		break;
+	case GL_FLOAT_MAT2:
+		uniform.type = UniformType::Mat2;
+		break;
+	case GL_FLOAT_MAT3:
+		uniform.type = UniformType::Mat3;
+		break;
+	case GL_FLOAT_MAT4:
+		uniform.type = UniformType::Mat4;
+		break;
+	default:
+		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
+	}
+	uniform.location = glGetUniformLocation(m_handler, name.c_str());
+	return std::move(uniform);
+}
+
+void Uniform::Apply()
+{
+	switch (type)
+	{
+	case rl::UniformType::Sampler1D:
+		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
+		break;
+	case rl::UniformType::Sampler2D:
+		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
+		break;
+	case rl::UniformType::Sampler3D:
+		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
+		break;
+	case rl::UniformType::Float:
+		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
+		break;
+	case rl::UniformType::Vec2:
+		vec2* v2 = reinterpret_cast<vec2*>(value.data());
+		glUniform2f(location, v2->x, v2->y);
+		break;
+	case rl::UniformType::Vec3:
+		vec3* v3 = reinterpret_cast<vec3*>(value.data());
+		glUniform3f(location, v3->x, v3->y, v3->z);
+		break;
+	case rl::UniformType::Vec4:
+		vec4* v4 = reinterpret_cast<vec4*>(value.data());
+		glUniform4f(location, v4->x, v4->y, v4->z, v4->w);
+		break;
+	case rl::UniformType::Mat2:
+		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
+		break;
+	case rl::UniformType::Mat3:
+		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
+		break;
+	case rl::UniformType::Mat4:
+		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
+		break;
+	default:
+		break;
+	}
 }
