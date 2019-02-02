@@ -18,3 +18,7 @@
 #include <nlohmann/json.hpp>
 
 #include <argh.h>
+
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_STATIC
+#include <stb/stb_image.h>

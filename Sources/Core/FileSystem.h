@@ -5,7 +5,8 @@
 namespace RED_LILIUM_NAMESPACE
 {
 
-	class ApplicationSettings;
+class ApplicationSettings;
+class TextureBase;
 
 class FileSystem : public RedLiliumObject
 {
@@ -15,6 +16,7 @@ public:
 
 	std::string ReadFile(const std::string& filename);
 	json ReadJson(const std::string& filename);
+	uptr<TextureBase> ReadTexture(const std::string& filename);
 
 private:
 	ptr<ApplicationSettings> m_applicationSettings;
