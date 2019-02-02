@@ -17,7 +17,6 @@ public:
 
 	uptr<RenderContext> CreateRenderContext();
 
-	void CheckErrors();
 	ptr<ApplicationSettings> GetApplicationSettings();
 	ptr<MaterialManager> GetMaterialManager();
 	ptr<VertexDeclaration> GetVertexDeclaration(const std::vector<VertexInput>& attributes);

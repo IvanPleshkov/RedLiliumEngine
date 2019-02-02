@@ -10,6 +10,8 @@
 #include <glm/ext.hpp>
 #include <glm/gtx/matrix_transform_2d.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/matrix_inverse.hpp>
 
 #include <spdlog/spdlog.h>
 

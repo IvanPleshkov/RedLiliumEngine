@@ -5,11 +5,20 @@
 namespace RED_LILIUM_NAMESPACE
 {
 
+class TextureMip
+{
+public:
+
+private:
+
+};
+
 class TextureBase : public RedLiliumObject
 {
 public:
 	std::pair<u16, u16> GetSize() const;
 	u8 GetChannelsCount() const;
+	u8 GetMipsCount() const;
 
 	Color32& GetRgba32(u16 width, u16 height);
 	const Color32& GetRgba32(u16 width, u16 height) const;
@@ -18,7 +27,7 @@ public:
 	const vec4& GetFloatPixel(u16 width, u16 height) const;
 
 private:
-	std::vector<char> m_data;
+	std::vector<std::vector<char>> m_data;
 };
 
 template<class T, u8 channels>

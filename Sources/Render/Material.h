@@ -17,6 +17,7 @@ public:
 	void Use();
 	void SetShaderProgram(const sptr<ShaderProgram>& shaderProgram);
 	
+	// todo: use string_view because most of uniform names in code are const char*
 	template<class T>
 	bool Set(const std::string& name, T& value);
 

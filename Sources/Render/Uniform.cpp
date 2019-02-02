@@ -66,7 +66,7 @@ void Uniform::Apply()
 		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
 		break;
 	case UniformType::Float:
-		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
+		glUniform1f(m_location, m_value.m_f32);
 		break;
 	case UniformType::Vec2:
 		glUniform2f(m_location, m_value.m_vec2.x, m_value.m_vec2.y);
@@ -78,13 +78,13 @@ void Uniform::Apply()
 		glUniform4f(m_location, m_value.m_vec4.x, m_value.m_vec4.y, m_value.m_vec4.z, m_value.m_vec4.w);
 		break;
 	case UniformType::Mat2:
-		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
+		glUniformMatrix2fv(m_location, 1, GL_FALSE, &m_value.m_mat2[0][0]);
 		break;
 	case UniformType::Mat3:
-		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
+		glUniformMatrix3fv(m_location, 1, GL_FALSE, &m_value.m_mat3[0][0]);
 		break;
 	case UniformType::Mat4:
-		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
+		glUniformMatrix4fv(m_location, 1, GL_FALSE, &m_value.m_mat4[0][0]);
 		break;
 	default:
 		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");

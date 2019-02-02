@@ -5,10 +5,89 @@
 
 using namespace RED_LILIUM_NAMESPACE;
 
+namespace
+{
+static void APIENTRY glDebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
+{
+	std::string msgSource;
+	switch (source) {
+	case GL_DEBUG_SOURCE_API:
+		msgSource = "WINDOW_SYSTEM";
+		break;
+	case GL_DEBUG_SOURCE_SHADER_COMPILER:
+		msgSource = "SHADER_COMPILER";
+		break;
+	case GL_DEBUG_SOURCE_THIRD_PARTY:
+		msgSource = "THIRD_PARTY";
+		break;
+	case GL_DEBUG_SOURCE_APPLICATION:
+		msgSource = "APPLICATION";
+		break;
+	case GL_DEBUG_SOURCE_OTHER:
+		msgSource = "OTHER";
+		break;
+	}
+
+	std::string msgType;
+	switch (type) {
+	case GL_DEBUG_TYPE_ERROR:
+		msgType = "ERROR";
+		break;
+	case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+		msgType = "DEPRECATED_BEHAVIOR";
+		break;
+	case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+		msgType = "UNDEFINED_BEHAVIOR";
+		break;
+	case GL_DEBUG_TYPE_PORTABILITY:
+		msgType = "PORTABILITY";
+		break;
+	case GL_DEBUG_TYPE_PERFORMANCE:
+		msgType = "PERFORMANCE";
+		break;
+	case GL_DEBUG_TYPE_OTHER:
+		msgType = "OTHER";
+		break;
+	}
+
+	std::string msg = 
+		std::string("glDebugMessage:\n") + 
+		std::string(message) + 
+		std::string("\nType = ") + msgType + 
+		std::string(" Source = ") + msgSource;
+
+	switch (severity) {
+	case GL_DEBUG_SEVERITY_LOW:
+		RED_LILIUM_LOG_WARNING(msg);
+		break;
+	case GL_DEBUG_SEVERITY_MEDIUM:
+		RED_LILIUM_LOG_ERROR(msg);
+		RED_LILIUM_ASSERT(false && "OpenGL message");
+		break;
+	case GL_DEBUG_SEVERITY_HIGH:
+		RED_LILIUM_LOG_CRITICAL(msg);
+		RED_LILIUM_ASSERT(false && "OpenGL message");
+		break;
+	case GL_DEBUG_SEVERITY_NOTIFICATION:
+		RED_LILIUM_LOG_DEBUG(msg);
+		break;
+	default:
+		RED_LILIUM_LOG_CRITICAL(msg);
+		RED_LILIUM_ASSERT(false && "OpenGL message");
+		break;
+	}
+}
+}
+
 RenderDevice::RenderDevice(ptr<ApplicationSettings> applicationSettings)
 	: RedLiliumObject()
 	, m_applicationSettings(applicationSettings)
 {
+#ifdef RED_LILIUM_RENDER_DEBUG
+	glEnable(GL_DEBUG_OUTPUT);
+	glDebugMessageCallback(glDebugCallback, NULL);
+	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+#endif
 }
 
 RenderDevice::~RenderDevice()
@@ -23,16 +102,6 @@ void RenderDevice::Init(ptr<MaterialManager> materialManager)
 uptr<RenderContext> RenderDevice::CreateRenderContext()
 {
 	return std::move(umake<RenderContext>(this));
-}
-
-void RenderDevice::CheckErrors()
-{
-	// check OpenGL error
-	GLenum err;
-	while ((err = glGetError()) != GL_NO_ERROR)
-	{
-		RED_LILIUM_ASSERT(false && "gl error!");
-	}
 }
 
 ptr<ApplicationSettings> RenderDevice::GetApplicationSettings()

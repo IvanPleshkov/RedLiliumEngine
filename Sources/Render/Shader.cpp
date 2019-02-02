@@ -115,7 +115,7 @@ void ShaderProgram::ParseProgram()
 		GLenum type;
 		glGetActiveAttrib(m_handler, (GLuint)i, bufSize, &length, &size, &type, name);
 
-		std::string s(name, name + length);
+		std::string s(name);
 		std::transform(s.begin(), s.end(), s.begin(), std::tolower);
 		VertexInput vertexInput;
 		vertexInput.layout = glGetAttribLocation(m_handler, name);
@@ -136,7 +136,7 @@ void ShaderProgram::ParseProgram()
 		GLenum type;
 		glGetActiveUniform(m_handler, (GLuint)i, bufSize, &length, &size, &type, name);
 
-		std::string s(name, name + length);
+		std::string s(name);
 		m_uniforms.push_back(std::move(GetUniform(s, type, size)));
 	}
 	std::sort(m_uniforms.begin(), m_uniforms.end(), [](const Uniform& lhs, const Uniform& rhs)
