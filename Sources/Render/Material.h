@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RenderCommon.h"
+#include "Uniform.h"
 
 namespace RED_LILIUM_NAMESPACE
 {
@@ -15,6 +16,9 @@ public:
 
 	void Use();
 	void SetShaderProgram(const sptr<ShaderProgram>& shaderProgram);
+	
+	template<class T>
+	bool Set(const std::string& name, T& value);
 
 private:
 	std::vector<Uniform> m_uniforms;
@@ -24,5 +28,18 @@ private:
 	ptr<VertexDeclaration> m_vertexDeclaration;
 	sptr<ShaderProgram> m_shaderProgram;
 };
+
+
+template<class T>
+inline bool Material::Set(const std::string & name, T & value)
+{
+	auto i = m_nameToUniform.find(name);
+	if (i == m_nameToUniform.end())
+	{
+		return false;
+	}
+	m_uniforms[i->second].Set(value);
+	return true;
+}
 
 } // namespace RED_LILIUM_NAMESPACE

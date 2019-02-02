@@ -2,6 +2,7 @@
 
 #include "RenderCommon.h"
 #include "GpuBuffer.h"
+#include "Uniform.h"
 
 namespace RED_LILIUM_NAMESPACE
 {

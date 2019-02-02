@@ -36,7 +36,7 @@ void Material::SetShaderProgram(const sptr<ShaderProgram>& shaderProgram)
 	for (size_t i = 0; i < m_uniforms.size(); i++)
 	{
 		auto& uniform = m_uniforms[i];
-		m_nameToUniform.insert({ uniform.name, i });
+		m_nameToUniform.insert({ uniform.GetName(), i });
 	}
 }
 
@@ -46,6 +46,6 @@ void Material::Use()
 
 	for (auto& uniform : m_uniforms)
 	{
-
+		uniform.Apply();
 	}
 }

@@ -57,6 +57,7 @@ namespace RenderTriangleNamespace
 		renderDevice->Init(materialManager.get());
 
 		sptr<Material> material = materialManager->Get("Shaders\\ColoredTriangle\\material.json");
+		material->Set("g_diffuseColor", vec4(0.0f, 0.0f, 1.0f, 0.0f));
 
 		uptr<Mesh> mesh = Mesh::GenerateTriangle();
 		sptr<GpuMesh> gpuMesh = smake<GpuMesh>(renderDevice.get());

@@ -49,38 +49,10 @@ namespace RED_LILIUM_NAMESPACE
 		u8 layout;
 	};
 
-	enum class UniformType : u8
-	{
-		Sampler1D,
-		Sampler2D,
-		Sampler3D,
-		Float,
-		Vec2,
-		Vec3,
-		Vec4,
-		Mat2,
-		Mat3,
-		Mat4,
-	};
-
 	enum class ShaderType : u8
 	{
 		Vertex = 1 << 0,
 		Fragment = 1 << 1,
 	};
-
-	struct Uniform
-	{
-		std::string name;
-		UniformType type;
-		u64 location;
-		// todo: use compact_vector
-		std::vector<char> value;
-
-		void Apply();
-	};
-
-	template<class T>
-	void SetUniformValue(const T& value);
 
 } // namespace RED_LILIUM_NAMESPACE

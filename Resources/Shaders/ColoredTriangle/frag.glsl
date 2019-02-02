@@ -9,5 +9,5 @@ uniform vec4 g_diffuseColor1;
 
 void main()
 {
-    color = vertexColor * g_diffuseColor * g_diffuseColor1;
+    color = g_diffuseColor; // * g_diffuseColor1;
 }
