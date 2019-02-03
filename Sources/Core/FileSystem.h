@@ -16,7 +16,7 @@ public:
 
 	std::string ReadFile(const std::string& filename);
 	json ReadJson(const std::string& filename);
-	uptr<TextureBase> ReadTexture(const std::string& filename);
+	cv::Mat ReadTexture(const std::string& filename, int cvFlags = cv::IMREAD_UNCHANGED);
 
 private:
 	ptr<ApplicationSettings> m_applicationSettings;

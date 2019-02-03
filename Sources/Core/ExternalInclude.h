@@ -24,3 +24,5 @@
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_STATIC
 #include <stb/stb_image.h>
+
+#include <opencv2/opencv.hpp>

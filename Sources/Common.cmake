@@ -63,8 +63,26 @@ if (MSVC)
 		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/glew32d.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/glew32.lib
 		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/GlU32.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/GlU32.lib
 		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/OpenGL32.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/OpenGL32.lib
-		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/freetype.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/freetype.lib)
-	
+		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/freetype.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/freetype.lib
+		
+		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/ade.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/ade.lib
+		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/opencv_calib3d401d.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/opencv_calib3d401.lib
+		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/opencv_core401d.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/opencv_core401.lib
+		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/opencv_dnn401d.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/opencv_dnn401.lib
+		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/opencv_features2d401d.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/opencv_features2d401.lib
+		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/opencv_flann401d.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/opencv_flann401.lib
+		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/opencv_gapi401d.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/opencv_gapi401.lib
+		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/opencv_highgui401d.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/opencv_highgui401.lib
+		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/opencv_imgcodecs401d.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/opencv_imgcodecs401.lib
+		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/opencv_imgproc401d.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/opencv_imgproc401.lib
+		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/opencv_ml401d.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/opencv_ml401.lib
+		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/opencv_objdetect401d.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/opencv_objdetect401.lib
+		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/opencv_photo401d.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/opencv_photo401.lib
+		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/opencv_stitching401d.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/opencv_stitching401.lib
+		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/opencv_ts401d.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/opencv_ts401.lib
+		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/opencv_video401d.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/opencv_video401.lib
+		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/opencv_videoio401d.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/opencv_videoio401.lib)
+
 else()
 	message("Only MSVC")
 endif()

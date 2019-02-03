@@ -29,21 +29,9 @@ json FileSystem::ReadJson(const std::string& filename)
 	return std::move(j);
 }
 
-uptr<TextureBase> FileSystem::ReadTexture(const std::string& filename)
+cv::Mat FileSystem::ReadTexture(const std::string& filename, int cvFlags)
 {
 	const std::string fullFilename = m_workingPath + "\\" + filename;
-	uptr<TextureBase> texture;
-
-	i32 width, height, channels;
-	stbi_set_flip_vertically_on_load(true);
-	unsigned char *image = stbi_load(
-		fullFilename.c_str(),
-		&width,
-		&height,
-		&channels,
-		STBI_rgb_alpha);
-
-	stbi_image_free(image);
-
-	return std::move(texture);
+	auto m = cv::imread(fullFilename.c_str(), cv::IMREAD_UNCHANGED);
+	return m;
 }
