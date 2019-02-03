@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "FileSystem.h"
 #include "ApplicationSettings.h"
-#include "Texture.h"
 
 using namespace RED_LILIUM_NAMESPACE;
 

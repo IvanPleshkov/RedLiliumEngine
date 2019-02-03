@@ -2,6 +2,7 @@
 
 #include <Render/RenderDevice.h>
 #include <Render/MaterialManager.h>
+#include <Render/GpuTextureManager.h>
 #include <Render/Shader.h>
 #include <Render/Material.h>
 #include <Render/GpuMesh.h>
@@ -54,10 +55,16 @@ namespace RenderTriangleNamespace
 		uptr<RenderDevice> renderDevice = umake<RenderDevice>(settings);
 		uptr<FileSystem> fileSystem = umake<FileSystem>(settings);
 		uptr<MaterialManager> materialManager = umake<MaterialManager>(renderDevice.get(), fileSystem.get());
-		renderDevice->Init(materialManager.get());
+		uptr<GpuTextureManager> gpuTextureManager = umake<GpuTextureManager>(renderDevice.get(), fileSystem.get());
+		renderDevice->Init(materialManager.get(), gpuTextureManager.get());
 
 		sptr<Material> material = materialManager->Get("Shaders\\ColoredTriangle\\material.json");
 		material->Set("g_diffuseColor1", vec4(1.0f, 1.0f, 1.0f, 0.0f));
+
+		TextureSettings textureSettings;
+		sptr<GpuTexture> texture1 = gpuTextureManager->Get("Textures\\wood.png", textureSettings);
+		textureSettings.format = TextureFormat::RGB8;
+		sptr<GpuTexture> texture2 = gpuTextureManager->Get("Textures\\alphatest.png", textureSettings);
 
 		uptr<Mesh> mesh = Mesh::GenerateTriangle();
 		sptr<GpuMesh> gpuMesh = smake<GpuMesh>(renderDevice.get());

@@ -3,7 +3,6 @@
 #include <Core/Common.h>
 #include <Core/Flags.h>
 #include <Core/Mesh.h>
-#include <Core/Texture.h>
 #include <GL/glew.h>
 
 namespace RED_LILIUM_NAMESPACE
@@ -23,6 +22,7 @@ namespace RED_LILIUM_NAMESPACE
 	class VertexDeclaration;
 	class VertexArrayObject;
 	class MaterialManager;
+	class GpuTextureManager;
 	class UniformBlock;
 
 	enum class VertexAttribute : u8

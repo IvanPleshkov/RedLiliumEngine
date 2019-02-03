@@ -1,94 +1,117 @@
 #pragma once
 
-#include <Core/Common.h>
+#include "Render/RenderCommon.h"
+#include "GpuBuffer.h"
 
 namespace RED_LILIUM_NAMESPACE
 {
 
-enum class TextureFormat
+	enum class TextureFormat : u8
+	{
+		R8,				// 	R		8
+		R8_SNORM,		// 	R		s8
+		R16,			// 	R		16
+		R16_SNORM,		// 	R		s16
+		RG8,			// 	RG		8 	8
+		RG8_SNORM,		// 	RG		s8 	s8
+		RG16,			// 	RG		16 	16
+		RG16_SNORM,		// 	RG		s16 	s16
+		R3_G3_B2,		// 	RGB		3 	3 	2
+		RGB4,			// 	RGB		4 	4 	4
+		RGB5,			// 	RGB		5 	5 	5
+		RGB8,			// 	RGB		8 	8 	8
+		RGB8_SNORM,		// 	RGB		s8 	s8 	s8
+		RGB10,			// 	RGB		10 	10 	10
+		RGB12,			// 	RGB		12 	12 	12
+		RGB16_SNORM,	// 	RGB		16 	16 	16
+		RGBA2,			// 	RGB		2 	2 	2 	2
+		RGBA4,			// 	RGB		4 	4 	4 	4
+		RGB5_A1,		// 	RGBA	5 	5 	5 	1
+		RGBA8,			// 	RGBA	8 	8 	8 	8
+		RGBA8_SNORM,	// 	RGBA	s8 	s8 	s8 	s8
+		RGB10_A2,		// 	RGBA	10 	10 	10 	2
+		RGB10_A2UI,		// 	RGBA	ui10 	ui10 	ui10 	ui2
+		RGBA12,			// 	RGBA	12 	12 	12 	12
+		RGBA16,			// 	RGBA	16 	16 	16 	16
+		SRGB8,			// 	RGB		8 	8 	8
+		SRGB8_ALPHA8,	// 	RGBA	8 	8 	8 	8
+		R16F,			// 	R		f16
+		RG16F,			// 	RG		f16 	f16
+		RGB16F,			// 	RGB		f16 	f16 	f16
+		RGBA16F,		// 	RGBA	f16 	f16 	f16 	f16
+		R32F,			// 	R		f32
+		RG32F,			// 	RG		f32 	f32
+		RGB32F,			// 	RGB		f32 	f32 	f32
+		RGBA32F,		// 	RGBA	f32 	f32 	f32 	f32
+		R11F_G11F_B10F,	// 	RGB		f11 	f11 	f10
+		RGB9_E5,		// 	RGB		9 	9 	9 	  	5
+		R8I,			// 	R		i8
+		R8UI,			// 	R		ui8
+		R16I,			// 	R		i16
+		R16UI,			// 	R		ui16
+		R32I,			// 	R		i32
+		R32UI,			// 	R		ui32
+		RG8I,			// 	RG		i8 	i8
+		RG8UI,			// 	RG		ui8 	ui8
+		RG16I,			// 	RG		i16 	i16
+		RG16UI,			// 	RG		ui16 	ui16
+		RG32I,			// 	RG		i32 	i32
+		RG32UI,			// 	RG		ui32 	ui32
+		RGB8I,			// 	RGB		i8 	i8 	i8
+		RGB8UI,			// 	RGB		ui8 	ui8 	ui8
+		RGB16I,			// 	RGB		i16 	i16 	i16
+		RGB16UI,		// 	RGB		ui16 	ui16 	ui16
+		RGB32I,			// 	RGB		i32 	i32 	i32
+		RGB32UI,		// 	RGB		ui32 	ui32 	ui32
+		RGBA8I,			// 	RGBA	i8 	i8 	i8 	i8
+		RGBA8UI,		// 	RGBA	ui8 	ui8 	ui8 	ui8
+		RGBA16I,		// 	RGBA	i16 	i16 	i16 	i16
+		RGBA16UI,		// 	RGBA	ui16 	ui16 	ui16 	ui16
+		RGBA32I,		// 	RGBA	i32 	i32 	i32 	i32
+		RGBA32UI,		// 	RGBA	ui32 	ui32 	ui32 	ui32
+	};
+
+enum class TextureWrapping : u8
 {
-	BC1,          // DXT1
-	BC2,          // DXT3
-	BC3,          // DXT5
-	BC4,          // LATC1/ATI1
-	BC5,          // LATC2/ATI2
-	BC6H,         // BC6H
-	BC7,          // BC7
-	ETC1,         // ETC1 RGB8
-	ETC2,         // ETC2 RGB8
-	ETC2A,        // ETC2 RGBA8
-	ETC2A1,       // ETC2 RGB8A1
-	PTC12,        // PVRTC1 RGB 2BPP
-	PTC14,        // PVRTC1 RGB 4BPP
-	PTC12A,       // PVRTC1 RGBA 2BPP
-	PTC14A,       // PVRTC1 RGBA 4BPP
-	PTC22,        // PVRTC2 RGBA 2BPP
-	PTC24,        // PVRTC2 RGBA 4BPP
+	Repeat,
+	MirroredRepeat,
+	ClampToEdge,
+	ClampToBorder
+};
 
-	Unknown,      // Compressed formats above.
+enum class TextureFiltering : u8
+{
+	Nearest,
+	Linear
+};
 
-	R1,
-	A8,
-	R8,
-	R8I,
-	R8U,
-	R8S,
-	R16,
-	R16I,
-	R16U,
-	R16F,
-	R16S,
-	R32I,
-	R32U,
-	R32F,
-	RG8,
-	RG8I,
-	RG8U,
-	RG8S,
-	RG16,
-	RG16I,
-	RG16U,
-	RG16F,
-	RG16S,
-	RG32I,
-	RG32U,
-	RG32F,
-	RGB8,
-	RGB8I,
-	RGB8U,
-	RGB8S,
-	RGB9E5F,
-	BGRA8,
-	RGBA8,
-	RGBA8I,
-	RGBA8U,
-	RGBA8S,
-	RGBA16,
-	RGBA16I,
-	RGBA16U,
-	RGBA16F,
-	RGBA16S,
-	RGBA32I,
-	RGBA32U,
-	RGBA32F,
-	R5G6B5,
-	RGBA4,
-	RGB5A1,
-	RGB10A2,
-	RG11B10F,
+struct TextureSettings
+{
+	u8 dims							= 2;
+	TextureFormat format			= TextureFormat::RGBA8;
+	TextureWrapping wrapping		= TextureWrapping::Repeat;
+	TextureFiltering filtering		= TextureFiltering::Linear;
+	bool needMips					= true;
+};
 
-	UnknownDepth, // Depth formats below.
+class GpuTexture : public GpuResource
+{
+public:
+	GpuTexture(ptr<RenderDevice> renderDevice, const TextureSettings& settings);
+	~GpuTexture();
 
-	D16,
-	D24,
-	D24S8,
-	D32,
-	D16F,
-	D24F,
-	D32F,
-	D0S8,
+	void Settings(const TextureSettings& settings);
+	const TextureSettings& Settings();
+	bool SendData(const cv::Mat& mat);
 
-	Count
+	void Bind();
+	void Unbind();
+
+private:
+	static GLint GetGlType(TextureFormat textureFormat);
+
+	GLenum m_glDimensions;
+	TextureSettings m_settings;
 };
 
 } // namespace RED_LILIUM_NAMESPACE

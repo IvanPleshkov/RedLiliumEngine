@@ -97,9 +97,10 @@ RenderDevice::~RenderDevice()
 {
 }
 
-void RenderDevice::Init(ptr<MaterialManager> materialManager)
+void RenderDevice::Init(ptr<MaterialManager> materialManager, ptr<GpuTextureManager> gpuTextureManager)
 {
 	m_materialManager = materialManager;
+	m_gpuTextureManager = gpuTextureManager;
 }
 
 uptr<RenderContext> RenderDevice::CreateRenderContext()
@@ -115,6 +116,11 @@ ptr<ApplicationSettings> RenderDevice::GetApplicationSettings()
 ptr<MaterialManager> RenderDevice::GetMaterialManager()
 {
 	return m_materialManager;
+}
+
+ptr<GpuTextureManager> RenderDevice::GetGpuTextureManager()
+{
+	return m_gpuTextureManager;
 }
 
 ptr<VertexDeclaration> RenderDevice::GetVertexDeclaration(const std::vector<VertexInput>& attributes)
