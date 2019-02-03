@@ -29,6 +29,7 @@ public:
 	void Link(const sptr<Shader>& vertexShader, const sptr<Shader>& fragmentShader);
 	ptr<VertexDeclaration> GetVertexDeclaration();
 	const std::vector<Uniform>& GetUniforms() const;
+	const std::vector<std::pair<ptr<UniformBlock>, GLuint>> GetUniformBlocks() const;
 
 private:
 	void ParseProgram();
@@ -36,6 +37,7 @@ private:
 	Uniform GetUniform(const std::string& name, GLenum glType, GLint size);
 
 	std::vector<Uniform> m_uniforms;
+	std::vector<std::pair<ptr<UniformBlock>, GLuint>> m_uniformBlocks;
 	ptr<VertexDeclaration> m_vertexDeclaration;
 	sptr<Shader> m_vertexShader;
 	sptr<Shader> m_fragmentShader;

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Material.h"
 #include "Shader.h"
+#include "Uniform.h"
 
 using namespace RED_LILIUM_NAMESPACE;
 
@@ -47,5 +48,11 @@ void Material::Use()
 	for (auto& uniform : m_uniforms)
 	{
 		uniform.Apply();
+	}
+
+	auto& uniformBlocks = GetShaderProgram()->GetUniformBlocks();
+	for (auto&[uniform, index] : uniformBlocks)
+	{
+		glBindBufferBase(GL_UNIFORM_BUFFER, index, uniform->GetNative());
 	}
 }

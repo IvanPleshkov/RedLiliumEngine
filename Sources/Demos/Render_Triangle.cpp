@@ -57,7 +57,7 @@ namespace RenderTriangleNamespace
 		renderDevice->Init(materialManager.get());
 
 		sptr<Material> material = materialManager->Get("Shaders\\ColoredTriangle\\material.json");
-		material->Set("g_diffuseColor", vec4(0.0f, 0.0f, 1.0f, 0.0f));
+		material->Set("g_diffuseColor1", vec4(1.0f, 1.0f, 1.0f, 0.0f));
 
 		uptr<Mesh> mesh = Mesh::GenerateTriangle();
 		sptr<GpuMesh> gpuMesh = smake<GpuMesh>(renderDevice.get());
@@ -80,6 +80,7 @@ namespace RenderTriangleNamespace
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			auto context = renderDevice->CreateRenderContext();
+			context->Set("g_testColor", vec4(0.0f, 1.0f, 1.0f, 1.0f));
 			context->Draw(gpuMesh, material);
 
 			SDL_GL_SwapWindow(window);

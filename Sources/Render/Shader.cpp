@@ -98,10 +98,13 @@ const std::vector<Uniform>& ShaderProgram::GetUniforms() const
 	return m_uniforms;
 }
 
+const std::vector<std::pair<ptr<UniformBlock>, GLuint>> ShaderProgram::GetUniformBlocks() const
+{
+	return m_uniformBlocks;
+}
+
 void ShaderProgram::ParseProgram()
 {
-	m_uniforms.clear();
-
 	GLint count;
 	const GLsizei bufSize = 64; // maximum name length
 	GLchar name[bufSize]; // variable name in GLSL
@@ -109,11 +112,11 @@ void ShaderProgram::ParseProgram()
 
 	std::vector<VertexInput> attributes;
 	glGetProgramiv(m_handler, GL_ACTIVE_ATTRIBUTES, &count);
-	for (GLint i = 0; i < count; i++)
+	for (GLuint i = 0; i < count; i++)
 	{
 		GLint size;
 		GLenum type;
-		glGetActiveAttrib(m_handler, (GLuint)i, bufSize, &length, &size, &type, name);
+		glGetActiveAttrib(m_handler, i, bufSize, &length, &size, &type, name);
 
 		std::string s(name);
 		std::transform(s.begin(), s.end(), s.begin(), std::tolower);
@@ -122,19 +125,26 @@ void ShaderProgram::ParseProgram()
 		vertexInput.vertexAttribute = GetVertexAttribute(s, type);
 		attributes.push_back(vertexInput);
 	}
-
 	std::sort(attributes.begin(), attributes.end(), [](const VertexInput& lhs, const VertexInput& rhs)
 	{
 		return lhs.layout < rhs.layout;
 	});
 	m_vertexDeclaration = m_renderDevice->GetVertexDeclaration(attributes);
 
+	m_uniforms.clear();
 	glGetProgramiv(m_handler, GL_ACTIVE_UNIFORMS, &count);
-	for (GLint i = 0; i < count; i++)
+	for (GLuint i = 0; i < count; i++)
 	{
+		GLint uniformBlock;
+		glGetActiveUniformsiv(m_handler, 1, &i, GL_UNIFORM_BLOCK_INDEX, &uniformBlock);
+		if (uniformBlock != -1)
+		{
+			continue;
+		}
+
 		GLint size;
 		GLenum type;
-		glGetActiveUniform(m_handler, (GLuint)i, bufSize, &length, &size, &type, name);
+		glGetActiveUniform(m_handler, i, bufSize, &length, &size, &type, name);
 
 		std::string s(name);
 		m_uniforms.push_back(std::move(GetUniform(s, type, size)));
@@ -143,6 +153,16 @@ void ShaderProgram::ParseProgram()
 	{
 		return lhs.GetLocation() < rhs.GetLocation();
 	});
+
+	m_uniformBlocks.clear();
+	glGetProgramiv(m_handler, GL_ACTIVE_UNIFORM_BLOCKS, &count);
+	for (GLint i = 0; i < count; i++)
+	{
+		glGetActiveUniformBlockName(m_handler, i, bufSize, &length, name);
+		std::string s(name);
+		auto blockIndex = glGetUniformBlockIndex(m_handler, s.c_str());
+		m_uniformBlocks.push_back({ m_renderDevice->GetUniformBlock(this, s), blockIndex });
+	}
 }
 
 VertexAttribute ShaderProgram::GetVertexAttribute(const std::string& name, GLenum glType)
@@ -233,44 +253,7 @@ VertexAttribute ShaderProgram::GetVertexAttribute(const std::string& name, GLenu
 
 Uniform ShaderProgram::GetUniform(const std::string& name, GLenum glType, GLint size)
 {
-	UniformType type;
-	switch (glType)
-	{
-	case GL_SAMPLER_1D:
-		type = UniformType::Sampler1D;
-		break;
-	case GL_SAMPLER_2D:
-		type = UniformType::Sampler2D;
-		break;
-	case GL_SAMPLER_3D:
-		type = UniformType::Sampler3D;
-		break;
-	case GL_FLOAT:
-		type = UniformType::Float;
-		break;
-	case GL_FLOAT_VEC2:
-		type = UniformType::Vec2;
-		break;
-	case GL_FLOAT_VEC3:
-		type = UniformType::Vec3;
-		break;
-	case GL_FLOAT_VEC4:
-		type = UniformType::Vec4;
-		break;
-	case GL_FLOAT_MAT2:
-		type = UniformType::Mat2;
-		break;
-	case GL_FLOAT_MAT3:
-		type = UniformType::Mat3;
-		break;
-	case GL_FLOAT_MAT4:
-		type = UniformType::Mat4;
-		break;
-	default:
-		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
-	}
 	u64 location = glGetUniformLocation(m_handler, name.c_str());
-
-	Uniform uniform(name, type, location);
+	Uniform uniform(name, glType, location);
 	return std::move(uniform);
 }

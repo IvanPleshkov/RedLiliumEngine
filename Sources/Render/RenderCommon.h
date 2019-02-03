@@ -23,6 +23,7 @@ namespace RED_LILIUM_NAMESPACE
 	class VertexDeclaration;
 	class VertexArrayObject;
 	class MaterialManager;
+	class UniformBlock;
 
 	enum class VertexAttribute : u8
 	{

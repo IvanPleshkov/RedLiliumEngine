@@ -2,6 +2,7 @@
 #include "RenderDevice.h"
 #include "VertexDeclaration.h"
 #include "RenderContext.h"
+#include "Uniform.h"
 
 using namespace RED_LILIUM_NAMESPACE;
 
@@ -88,6 +89,8 @@ RenderDevice::RenderDevice(ptr<ApplicationSettings> applicationSettings)
 	glDebugMessageCallback(glDebugCallback, NULL);
 	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
 #endif
+
+	glEnable(GL_MULTISAMPLE);
 }
 
 RenderDevice::~RenderDevice()
@@ -132,4 +135,56 @@ ptr<VertexDeclaration> RenderDevice::GetVertexDeclaration(const std::vector<Vert
 		i = j.first;
 	}
 	return i->second.get();
+}
+
+ptr<UniformBlock> RenderDevice::GetUniformBlock(const std::string& name)
+{
+	auto i = m_uniformBlocks.find(name);
+	if (i == m_uniformBlocks.end())
+	{
+		std::string s = "Uniform block '" + name + "' not found";
+		RED_LILIUM_LOG_WARNING(s);
+		return nullptr;
+	}
+
+	return i->second.get();
+}
+
+ptr<UniformBlock> RenderDevice::GetUniformBlock(ptr<ShaderProgram> program, const std::string& name)
+{
+	auto i = m_uniformBlocks.find(name);
+	if (i == m_uniformBlocks.end())
+	{
+		uptr<UniformBlock> uniformBlock = umake<UniformBlock>(program, name);
+		ptr<UniformBlock> result = uniformBlock.get();
+		m_uniformBlocks.insert({ name, std::move(uniformBlock) });
+
+		auto& uniforms = result->GetUniforms();
+		for (auto& uniform : uniforms)
+		{
+			if (auto i = m_globalUniforms.find(uniform.GetName()); i != m_globalUniforms.end())
+			{
+				std::string s = "Gloabl Uniform " + uniform.GetName() + " is already present in block " + i->second.second->GetName();
+				RED_LILIUM_LOG_ERROR(s);
+				RED_LILIUM_ASSERT(false && "Gloabl Uniform is already present in other uniform block");
+			}
+			m_globalUniforms.insert({ uniform.GetName(), { uniform, result } });
+		}
+
+		return result;
+	}
+
+	i->second->Check(program);
+	return i->second.get();
+}
+
+std::optional<std::pair<Uniform, ptr<UniformBlock>>> RenderDevice::GetGlobalUniform(const std::string& name)
+{
+	auto i = m_globalUniforms.find(name);
+	if (i == m_globalUniforms.end())
+	{
+		return std::nullopt;
+	}
+
+	return i->second;
 }
