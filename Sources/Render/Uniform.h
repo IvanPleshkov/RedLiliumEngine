@@ -38,6 +38,9 @@ struct Uniform
 	const std::string& GetName() const { return m_name; }
 	u64 GetLocation() const { return m_location; }
 
+	bool operator ==(const Uniform& u) const;
+	bool operator !=(const Uniform& u) const;
+
 private:
 	union
 	{
@@ -68,6 +71,7 @@ public:
 
 public: // only for struct Uniform
 	void SetData(void* data, size_t size, size_t offset);
+	std::vector<Uniform> FindUniformsFromShader(ptr<ShaderProgram> program) const;
 
 private:
 	std::vector<Uniform> m_uniforms;

@@ -65,7 +65,6 @@ namespace
 			for (int j = 0; j < src.cols; j++)
 			{
 				auto srcPixel = ((const std::array<SrcFormat, SrcChannelsCount>*)(src.data + src.step.p[0] * i))[j];
-				// auto srcPixel = src.at<std::array<SrcFormat, SrcChannelsCount>>(i, j);
 
 				if (SrcChannelsCount > 0)
 				{
@@ -102,10 +101,6 @@ namespace
 		class DestAlphaFormat>
 	GpuTextureSendData ConvertOpencvMatTemplated(const cv::Mat& src, GLenum format, GLenum type)
 	{
-		int srcType = src.type();
-		u8 depth = srcType & CV_MAT_DEPTH_MASK;
-		u8 chans = 1 + (srcType >> CV_CN_SHIFT);
-
 		switch (src.depth()) {
 		case CV_8U:
 			switch (src.channels())

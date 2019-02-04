@@ -168,6 +168,51 @@ void Uniform::SendToBlock(ptr<UniformBlock> block)
 	}
 }
 
+bool Uniform::operator ==(const Uniform& u) const
+{
+	if (m_name != u.m_name || m_type != u.m_type || m_location != m_location)
+	{
+		return false;
+	}
+
+	switch (m_type)
+	{
+	case UniformType::Sampler1D:
+		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
+		break;
+	case UniformType::Sampler2D:
+		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
+		break;
+	case UniformType::Sampler3D:
+		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
+		break;
+	case UniformType::Float:
+		return m_value.m_f32 == u.m_value.m_f32;
+	case UniformType::Vec2:
+		return m_value.m_vec2 == u.m_value.m_vec2;
+	case UniformType::Vec3:
+		return m_value.m_vec3 == u.m_value.m_vec3;
+	case UniformType::Vec4:
+		return m_value.m_vec4 == u.m_value.m_vec4;
+	case UniformType::Mat2:
+		return m_value.m_mat2 == u.m_value.m_mat2;
+	case UniformType::Mat3:
+		return m_value.m_mat3 == u.m_value.m_mat3;
+	case UniformType::Mat4:
+		return m_value.m_mat4 == u.m_value.m_mat4;
+	default:
+		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
+		break;
+	}
+
+	return true;
+}
+
+bool Uniform::operator !=(const Uniform& u) const
+{
+	return !(*this == u);
+}
+
 UniformBlock::UniformBlock(ptr<ShaderProgram> program, const std::string& name)
 	: GpuBuffer(program->GetRenderDevice(), GL_UNIFORM_BUFFER, GpuBufferUsage::Dynamic)
 	, m_name(name)
@@ -177,8 +222,68 @@ UniformBlock::UniformBlock(ptr<ShaderProgram> program, const std::string& name)
 
 	GLint blockSize;
 	glGetActiveUniformBlockiv(program->GetNative(), blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
-
 	m_data.resize(blockSize, char(0));
+
+	m_uniforms = FindUniformsFromShader(program);
+}
+
+UniformBlock::~UniformBlock()
+{ }
+
+void UniformBlock::Check(ptr<ShaderProgram> program)
+{
+	auto uniforms = FindUniformsFromShader(program);
+	std::map<std::string, size_t> nameToIndex;
+	for (size_t i = 0; i < uniforms.size(); i++)
+	{
+		nameToIndex.insert({ uniforms[i].GetName(), i });
+	}
+
+	for (const auto& uniform : m_uniforms)
+	{
+		auto it = nameToIndex.find(uniform.GetName());
+		if (it == nameToIndex.end())
+		{
+			RED_LILIUM_ASSERT(false && "Invalid Uniform Block. Uniform block is different in another shader");
+		}
+
+		size_t index = it->second;
+		nameToIndex.erase(it);
+
+		const Uniform& checkUniform = uniforms[index];
+
+		if (uniform != checkUniform)
+		{
+			RED_LILIUM_ASSERT(false && "Invalid Uniform Block. Uniform block is different in another shader");
+		}
+	}
+
+	if (!nameToIndex.empty())
+	{
+		RED_LILIUM_ASSERT(false && "Invalid Uniform Block. Uniform block is different in another shader");
+	}
+}
+
+void UniformBlock::SendData()
+{
+	Bind();
+	GpuBuffer::SendData(m_data.data(), m_data.size());
+	Undind();
+}
+
+const std::vector<Uniform>& UniformBlock::GetUniforms() const
+{
+	return m_uniforms;
+}
+
+void UniformBlock::SetData(void* data, size_t size, size_t offset)
+{
+	std::memcpy(m_data.data() + offset, data, size);
+}
+
+std::vector<Uniform> UniformBlock::FindUniformsFromShader(ptr<ShaderProgram> program) const
+{
+	auto blockIndex = glGetUniformBlockIndex(program->GetNative(), m_name.c_str());
 
 	GLint uniformsCount;
 	const GLsizei bufSize = 64; // maximum name length
@@ -232,34 +337,12 @@ UniformBlock::UniformBlock(ptr<ShaderProgram> program, const std::string& name)
 			offsets.data());
 	}
 
+	std::vector<Uniform> result;
+	result.reserve(uniformNames.size());
 	for (size_t i = 0; i < uniformNames.size(); i++)
 	{
 		Uniform u(uniformNames[i], uniformTypes[i], static_cast<u64>(offsets[i]));
-		m_uniforms.push_back(std::move(u));
+		result.push_back(std::move(u));
 	}
-}
-
-UniformBlock::~UniformBlock()
-{ }
-
-void UniformBlock::Check(ptr<ShaderProgram> program)
-{
-	RED_LILIUM_NOT_IMPLEMENTED();
-}
-
-void UniformBlock::SendData()
-{
-	Bind();
-	GpuBuffer::SendData(m_data.data(), m_data.size());
-	Undind();
-}
-
-const std::vector<Uniform>& UniformBlock::GetUniforms() const
-{
-	return m_uniforms;
-}
-
-void UniformBlock::SetData(void* data, size_t size, size_t offset)
-{
-	std::memcpy(m_data.data() + offset, data, size);
+	return std::move(result);
 }
