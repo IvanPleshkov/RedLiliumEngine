@@ -99,7 +99,7 @@ sptr<Material> MaterialManager::NewMaterial(std::string_view filename)
 sptr<Shader> MaterialManager::NewShader(std::string_view filename, ShaderType type)
 {
 	sptr<Shader> shader = smake<Shader>(m_renderDevice);
-	std::string shaderSource = m_fileSystem->ReadFile(filename);
+	std::string shaderSource = m_fileSystem->ReadShaderFile(filename);
 	shader->CompileFromString(type, shaderSource);
 	return std::move(shader);
 }
