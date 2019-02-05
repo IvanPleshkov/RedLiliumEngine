@@ -5,7 +5,7 @@
 
 using namespace RED_LILIUM_NAMESPACE;
 
-Material::Material(ptr<RenderDevice> renderDevice, const std::string& filename)
+Material::Material(ptr<RenderDevice> renderDevice, std::string_view filename)
 	: RedLiliumObject()
 	, m_renderDevice(renderDevice)
 	, m_filename(filename)

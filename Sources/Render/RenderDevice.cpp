@@ -184,7 +184,7 @@ ptr<UniformBlock> RenderDevice::GetUniformBlock(ptr<ShaderProgram> program, cons
 	return i->second.get();
 }
 
-std::optional<std::pair<Uniform, ptr<UniformBlock>>> RenderDevice::GetGlobalUniform(const std::string& name)
+std::optional<std::pair<Uniform, ptr<UniformBlock>>> RenderDevice::GetGlobalUniform(std::string_view name)
 {
 	auto i = m_globalUniforms.find(name);
 	if (i == m_globalUniforms.end())

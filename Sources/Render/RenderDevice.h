@@ -23,7 +23,7 @@ public:
 	ptr<GpuTextureManager> GetGpuTextureManager();
 
 	ptr<VertexDeclaration> GetVertexDeclaration(const std::vector<VertexInput>& attributes);
-	std::optional<std::pair<Uniform, ptr<UniformBlock>>> GetGlobalUniform(const std::string& name);
+	std::optional<std::pair<Uniform, ptr<UniformBlock>>> GetGlobalUniform(std::string_view name);
 	ptr<UniformBlock> GetUniformBlock(const std::string& name);
 	ptr<UniformBlock> GetUniformBlock(ptr<ShaderProgram> program, const std::string& name);
 
@@ -33,7 +33,7 @@ private:
 	ptr<GpuTextureManager> m_gpuTextureManager;
 	std::map<std::string, uptr<VertexDeclaration>> m_vertexDeclarations;
 	std::map<std::string, uptr<UniformBlock>> m_uniformBlocks;
-	std::map<std::string, std::pair<Uniform, ptr<UniformBlock>>> m_globalUniforms;
+	std::map<std::string, std::pair<Uniform, ptr<UniformBlock>>, std::less<>> m_globalUniforms;
 };
 
 } // namespace RED_LILIUM_NAMESPACE

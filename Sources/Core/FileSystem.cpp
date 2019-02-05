@@ -11,9 +11,9 @@ FileSystem::FileSystem(ptr<ApplicationSettings> applicationSettings)
 {
 }
 
-std::string FileSystem::ReadFile(const std::string& filename)
+std::string FileSystem::ReadFile(std::string_view filename)
 {
-	const std::string fullFilename = m_workingPath + "\\" + filename;
+	const std::string fullFilename = m_workingPath + "\\" + std::string(filename);
 	std::ifstream fileStream(fullFilename);
 	std::string fileData(
 		(std::istreambuf_iterator<char>(fileStream)),
@@ -21,16 +21,16 @@ std::string FileSystem::ReadFile(const std::string& filename)
 	return std::move(fileData);
 }
 
-json FileSystem::ReadJson(const std::string& filename)
+json FileSystem::ReadJson(std::string_view filename)
 {
-	std::string fileData = ReadFile(filename);
+	const std::string fileData = ReadFile(filename);
 	json j = json::parse(fileData);
 	return std::move(j);
 }
 
-cv::Mat FileSystem::ReadTexture(const std::string& filename, int cvFlags)
+cv::Mat FileSystem::ReadTexture(std::string_view filename, int cvFlags)
 {
-	const std::string fullFilename = m_workingPath + "\\" + filename;
+	const std::string fullFilename = m_workingPath + "\\" + std::string(filename);
 	auto m = cv::imread(fullFilename.c_str(), cv::IMREAD_UNCHANGED);
 	return m;
 }

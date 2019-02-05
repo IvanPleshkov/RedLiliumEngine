@@ -14,9 +14,9 @@ public:
 	FileSystem(ptr<ApplicationSettings> applicationSettings);
 	~FileSystem() override = default;
 
-	std::string ReadFile(const std::string& filename);
-	json ReadJson(const std::string& filename);
-	cv::Mat ReadTexture(const std::string& filename, int cvFlags = cv::IMREAD_UNCHANGED);
+	std::string ReadFile(std::string_view filename);
+	json ReadJson(std::string_view filename);
+	cv::Mat ReadTexture(std::string_view filename, int cvFlags = cv::IMREAD_UNCHANGED);
 
 private:
 	ptr<ApplicationSettings> m_applicationSettings;

@@ -9,7 +9,7 @@ namespace RED_LILIUM_NAMESPACE
 class Material : public RedLiliumObject
 {
 public:
-	Material(ptr<RenderDevice> renderDevice, const std::string& filename);
+	Material(ptr<RenderDevice> renderDevice, std::string_view filename);
 	~Material() override;
 	ptr<VertexDeclaration> GetVertexDeclaration();
 	const sptr<ShaderProgram>& GetShaderProgram();
@@ -19,11 +19,11 @@ public:
 	
 	// todo: use string_view because most of uniform names in code are const char*
 	template<class T>
-	bool Set(const std::string& name, T& value);
+	bool Set(std::string_view name, T& value);
 
 private:
 	std::vector<Uniform> m_uniforms;
-	std::map<std::string, size_t> m_nameToUniform;
+	std::map<std::string, size_t, std::less<>> m_nameToUniform;
 	ptr<RenderDevice> m_renderDevice;
 	std::string m_filename;
 	ptr<VertexDeclaration> m_vertexDeclaration;
@@ -32,7 +32,7 @@ private:
 
 
 template<class T>
-inline bool Material::Set(const std::string & name, T & value)
+inline bool Material::Set(std::string_view name, T & value)
 {
 	auto i = m_nameToUniform.find(name);
 	if (i == m_nameToUniform.end())

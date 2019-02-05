@@ -16,7 +16,7 @@ public:
 
 	// todo: use string_view because most of uniform names in code are const char*
 	template<class T>
-	bool Set(const std::string& name, T& value);
+	bool Set(std::string_view name, T& value);
 
 private:
 	void UpdateUniformBlocks();
@@ -26,7 +26,7 @@ private:
 };
 
 template<class T>
-inline bool RenderContext::Set(const std::string& name, T& value)
+inline bool RenderContext::Set(std::string_view name, T& value)
 {
 	auto u = m_renderDevice->GetGlobalUniform(name);
 	if (u.has_value())
