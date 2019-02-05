@@ -14,12 +14,12 @@ public:
 	ptr<VertexDeclaration> GetVertexDeclaration();
 	const sptr<ShaderProgram>& GetShaderProgram();
 
-	void Use();
-	void SetShaderProgram(const sptr<ShaderProgram>& shaderProgram);
-	
-	// todo: use string_view because most of uniform names in code are const char*
 	template<class T>
 	bool Set(std::string_view name, T& value);
+
+/*internal*/ public:
+	void Use(ptr<RenderContext> context);
+	void SetShaderProgram(const sptr<ShaderProgram>& shaderProgram);
 
 private:
 	std::vector<Uniform> m_uniforms;

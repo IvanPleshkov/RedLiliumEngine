@@ -143,12 +143,12 @@ ptr<VertexDeclaration> RenderDevice::GetVertexDeclaration(const std::vector<Vert
 	return i->second.get();
 }
 
-ptr<UniformBlock> RenderDevice::GetUniformBlock(const std::string& name)
+ptr<UniformBlock> RenderDevice::GetUniformBlock(std::string_view name)
 {
 	auto i = m_uniformBlocks.find(name);
 	if (i == m_uniformBlocks.end())
 	{
-		std::string s = "Uniform block '" + name + "' not found";
+		std::string s = "Uniform block '" + std::string(name) + "' not found";
 		RED_LILIUM_LOG_WARNING(s);
 		return nullptr;
 	}
@@ -156,17 +156,16 @@ ptr<UniformBlock> RenderDevice::GetUniformBlock(const std::string& name)
 	return i->second.get();
 }
 
-ptr<UniformBlock> RenderDevice::GetUniformBlock(ptr<ShaderProgram> program, const std::string& name)
+ptr<UniformBlock> RenderDevice::GetUniformBlock(ptr<ShaderProgram> program, std::string_view name)
 {
 	auto i = m_uniformBlocks.find(name);
 	if (i == m_uniformBlocks.end())
 	{
 		uptr<UniformBlock> uniformBlock = umake<UniformBlock>(program, name);
 		ptr<UniformBlock> result = uniformBlock.get();
-		m_uniformBlocks.insert({ name, std::move(uniformBlock) });
+		m_uniformBlocks.insert({ std::string(name), std::move(uniformBlock) });
 
-		auto& uniforms = result->GetUniforms();
-		for (auto& uniform : uniforms)
+		for (auto& uniform : result->m_uniforms)
 		{
 			if (auto i = m_globalUniforms.find(uniform.GetName()); i != m_globalUniforms.end())
 			{
@@ -174,7 +173,7 @@ ptr<UniformBlock> RenderDevice::GetUniformBlock(ptr<ShaderProgram> program, cons
 				RED_LILIUM_LOG_ERROR(s);
 				RED_LILIUM_ASSERT(false && "Gloabl Uniform is already present in other uniform block");
 			}
-			m_globalUniforms.insert({ uniform.GetName(), { uniform, result } });
+			m_globalUniforms.insert({ uniform.GetName(), { &uniform, result } });
 		}
 
 		return result;
@@ -184,7 +183,7 @@ ptr<UniformBlock> RenderDevice::GetUniformBlock(ptr<ShaderProgram> program, cons
 	return i->second.get();
 }
 
-std::optional<std::pair<Uniform, ptr<UniformBlock>>> RenderDevice::GetGlobalUniform(std::string_view name)
+std::optional<std::pair<ptr<Uniform>, ptr<UniformBlock>>> RenderDevice::GetGlobalUniform(std::string_view name)
 {
 	auto i = m_globalUniforms.find(name);
 	if (i == m_globalUniforms.end())

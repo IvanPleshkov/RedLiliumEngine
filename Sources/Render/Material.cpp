@@ -2,6 +2,7 @@
 #include "Material.h"
 #include "Shader.h"
 #include "Uniform.h"
+#include "RenderContext.h"
 
 using namespace RED_LILIUM_NAMESPACE;
 
@@ -41,13 +42,26 @@ void Material::SetShaderProgram(const sptr<ShaderProgram>& shaderProgram)
 	}
 }
 
-void Material::Use()
+void Material::Use(ptr<RenderContext> context)
 {
 	glUseProgram(GetShaderProgram()->GetNative());
 
-	for (auto& uniform : m_uniforms)
+	u8 currentTextureUnit = 0;
+	for (const auto& uniform : m_uniforms)
 	{
-		uniform.Apply();
+		Uniform uniformCopy("", uniform.GetType(), uniform.GetLocation());
+		if (uniform.HasValue())
+		{
+			uniformCopy.Set(uniform.GetValue());
+		}
+		else
+		{
+			ptr<const Uniform::ValueVariants> value = context->GetUniformValue(uniform.GetName());
+			RED_LILIUM_ASSERT(value != nullptr && "All uniforms should be initialized before draw");
+			uniformCopy.Set(*value);
+		}
+		
+		uniformCopy.Apply();
 	}
 
 	auto& uniformBlocks = GetShaderProgram()->GetUniformBlocks();

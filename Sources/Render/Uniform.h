@@ -22,28 +22,14 @@ enum class UniformType : u8
 
 struct Uniform
 {
-	Uniform(const std::string& name, GLenum glType, u64 location);
+	struct Empty
+	{
+		bool operator ==(const Empty&) const { return true; }
+		bool operator !=(const Empty&) const { return false; }
+	};
 
-	void Set(const sptr<GpuTexture>& value);
-	void Set(f32 value);
-	void Set(const vec2& value);
-	void Set(const vec3& value);
-	void Set(const vec4& value);
-	void Set(const mat2& value);
-	void Set(const mat3& value);
-	void Set(const mat4& value);
-
-	void Apply();
-	void SendToBlock(ptr<UniformBlock> block);
-
-	const std::string& GetName() const { return m_name; }
-	u64 GetLocation() const { return m_location; }
-
-	bool operator ==(const Uniform& u) const;
-	bool operator !=(const Uniform& u) const;
-
-private:
 	using ValueVariants = std::variant<
+		Empty,
 		sptr<GpuTexture>,
 		f32,
 		vec2,
@@ -53,6 +39,35 @@ private:
 		mat3,
 		mat4>;
 
+	Uniform(std::string_view name, UniformType type, u64 location);
+
+	void Set(const ValueVariants& value);
+	void Set(const sptr<GpuTexture>& value);
+	void Set(f32 value);
+	void Set(const vec2& value);
+	void Set(const vec3& value);
+	void Set(const vec4& value);
+	void Set(const mat2& value);
+	void Set(const mat3& value);
+	void Set(const mat4& value);
+
+	bool HasValue() const;
+	bool IsSampler() const;
+	const ValueVariants& GetValue() const { return m_value; }
+
+	void Apply() const;
+	void SendToBlock(ptr<UniformBlock> block) const;
+
+	const std::string& GetName() const { return m_name; }
+	u64 GetLocation() const { return m_location; }
+	UniformType GetType() const { return m_type; }
+
+	bool operator ==(const Uniform& u) const;
+	bool operator !=(const Uniform& u) const;
+
+	static UniformType GlTypeToUniformType(GLenum glType);
+
+private:
 	ValueVariants m_value;
 
 	std::string m_name;
@@ -63,18 +78,18 @@ private:
 class UniformBlock : public GpuBuffer
 {
 public:
-	UniformBlock(ptr<ShaderProgram> program, const std::string& name);
+	UniformBlock(ptr<ShaderProgram> program, std::string_view name);
 	~UniformBlock() override;
 
 	void Check(ptr<ShaderProgram> program);
 	void SendData();
-	const std::vector<Uniform>& GetUniforms() const;
 	const std::string& GetName() const { return m_name; }
 
-public: // only for struct Uniform
+/*internal*/ public:
 	void SetData(const void* data, size_t size, size_t offset);
 	std::vector<Uniform> FindUniformsFromShader(ptr<ShaderProgram> program) const;
 
+	friend class RenderDevice;
 private:
 	std::vector<Uniform> m_uniforms;
 	std::string m_name;

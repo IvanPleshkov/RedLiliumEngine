@@ -254,6 +254,6 @@ VertexAttribute ShaderProgram::GetVertexAttribute(const std::string& name, GLenu
 Uniform ShaderProgram::GetUniform(const std::string& name, GLenum glType, GLint size)
 {
 	u64 location = glGetUniformLocation(m_handler, name.c_str());
-	Uniform uniform(name, glType, location);
+	Uniform uniform(name, Uniform::GlTypeToUniformType(glType), location);
 	return std::move(uniform);
 }

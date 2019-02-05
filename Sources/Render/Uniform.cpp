@@ -5,47 +5,82 @@
 
 using namespace RED_LILIUM_NAMESPACE;
 
-Uniform::Uniform(const std::string& name, GLenum glType, u64 location)
-	: m_name(name)
-	, m_location(location)
-	, m_value(f32(0))
+UniformType Uniform::GlTypeToUniformType(GLenum glType)
 {
 	switch (glType)
 	{
 	case GL_SAMPLER_1D:
-		m_type = UniformType::Sampler1D;
-		break;
+		return UniformType::Sampler1D;
 	case GL_SAMPLER_2D:
-		m_type = UniformType::Sampler2D;
-		break;
+		return UniformType::Sampler2D;
 	case GL_SAMPLER_3D:
-		m_type = UniformType::Sampler3D;
-		break;
+		return UniformType::Sampler3D;
 	case GL_FLOAT:
-		m_type = UniformType::Float;
-		break;
+		return UniformType::Float;
 	case GL_FLOAT_VEC2:
-		m_type = UniformType::Vec2;
-		break;
+		return UniformType::Vec2;
 	case GL_FLOAT_VEC3:
-		m_type = UniformType::Vec3;
-		break;
+		return UniformType::Vec3;
 	case GL_FLOAT_VEC4:
-		m_type = UniformType::Vec4;
-		break;
+		return UniformType::Vec4;
 	case GL_FLOAT_MAT2:
-		m_type = UniformType::Mat2;
-		break;
+		return UniformType::Mat2;
 	case GL_FLOAT_MAT3:
-		m_type = UniformType::Mat3;
-		break;
+		return UniformType::Mat3;
 	case GL_FLOAT_MAT4:
-		m_type = UniformType::Mat4;
+		return UniformType::Mat4;
+	default:
+		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
+		return UniformType::Float;
+	}
+}
+
+Uniform::Uniform(std::string_view name, UniformType type, u64 location)
+	: m_name(name)
+	, m_location(location)
+	, m_type(type)
+	, m_value()
+{ }
+
+void Uniform::Set(const ValueVariants& value)
+{
+	switch (m_type)
+	{
+	case UniformType::Sampler1D:
+		RED_LILIUM_ASSERT(value.index() == 1);
+		break;
+	case UniformType::Sampler2D:
+		RED_LILIUM_ASSERT(value.index() == 1);
+		break;
+	case UniformType::Sampler3D:
+		RED_LILIUM_ASSERT(value.index() == 1);
+		break;
+	case UniformType::Float:
+		RED_LILIUM_ASSERT(value.index() == 2);
+		break;
+	case UniformType::Vec2:
+		RED_LILIUM_ASSERT(value.index() == 3);
+		break;
+	case UniformType::Vec3:
+		RED_LILIUM_ASSERT(value.index() == 4);
+		break;
+	case UniformType::Vec4:
+		RED_LILIUM_ASSERT(value.index() == 5);
+		break;
+	case UniformType::Mat2:
+		RED_LILIUM_ASSERT(value.index() == 6);
+		break;
+	case UniformType::Mat3:
+		RED_LILIUM_ASSERT(value.index() == 7);
+		break;
+	case UniformType::Mat4:
+		RED_LILIUM_ASSERT(value.index() == 8);
 		break;
 	default:
-		m_type = UniformType::Float;
-		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
+		break;
 	}
+
+	m_value = value;
 }
 
 void Uniform::Set(const sptr<GpuTexture>& value)
@@ -115,8 +150,23 @@ void Uniform::Set(const mat4& value)
 	m_value = value;
 }
 
-void Uniform::Apply()
+bool Uniform::HasValue() const
 {
+	return m_value.index() != 0 && m_value.index() != std::variant_npos;
+}
+
+bool Uniform::IsSampler() const
+{
+	return
+		m_type == UniformType::Sampler1D ||
+		m_type == UniformType::Sampler2D ||
+		m_type == UniformType::Sampler3D;
+}
+
+void Uniform::Apply() const
+{
+	RED_LILIUM_ASSERT(HasValue());
+
 	switch (m_type)
 	{
 	case UniformType::Sampler1D:
@@ -194,8 +244,10 @@ void Uniform::Apply()
 	}
 }
 
-void Uniform::SendToBlock(ptr<UniformBlock> block)
+void Uniform::SendToBlock(ptr<UniformBlock> block) const
 {
+	RED_LILIUM_ASSERT(HasValue());
+
 	switch (m_type)
 	{
 	case UniformType::Sampler1D:
@@ -273,7 +325,7 @@ bool Uniform::operator !=(const Uniform& u) const
 		m_value != u.m_value;
 }
 
-UniformBlock::UniformBlock(ptr<ShaderProgram> program, const std::string& name)
+UniformBlock::UniformBlock(ptr<ShaderProgram> program, std::string_view name)
 	: GpuBuffer(program->GetRenderDevice(), GL_UNIFORM_BUFFER, GpuBufferUsage::Dynamic)
 	, m_name(name)
 	, m_data()
@@ -329,11 +381,6 @@ void UniformBlock::SendData()
 	Bind();
 	GpuBuffer::SendData(m_data.data(), m_data.size());
 	Undind();
-}
-
-const std::vector<Uniform>& UniformBlock::GetUniforms() const
-{
-	return m_uniforms;
 }
 
 void UniformBlock::SetData(const void* data, size_t size, size_t offset)
@@ -401,7 +448,8 @@ std::vector<Uniform> UniformBlock::FindUniformsFromShader(ptr<ShaderProgram> pro
 	result.reserve(uniformNames.size());
 	for (size_t i = 0; i < uniformNames.size(); i++)
 	{
-		Uniform u(uniformNames[i], uniformTypes[i], static_cast<u64>(offsets[i]));
+		UniformType uniformType = Uniform::GlTypeToUniformType(uniformTypes[i]);
+		Uniform u(uniformNames[i], uniformType, static_cast<u64>(offsets[i]));
 		result.push_back(std::move(u));
 	}
 	return std::move(result);

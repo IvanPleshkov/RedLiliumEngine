@@ -20,7 +20,7 @@ RenderContext::~RenderContext()
 void RenderContext::Draw(const sptr<GpuMesh>& mesh, const sptr<Material>& material)
 {
 	UpdateUniformBlocks();
-	material->Use();
+	material->Use(this);
 
 	ptr<VertexArrayObject> vao = mesh->GetVertexArrayObject(material->GetVertexDeclaration());
 	glBindVertexArray(vao->GetNative());
@@ -33,11 +33,33 @@ void RenderContext::UpdateUniformBlocks()
 	std::unordered_set<ptr<UniformBlock>> changedBlocks;
 	for (auto&[ uniform, block ] : m_uniformBlocksToUpdate)
 	{
-		uniform.SendToBlock(block);
+		uniform->SendToBlock(block);
 		changedBlocks.insert(block);
 	}
 	for (auto& block : changedBlocks)
 	{
 		block->SendData();
 	}
+}
+
+ptr<const Uniform::ValueVariants> RenderContext::GetUniformValue(std::string_view name)
+{
+	auto i = m_contextUniforms.find(name);
+	if (i != m_contextUniforms.end())
+	{
+		return &i->second;
+	}
+
+	auto u = m_renderDevice->GetGlobalUniform(name);
+	if (u.has_value())
+	{
+		return &u.value().first->GetValue();
+	}
+
+	return nullptr;
+}
+
+void RenderContext::Clear()
+{
+	m_contextUniforms.clear();
 }
