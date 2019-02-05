@@ -4,22 +4,14 @@
 
 in vec3 position;
 in vec4 color0;
+in vec2 texcoord0;
 
 out vec4 vertexColor;
-
-uniform vec4 g_diffuseColor1;
-uniform vec4 g_diffuseColor2;
-
-uniform Transforms
-{
-    mat4 g_view;
-    mat4 g_proj;
-    mat4 g_viewProj;
-    vec4 g_testColor;
-};
+out vec2 uv;
 
 void main()
 {
     gl_Position = vec4(position.x, position.y, position.z, 1.0);
     vertexColor = color0 * g_testColor * g_diffuseColor1;
+    uv = texcoord0;
 }

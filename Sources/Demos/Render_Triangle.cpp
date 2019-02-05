@@ -58,20 +58,24 @@ namespace RenderTriangleNamespace
 		uptr<GpuTextureManager> gpuTextureManager = umake<GpuTextureManager>(renderDevice.get(), fileSystem.get());
 		renderDevice->Init(materialManager.get(), gpuTextureManager.get());
 
-		sptr<Material> material = materialManager->Get("Shaders\\ColoredTriangle\\material.json");
-		material->Set("g_diffuseColor1", vec4(1.0f, 1.0f, 0.0f, 0.0f));
-
 		TextureSettings textureSettings;
-		sptr<GpuTexture> texture1 = gpuTextureManager->Get("Textures\\wood.png", textureSettings);
 		textureSettings.format = TextureFormat::RGB8;
+		sptr<GpuTexture> texture1 = gpuTextureManager->Get("Textures\\wood.png", textureSettings);
+		textureSettings.format = TextureFormat::RGBA8;
 		sptr<GpuTexture> texture2 = gpuTextureManager->Get("Textures\\alphatest.png", textureSettings);
 
-		uptr<Mesh> mesh = Mesh::GenerateTriangle();
+		sptr<Material> material = materialManager->Get("Shaders\\ColoredTriangle\\material.json");
+		material->Set("g_diffuseColor1", vec4(1.0f, 1.0f, 0.0f, 0.0f));
+		material->Set("g_albedo2", texture2);
+		material->Set("g_albedo1", texture1);
+
+		uptr<Mesh> mesh = Mesh::GenerateRectangle();
 		sptr<GpuMesh> gpuMesh = smake<GpuMesh>(renderDevice.get());
 		gpuMesh->Update(mesh.get());
 
 		quitting = false;
-		while (!quitting) {
+		while (!quitting)
+		{
 
 			SDL_Event event;
 			while (SDL_PollEvent(&event)) {
@@ -88,6 +92,8 @@ namespace RenderTriangleNamespace
 
 			auto context = renderDevice->CreateRenderContext();
 			context->Set("g_testColor", vec4(0.0f, 1.0f, 1.0f, 1.0f));
+			// context->Set("g_albedo1", texture2);
+			// context->Set("g_albedo2", texture1);
 			// context->Set("g_diffuseColor1", vec4(1.0f, 0.0f, 1.0f, 0.0f));
 			context->Draw(gpuMesh, material);
 

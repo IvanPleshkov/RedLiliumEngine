@@ -30,6 +30,7 @@ struct Uniform
 
 	using ValueVariants = std::variant<
 		Empty,
+		u64,
 		sptr<GpuTexture>,
 		f32,
 		vec2,
@@ -43,6 +44,7 @@ struct Uniform
 
 	void Set(const ValueVariants& value);
 	void Set(const sptr<GpuTexture>& value);
+	void Set(u64 value);
 	void Set(f32 value);
 	void Set(const vec2& value);
 	void Set(const vec3& value);

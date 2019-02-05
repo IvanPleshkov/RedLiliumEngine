@@ -60,9 +60,9 @@ namespace
 
 		Pixel pixel;
 		u64 resultPos = 0;
-		for (int i = 0; i < src.rows; i++)
+		for (i32 i = src.rows - 1; i >= 0; i--)
 		{
-			for (int j = 0; j < src.cols; j++)
+			for (i32 j = 0; j < src.cols; j++)
 			{
 				auto srcPixel = ((const std::array<SrcFormat, SrcChannelsCount>*)(src.data + src.step.p[0] * i))[j];
 
@@ -266,7 +266,7 @@ namespace
 			}
 			break;
 
-		case GL_RGB:
+		case GL_BGR:
 			switch (type)
 			{
 			case GL_UNSIGNED_BYTE:
@@ -290,7 +290,7 @@ namespace
 			break;
 
 
-		case GL_RGBA:
+		case GL_BGRA:
 			switch (type)
 			{
 			case GL_UNSIGNED_BYTE:
@@ -357,7 +357,7 @@ namespace
 			RED_LILIUM_NOT_IMPLEMENTED();
 
 		case TextureFormat::RGB8:
-			return std::move(ConvertOpencvMat(src, GL_RGB, GL_UNSIGNED_BYTE));
+			return std::move(ConvertOpencvMat(src, GL_BGR, GL_UNSIGNED_BYTE));
 
 		case TextureFormat::RGB8_SNORM:
 			RED_LILIUM_NOT_IMPLEMENTED();
@@ -381,13 +381,13 @@ namespace
 			RED_LILIUM_NOT_IMPLEMENTED();
 
 		case TextureFormat::RGBA8:
-			return std::move(ConvertOpencvMat(src, GL_RGBA, GL_UNSIGNED_BYTE));
+			return std::move(ConvertOpencvMat(src, GL_BGRA, GL_UNSIGNED_BYTE));
 
 		case TextureFormat::RGBA8_SNORM:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
 		case TextureFormat::RGB10_A2:
-			return std::move(ConvertOpencvMat(src, GL_RGBA, GL_UNSIGNED_INT_10_10_10_2));
+			return std::move(ConvertOpencvMat(src, GL_BGRA, GL_UNSIGNED_INT_10_10_10_2));
 
 		case TextureFormat::RGB10_A2UI:
 			RED_LILIUM_NOT_IMPLEMENTED();
@@ -396,7 +396,7 @@ namespace
 			RED_LILIUM_NOT_IMPLEMENTED();
 
 		case TextureFormat::RGBA16:
-			return std::move(ConvertOpencvMat(src, GL_RGBA, GL_UNSIGNED_SHORT));
+			return std::move(ConvertOpencvMat(src, GL_BGRA, GL_UNSIGNED_SHORT));
 
 		case TextureFormat::SRGB8:
 			RED_LILIUM_NOT_IMPLEMENTED();
@@ -411,10 +411,10 @@ namespace
 			return std::move(ConvertOpencvMat(src, GL_RG, GL_HALF_FLOAT));
 
 		case TextureFormat::RGB16F:
-			return std::move(ConvertOpencvMat(src, GL_RGB, GL_HALF_FLOAT));
+			return std::move(ConvertOpencvMat(src, GL_BGR, GL_HALF_FLOAT));
 
 		case TextureFormat::RGBA16F:
-			return std::move(ConvertOpencvMat(src, GL_RGBA, GL_HALF_FLOAT));
+			return std::move(ConvertOpencvMat(src, GL_BGRA, GL_HALF_FLOAT));
 
 		case TextureFormat::R32F:
 			return std::move(ConvertOpencvMat(src, GL_R, GL_FLOAT));
@@ -423,10 +423,10 @@ namespace
 			return std::move(ConvertOpencvMat(src, GL_RG, GL_FLOAT));
 
 		case TextureFormat::RGB32F:
-			return std::move(ConvertOpencvMat(src, GL_RGB, GL_FLOAT));
+			return std::move(ConvertOpencvMat(src, GL_BGR, GL_FLOAT));
 
 		case TextureFormat::RGBA32F:
-			return std::move(ConvertOpencvMat(src, GL_RGBA, GL_FLOAT));
+			return std::move(ConvertOpencvMat(src, GL_BGRA, GL_FLOAT));
 
 		case TextureFormat::R11F_G11F_B10F:
 			RED_LILIUM_NOT_IMPLEMENTED();
@@ -501,10 +501,10 @@ namespace
 			RED_LILIUM_NOT_IMPLEMENTED();
 
 		case TextureFormat::RGBA32I:
-			return std::move(ConvertOpencvMat(src, GL_RGBA, GL_INT));
+			return std::move(ConvertOpencvMat(src, GL_BGRA, GL_INT));
 
 		case TextureFormat::RGBA32UI:
-			return std::move(ConvertOpencvMat(src, GL_RGBA, GL_UNSIGNED_INT));
+			return std::move(ConvertOpencvMat(src, GL_BGRA, GL_UNSIGNED_INT));
 
 		default:
 			RED_LILIUM_NOT_IMPLEMENTED();

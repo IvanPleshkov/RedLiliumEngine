@@ -3,6 +3,7 @@
 #include "Shader.h"
 #include "Uniform.h"
 #include "RenderContext.h"
+#include "GpuTexture.h"
 
 using namespace RED_LILIUM_NAMESPACE;
 
@@ -61,6 +62,14 @@ void Material::Use(ptr<RenderContext> context)
 			uniformCopy.Set(*value);
 		}
 		
+		if (uniformCopy.IsSampler())
+		{
+			glActiveTexture(GL_TEXTURE0 + currentTextureUnit);
+			std::get<sptr<GpuTexture>>(uniformCopy.GetValue())->Bind();
+			uniformCopy.Set(static_cast<u64>(currentTextureUnit));
+			currentTextureUnit++;
+		}
+
 		uniformCopy.Apply();
 	}
 

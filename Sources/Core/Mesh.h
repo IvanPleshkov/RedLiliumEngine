@@ -12,6 +12,7 @@ public:
 
 	static uptr<Mesh> GenerateCube();
 	static uptr<Mesh> GenerateTriangle();
+	static uptr<Mesh> GenerateRectangle();
 
 	std::vector<u32> m_indices;
 	std::vector<vec3> m_positions;

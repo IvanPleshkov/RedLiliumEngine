@@ -47,34 +47,34 @@ void Uniform::Set(const ValueVariants& value)
 	switch (m_type)
 	{
 	case UniformType::Sampler1D:
-		RED_LILIUM_ASSERT(value.index() == 1);
-		break;
-	case UniformType::Sampler2D:
-		RED_LILIUM_ASSERT(value.index() == 1);
-		break;
-	case UniformType::Sampler3D:
-		RED_LILIUM_ASSERT(value.index() == 1);
-		break;
-	case UniformType::Float:
 		RED_LILIUM_ASSERT(value.index() == 2);
 		break;
-	case UniformType::Vec2:
+	case UniformType::Sampler2D:
+		RED_LILIUM_ASSERT(value.index() == 2);
+		break;
+	case UniformType::Sampler3D:
+		RED_LILIUM_ASSERT(value.index() == 2);
+		break;
+	case UniformType::Float:
 		RED_LILIUM_ASSERT(value.index() == 3);
 		break;
-	case UniformType::Vec3:
+	case UniformType::Vec2:
 		RED_LILIUM_ASSERT(value.index() == 4);
 		break;
-	case UniformType::Vec4:
+	case UniformType::Vec3:
 		RED_LILIUM_ASSERT(value.index() == 5);
 		break;
-	case UniformType::Mat2:
+	case UniformType::Vec4:
 		RED_LILIUM_ASSERT(value.index() == 6);
 		break;
-	case UniformType::Mat3:
+	case UniformType::Mat2:
 		RED_LILIUM_ASSERT(value.index() == 7);
 		break;
-	case UniformType::Mat4:
+	case UniformType::Mat3:
 		RED_LILIUM_ASSERT(value.index() == 8);
+		break;
+	case UniformType::Mat4:
+		RED_LILIUM_ASSERT(value.index() == 9);
 		break;
 	default:
 		break;
@@ -105,6 +105,11 @@ void Uniform::Set(const sptr<GpuTexture>& value)
 		break;
 	}
 
+	m_value = value;
+}
+
+void Uniform::Set(u64 value)
+{
 	m_value = value;
 }
 
@@ -171,29 +176,20 @@ void Uniform::Apply() const
 	{
 	case UniformType::Sampler1D:
 		{
-			const sptr<GpuTexture>& v = std::get<sptr<GpuTexture>>(m_value);
-			if (v != nullptr)
-			{
-				glUniform1i(m_location, v->GetNative());
-			}
+			const u64& v = std::get<u64>(m_value);
+			glUniform1i(m_location, static_cast<GLint>(v));
 		}
 		break;
 	case UniformType::Sampler2D:
 		{
-			const sptr<GpuTexture>& v = std::get<sptr<GpuTexture>>(m_value);
-			if (v != nullptr)
-			{
-				glUniform1i(m_location, v->GetNative());
-			}
+			const u64& v = std::get<u64>(m_value);
+			glUniform1i(m_location, static_cast<GLint>(v));
 		}
 		break;
 	case UniformType::Sampler3D:
 		{
-			const sptr<GpuTexture>& v = std::get<sptr<GpuTexture>>(m_value);
-			if (v != nullptr)
-			{
-				glUniform1i(m_location, v->GetNative());
-			}
+			const u64& v = std::get<u64>(m_value);
+			glUniform1i(m_location, static_cast<GLint>(v));
 		}
 		break;
 	case UniformType::Float:
