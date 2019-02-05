@@ -10,18 +10,20 @@ class Camera : public RedLiliumObject
 public:
 	~Camera() override = default;
 
-	const dmat4& GetView() const;
-	void SetView(const dmat4& view);
-	const dmat4& GetProj() const;
-	void SetProj(const dmat4& proj);
+	const mat4& GetView() const;
+	void SetView(const mat4& view);
+	const mat4& GetProj() const;
+	void SetProj(const mat4& proj);
 
-	dmat4 GetReversedZProj() const;
+	void SetPerspective(float fov, float aspect, float znear, float zfar);
 
-	static dmat4 MakeInfReversedZProjRH(double fovY_radians, double aspectWbyH, double zNear);
+	mat4 GetReversedZProj() const;
+
+	static mat4 MakeInfReversedZProjRH(f32 fovY_radians, f32 aspectWbyH, f32 zNear);
 
 private:
-	dmat4 m_view;
-	dmat4 m_proj;
+	mat4 m_view;
+	mat4 m_proj;
 };
 
 } // namespace RED_LILIUM_NAMESPACE

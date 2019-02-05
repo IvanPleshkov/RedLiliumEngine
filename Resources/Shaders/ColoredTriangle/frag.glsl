@@ -13,7 +13,6 @@ uniform sampler2D g_albedo1;
 
 void main()
 {
-    // color = vertexColor; // * g_diffuseColor1;
     vec4 c1 = texture( g_albedo1, uv );
     vec4 c2 = texture( g_albedo2, uv );
     color = mix(c1, c2, c2.a);

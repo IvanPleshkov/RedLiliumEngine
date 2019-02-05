@@ -28,6 +28,15 @@ void RenderContext::Draw(const sptr<GpuMesh>& mesh, const sptr<Material>& materi
 	glBindVertexArray(0);
 }
 
+void RenderContext::CurrentCamera(ptr<Camera> camera)
+{
+	m_currentCamera = camera;
+	Set("g_view", camera->GetView());
+	Set("g_proj", camera->GetProj());
+	mat4 viewProj = camera->GetProj() * camera->GetView();
+	Set("g_viewProj", viewProj);
+}
+
 void RenderContext::UpdateUniformBlocks()
 {
 	std::unordered_set<ptr<UniformBlock>> changedBlocks;

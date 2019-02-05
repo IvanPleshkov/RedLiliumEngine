@@ -219,19 +219,19 @@ void Uniform::Apply() const
 	case UniformType::Mat2:
 		{
 			const mat2& v = std::get<mat2>(m_value);
-			glUniformMatrix2fv(m_location, 1, GL_FALSE, &v[0][0]);
+			glUniformMatrix2fv(m_location, 1, GL_FALSE, glm::value_ptr(v));
 		}
 		break;
 	case UniformType::Mat3:
 		{
 			const mat3& v = std::get<mat3>(m_value);
-			glUniformMatrix3fv(m_location, 1, GL_FALSE, &v[0][0]);
+			glUniformMatrix3fv(m_location, 1, GL_FALSE, glm::value_ptr(v));
 		}
 		break;
 	case UniformType::Mat4:
 		{
 			const mat4& v = std::get<mat4>(m_value);
-			glUniformMatrix4fv(m_location, 1, GL_FALSE, &v[0][0]);
+			glUniformMatrix4fv(m_location, 1, GL_FALSE, glm::value_ptr(v));
 		}
 		break;
 	default:
@@ -264,37 +264,37 @@ void Uniform::SendToBlock(ptr<UniformBlock> block) const
 	case UniformType::Vec2:
 		{
 			const vec2& v = std::get<vec2>(m_value);
-			block->SetData(&v, sizeof(vec2), static_cast<size_t>(m_location));
+			block->SetData(glm::value_ptr(v), sizeof(vec2), static_cast<size_t>(m_location));
 		}
 		break;
 	case UniformType::Vec3:
 		{
 			const vec3& v = std::get<vec3>(m_value);
-			block->SetData(&v, sizeof(vec3), static_cast<size_t>(m_location));
+			block->SetData(glm::value_ptr(v), sizeof(vec3), static_cast<size_t>(m_location));
 		}
 		break;
 	case UniformType::Vec4:
 		{
 			const vec4& v = std::get<vec4>(m_value);
-			block->SetData(&v, sizeof(vec4), static_cast<size_t>(m_location));
+			block->SetData(glm::value_ptr(v), sizeof(vec4), static_cast<size_t>(m_location));
 		}
 		break;
 	case UniformType::Mat2:
 		{
 			const mat2& v = std::get<mat2>(m_value);
-			block->SetData(&v, sizeof(mat2), static_cast<size_t>(m_location));
+			block->SetData(glm::value_ptr(v), sizeof(mat2), static_cast<size_t>(m_location));
 		}
 		break;
 	case UniformType::Mat3:
 		{
 			const mat3& v = std::get<mat3>(m_value);
-			block->SetData(&v, sizeof(mat3), static_cast<size_t>(m_location));
+			block->SetData(glm::value_ptr(v), sizeof(mat3), static_cast<size_t>(m_location));
 		}
 		break;
 	case UniformType::Mat4:
 		{
 			const mat4& v = std::get<mat4>(m_value);
-			block->SetData(&v, sizeof(mat4), static_cast<size_t>(m_location));
+			block->SetData(glm::value_ptr(v), sizeof(mat4), static_cast<size_t>(m_location));
 		}
 		break;
 	default:

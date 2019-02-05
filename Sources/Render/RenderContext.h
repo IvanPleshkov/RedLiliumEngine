@@ -2,6 +2,7 @@
 
 #include "RenderCommon.h"
 #include "Uniform.h"
+#include <Core/Camera.h>
 
 namespace RED_LILIUM_NAMESPACE
 {
@@ -17,6 +18,10 @@ public:
 	template<class T>
 	bool Set(std::string_view name, const T& value);
 
+	void CurrentCamera(ptr<Camera> camera);
+	ptr<Camera> CurrentCamera() { return m_currentCamera; }
+	ptr<const Camera> CurrentCamera() const { return m_currentCamera; }
+
 	void Clear();
 
 /*internal*/ public:
@@ -26,6 +31,7 @@ private:
 	void UpdateUniformBlocks();
 
 	ptr<RenderDevice> m_renderDevice;
+	ptr<Camera> m_currentCamera;
 	std::vector<std::pair<ptr<Uniform>, ptr<UniformBlock>>> m_uniformBlocksToUpdate;
 	std::map<std::string, Uniform::ValueVariants, std::less<>> m_contextUniforms;
 };
