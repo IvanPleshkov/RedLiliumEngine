@@ -25,6 +25,7 @@ const sptr<GpuTexture>& GpuTextureManager::Get(std::string_view filename, const 
 	sptr<GpuTexture> texture = smake<GpuTexture>(m_renderDevice, settings);
 	cv::Mat mat = m_filesystem->ReadTexture(filename);
 	texture->SendData(mat);
-	m_textures.insert({ std::string(filename), texture });
-	return texture;
+	auto [it, inserted] = m_textures.insert({ std::string(filename), texture });
+	RED_LILIUM_ASSERT(inserted == true);
+	return it->second;
 }
