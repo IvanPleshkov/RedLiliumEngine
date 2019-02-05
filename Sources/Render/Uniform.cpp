@@ -1,12 +1,14 @@
 #include "pch.h"
 #include "Uniform.h"
 #include "Shader.h"
+#include "GpuTexture.h"
 
 using namespace RED_LILIUM_NAMESPACE;
 
 Uniform::Uniform(const std::string& name, GLenum glType, u64 location)
 	: m_name(name)
 	, m_location(location)
+	, m_value(f32(0))
 {
 	switch (glType)
 	{
@@ -46,46 +48,55 @@ Uniform::Uniform(const std::string& name, GLenum glType, u64 location)
 	}
 }
 
+void Uniform::Set(const sptr<GpuTexture>& value)
+{
+	RED_LILIUM_ASSERT(
+		m_type == UniformType::Sampler1D ||
+		m_type == UniformType::Sampler2D ||
+		m_type == UniformType::Sampler3D);
+	m_value = value;
+}
+
 void Uniform::Set(f32 value)
 {
 	RED_LILIUM_ASSERT(m_type == UniformType::Float);
-	m_value.m_f32 = value;
+	m_value = value;
 }
 
 void Uniform::Set(const vec2& value)
 {
 	RED_LILIUM_ASSERT(m_type == UniformType::Vec2);
-	m_value.m_vec2 = value;
+	m_value = value;
 }
 
 void Uniform::Set(const vec3& value)
 {
 	RED_LILIUM_ASSERT(m_type == UniformType::Vec3);
-	m_value.m_vec3 = value;
+	m_value = value;
 }
 
 void Uniform::Set(const vec4& value)
 {
 	RED_LILIUM_ASSERT(m_type == UniformType::Vec4);
-	m_value.m_vec4 = value;
+	m_value = value;
 }
 
 void Uniform::Set(const mat2& value)
 {
 	RED_LILIUM_ASSERT(m_type == UniformType::Mat2);
-	m_value.m_mat2 = value;
+	m_value = value;
 }
 
 void Uniform::Set(const mat3& value)
 {
 	RED_LILIUM_ASSERT(m_type == UniformType::Mat3);
-	m_value.m_mat3 = value;
+	m_value = value;
 }
 
 void Uniform::Set(const mat4& value)
 {
 	RED_LILIUM_ASSERT(m_type == UniformType::Mat3);
-	m_value.m_mat4 = value;
+	m_value = value;
 }
 
 void Uniform::Apply()
@@ -93,34 +104,73 @@ void Uniform::Apply()
 	switch (m_type)
 	{
 	case UniformType::Sampler1D:
-		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
+		{
+			const sptr<GpuTexture>& v = std::get<sptr<GpuTexture>>(m_value);
+			if (v != nullptr)
+			{
+				glUniform1i(m_location, v->GetNative());
+			}
+		}
 		break;
 	case UniformType::Sampler2D:
-		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
+		{
+			const sptr<GpuTexture>& v = std::get<sptr<GpuTexture>>(m_value);
+			if (v != nullptr)
+			{
+				glUniform1i(m_location, v->GetNative());
+			}
+		}
 		break;
 	case UniformType::Sampler3D:
-		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
+		{
+			const sptr<GpuTexture>& v = std::get<sptr<GpuTexture>>(m_value);
+			if (v != nullptr)
+			{
+				glUniform1i(m_location, v->GetNative());
+			}
+		}
 		break;
 	case UniformType::Float:
-		glUniform1f(m_location, m_value.m_f32);
+		{
+			const f32& v = std::get<f32>(m_value);
+			glUniform1f(m_location, v);
+		}
 		break;
 	case UniformType::Vec2:
-		glUniform2f(m_location, m_value.m_vec2.x, m_value.m_vec2.y);
+		{
+			const vec2& v = std::get<vec2>(m_value);
+			glUniform2f(m_location, v.x, v.y);
+		}
 		break;
 	case UniformType::Vec3:
-		glUniform3f(m_location, m_value.m_vec3.x, m_value.m_vec3.y, m_value.m_vec3.z);
+		{
+			const vec3& v = std::get<vec3>(m_value);
+			glUniform3f(m_location, v.x, v.y, v.z);
+		}
 		break;
 	case UniformType::Vec4:
-		glUniform4f(m_location, m_value.m_vec4.x, m_value.m_vec4.y, m_value.m_vec4.z, m_value.m_vec4.w);
+		{
+			const vec4& v = std::get<vec4>(m_value);
+			glUniform4f(m_location, v.x, v.y, v.z, v.w);
+		}
 		break;
 	case UniformType::Mat2:
-		glUniformMatrix2fv(m_location, 1, GL_FALSE, &m_value.m_mat2[0][0]);
+		{
+			const mat2& v = std::get<mat2>(m_value);
+			glUniformMatrix2fv(m_location, 1, GL_FALSE, &v[0][0]);
+		}
 		break;
 	case UniformType::Mat3:
-		glUniformMatrix3fv(m_location, 1, GL_FALSE, &m_value.m_mat3[0][0]);
+		{
+			const mat3& v = std::get<mat3>(m_value);
+			glUniformMatrix3fv(m_location, 1, GL_FALSE, &v[0][0]);
+		}
 		break;
 	case UniformType::Mat4:
-		glUniformMatrix4fv(m_location, 1, GL_FALSE, &m_value.m_mat4[0][0]);
+		{
+			const mat4& v = std::get<mat4>(m_value);
+			glUniformMatrix4fv(m_location, 1, GL_FALSE, &v[0][0]);
+		}
 		break;
 	default:
 		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
@@ -133,34 +183,55 @@ void Uniform::SendToBlock(ptr<UniformBlock> block)
 	switch (m_type)
 	{
 	case UniformType::Sampler1D:
-		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
+		RED_LILIUM_ASSERT(false && "Cannot set sampler to Uniform Block");
 		break;
 	case UniformType::Sampler2D:
-		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
+		RED_LILIUM_ASSERT(false && "Cannot set sampler to Uniform Block");
 		break;
 	case UniformType::Sampler3D:
-		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
+		RED_LILIUM_ASSERT(false && "Cannot set sampler to Uniform Block");
 		break;
 	case UniformType::Float:
-		block->SetData(&m_value.m_f32, sizeof(float), static_cast<size_t>(m_location));
+		{
+			const f32& v = std::get<f32>(m_value);
+			block->SetData(&v, sizeof(float), static_cast<size_t>(m_location));
+		}
 		break;
 	case UniformType::Vec2:
-		block->SetData(&m_value.m_vec2, sizeof(vec2), static_cast<size_t>(m_location));
+		{
+			const vec2& v = std::get<vec2>(m_value);
+			block->SetData(&v, sizeof(vec2), static_cast<size_t>(m_location));
+		}
 		break;
 	case UniformType::Vec3:
-		block->SetData(&m_value.m_vec3, sizeof(vec3), static_cast<size_t>(m_location));
+		{
+			const vec3& v = std::get<vec3>(m_value);
+			block->SetData(&v, sizeof(vec3), static_cast<size_t>(m_location));
+		}
 		break;
 	case UniformType::Vec4:
-		block->SetData(&m_value.m_vec4, sizeof(vec4), static_cast<size_t>(m_location));
+		{
+			const vec4& v = std::get<vec4>(m_value);
+			block->SetData(&v, sizeof(vec4), static_cast<size_t>(m_location));
+		}
 		break;
 	case UniformType::Mat2:
-		block->SetData(&m_value.m_mat2, sizeof(mat2), static_cast<size_t>(m_location));
+		{
+			const mat2& v = std::get<mat2>(m_value);
+			block->SetData(&v, sizeof(mat2), static_cast<size_t>(m_location));
+		}
 		break;
 	case UniformType::Mat3:
-		block->SetData(&m_value.m_mat3, sizeof(mat3), static_cast<size_t>(m_location));
+		{
+			const mat3& v = std::get<mat3>(m_value);
+			block->SetData(&v, sizeof(mat3), static_cast<size_t>(m_location));
+		}
 		break;
 	case UniformType::Mat4:
-		block->SetData(&m_value.m_mat4, sizeof(mat4), static_cast<size_t>(m_location));
+		{
+			const mat4& v = std::get<mat4>(m_value);
+			block->SetData(&v, sizeof(mat4), static_cast<size_t>(m_location));
+		}
 		break;
 	default:
 		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
@@ -170,47 +241,20 @@ void Uniform::SendToBlock(ptr<UniformBlock> block)
 
 bool Uniform::operator ==(const Uniform& u) const
 {
-	if (m_name != u.m_name || m_type != u.m_type || m_location != m_location)
-	{
-		return false;
-	}
-
-	switch (m_type)
-	{
-	case UniformType::Sampler1D:
-		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
-		break;
-	case UniformType::Sampler2D:
-		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
-		break;
-	case UniformType::Sampler3D:
-		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
-		break;
-	case UniformType::Float:
-		return m_value.m_f32 == u.m_value.m_f32;
-	case UniformType::Vec2:
-		return m_value.m_vec2 == u.m_value.m_vec2;
-	case UniformType::Vec3:
-		return m_value.m_vec3 == u.m_value.m_vec3;
-	case UniformType::Vec4:
-		return m_value.m_vec4 == u.m_value.m_vec4;
-	case UniformType::Mat2:
-		return m_value.m_mat2 == u.m_value.m_mat2;
-	case UniformType::Mat3:
-		return m_value.m_mat3 == u.m_value.m_mat3;
-	case UniformType::Mat4:
-		return m_value.m_mat4 == u.m_value.m_mat4;
-	default:
-		RED_LILIUM_ASSERT(false && "Unsupported uniform type!");
-		break;
-	}
-
-	return true;
+	return
+		m_type == u.m_type &&
+		m_location == u.m_location &&
+		m_name == u.m_name &&
+		m_value == u.m_value;
 }
 
 bool Uniform::operator !=(const Uniform& u) const
 {
-	return !(*this == u);
+	return
+		m_type != u.m_type ||
+		m_location != u.m_location ||
+		m_name != u.m_name ||
+		m_value != u.m_value;
 }
 
 UniformBlock::UniformBlock(ptr<ShaderProgram> program, const std::string& name)
@@ -276,7 +320,7 @@ const std::vector<Uniform>& UniformBlock::GetUniforms() const
 	return m_uniforms;
 }
 
-void UniformBlock::SetData(void* data, size_t size, size_t offset)
+void UniformBlock::SetData(const void* data, size_t size, size_t offset)
 {
 	std::memcpy(m_data.data() + offset, data, size);
 }

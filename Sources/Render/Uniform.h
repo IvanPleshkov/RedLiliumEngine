@@ -24,6 +24,7 @@ struct Uniform
 {
 	Uniform(const std::string& name, GLenum glType, u64 location);
 
+	void Set(const sptr<GpuTexture>& value);
 	void Set(f32 value);
 	void Set(const vec2& value);
 	void Set(const vec3& value);
@@ -42,16 +43,17 @@ struct Uniform
 	bool operator !=(const Uniform& u) const;
 
 private:
-	union
-	{
-		f32 m_f32;
-		vec2 m_vec2;
-		vec3 m_vec3;
-		vec4 m_vec4;
-		mat2 m_mat2;
-		mat3 m_mat3;
-		mat4 m_mat4;
-	} m_value;
+	using ValueVariants = std::variant<
+		sptr<GpuTexture>,
+		f32,
+		vec2,
+		vec3,
+		vec4,
+		mat2,
+		mat3,
+		mat4>;
+
+	ValueVariants m_value;
 
 	std::string m_name;
 	UniformType m_type;
@@ -70,7 +72,7 @@ public:
 	const std::string& GetName() const { return m_name; }
 
 public: // only for struct Uniform
-	void SetData(void* data, size_t size, size_t offset);
+	void SetData(const void* data, size_t size, size_t offset);
 	std::vector<Uniform> FindUniformsFromShader(ptr<ShaderProgram> program) const;
 
 private:

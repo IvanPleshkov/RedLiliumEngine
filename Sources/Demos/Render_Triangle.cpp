@@ -59,7 +59,7 @@ namespace RenderTriangleNamespace
 		renderDevice->Init(materialManager.get(), gpuTextureManager.get());
 
 		sptr<Material> material = materialManager->Get("Shaders\\ColoredTriangle\\material.json");
-		material->Set("g_diffuseColor1", vec4(1.0f, 1.0f, 1.0f, 0.0f));
+		material->Set("g_diffuseColor1", vec4(1.0f, 0.0f, 1.0f, 0.0f));
 
 		TextureSettings textureSettings;
 		sptr<GpuTexture> texture1 = gpuTextureManager->Get("Textures\\wood.png", textureSettings);

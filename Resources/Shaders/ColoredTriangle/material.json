@@ -11,19 +11,5 @@
         "Language" : "glsl",
         "ApiVersion" : "450",
         "Filename" : "Shaders\\ColoredTriangle\\frag.glsl"
-    },
-
-    "Uniforms" :
-    [
-        {
-            "Name" : "g_diffuseColor",
-            "Type" : "vec4",
-            "Value": "1, 0, 0, 1"
-        },
-        {
-            "Name" : "g_diffuseColor2",
-            "Type" : "vec4",
-            "Value": "0, 0, 0, 1"
-        }
-    ]
+    }
 }
