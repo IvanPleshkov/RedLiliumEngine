@@ -323,187 +323,187 @@ namespace
 	{
 		switch (destFormat)
 		{
-		case rl::TextureFormat::R8:
+		case TextureFormat::R8:
 			return std::move(ConvertOpencvMat(src, GL_RED, GL_UNSIGNED_BYTE));
 
-		case rl::TextureFormat::R8_SNORM:
+		case TextureFormat::R8_SNORM:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::R16:
+		case TextureFormat::R16:
 			return std::move(ConvertOpencvMat(src, GL_RED, GL_UNSIGNED_SHORT));
 
-		case rl::TextureFormat::R16_SNORM:
+		case TextureFormat::R16_SNORM:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RG8:
+		case TextureFormat::RG8:
 			return std::move(ConvertOpencvMat(src, GL_RG, GL_UNSIGNED_BYTE));
 
-		case rl::TextureFormat::RG8_SNORM:
+		case TextureFormat::RG8_SNORM:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RG16:
+		case TextureFormat::RG16:
 			return std::move(ConvertOpencvMat(src, GL_RG, GL_UNSIGNED_SHORT));
 
-		case rl::TextureFormat::RG16_SNORM:
+		case TextureFormat::RG16_SNORM:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::R3_G3_B2:
+		case TextureFormat::R3_G3_B2:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RGB4:
+		case TextureFormat::RGB4:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RGB5:
+		case TextureFormat::RGB5:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RGB8:
+		case TextureFormat::RGB8:
 			return std::move(ConvertOpencvMat(src, GL_RGB, GL_UNSIGNED_BYTE));
 
-		case rl::TextureFormat::RGB8_SNORM:
+		case TextureFormat::RGB8_SNORM:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RGB10:
+		case TextureFormat::RGB10:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RGB12:
+		case TextureFormat::RGB12:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RGB16_SNORM:
+		case TextureFormat::RGB16_SNORM:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RGBA2:
+		case TextureFormat::RGBA2:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RGBA4:
+		case TextureFormat::RGBA4:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RGB5_A1:
+		case TextureFormat::RGB5_A1:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RGBA8:
+		case TextureFormat::RGBA8:
 			return std::move(ConvertOpencvMat(src, GL_RGBA, GL_UNSIGNED_BYTE));
 
-		case rl::TextureFormat::RGBA8_SNORM:
+		case TextureFormat::RGBA8_SNORM:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RGB10_A2:
+		case TextureFormat::RGB10_A2:
 			return std::move(ConvertOpencvMat(src, GL_RGBA, GL_UNSIGNED_INT_10_10_10_2));
 
-		case rl::TextureFormat::RGB10_A2UI:
+		case TextureFormat::RGB10_A2UI:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RGBA12:
+		case TextureFormat::RGBA12:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RGBA16:
+		case TextureFormat::RGBA16:
 			return std::move(ConvertOpencvMat(src, GL_RGBA, GL_UNSIGNED_SHORT));
 
-		case rl::TextureFormat::SRGB8:
+		case TextureFormat::SRGB8:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::SRGB8_ALPHA8:
+		case TextureFormat::SRGB8_ALPHA8:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::R16F:
+		case TextureFormat::R16F:
 			return std::move(ConvertOpencvMat(src, GL_R, GL_HALF_FLOAT));
 
-		case rl::TextureFormat::RG16F:
+		case TextureFormat::RG16F:
 			return std::move(ConvertOpencvMat(src, GL_RG, GL_HALF_FLOAT));
 
-		case rl::TextureFormat::RGB16F:
+		case TextureFormat::RGB16F:
 			return std::move(ConvertOpencvMat(src, GL_RGB, GL_HALF_FLOAT));
 
-		case rl::TextureFormat::RGBA16F:
+		case TextureFormat::RGBA16F:
 			return std::move(ConvertOpencvMat(src, GL_RGBA, GL_HALF_FLOAT));
 
-		case rl::TextureFormat::R32F:
+		case TextureFormat::R32F:
 			return std::move(ConvertOpencvMat(src, GL_R, GL_FLOAT));
 
-		case rl::TextureFormat::RG32F:
+		case TextureFormat::RG32F:
 			return std::move(ConvertOpencvMat(src, GL_RG, GL_FLOAT));
 
-		case rl::TextureFormat::RGB32F:
+		case TextureFormat::RGB32F:
 			return std::move(ConvertOpencvMat(src, GL_RGB, GL_FLOAT));
 
-		case rl::TextureFormat::RGBA32F:
+		case TextureFormat::RGBA32F:
 			return std::move(ConvertOpencvMat(src, GL_RGBA, GL_FLOAT));
 
-		case rl::TextureFormat::R11F_G11F_B10F:
+		case TextureFormat::R11F_G11F_B10F:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RGB9_E5:
+		case TextureFormat::RGB9_E5:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::R8I:
+		case TextureFormat::R8I:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::R8UI:
+		case TextureFormat::R8UI:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::R16I:
+		case TextureFormat::R16I:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::R16UI:
+		case TextureFormat::R16UI:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::R32I:
+		case TextureFormat::R32I:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::R32UI:
+		case TextureFormat::R32UI:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RG8I:
+		case TextureFormat::RG8I:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RG8UI:
+		case TextureFormat::RG8UI:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RG16I:
+		case TextureFormat::RG16I:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RG16UI:
+		case TextureFormat::RG16UI:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RG32I:
+		case TextureFormat::RG32I:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RG32UI:
+		case TextureFormat::RG32UI:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RGB8I:
+		case TextureFormat::RGB8I:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RGB8UI:
+		case TextureFormat::RGB8UI:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RGB16I:
+		case TextureFormat::RGB16I:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RGB16UI:
+		case TextureFormat::RGB16UI:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RGB32I:
+		case TextureFormat::RGB32I:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RGB32UI:
+		case TextureFormat::RGB32UI:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RGBA8I:
+		case TextureFormat::RGBA8I:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RGBA8UI:
+		case TextureFormat::RGBA8UI:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RGBA16I:
+		case TextureFormat::RGBA16I:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RGBA16UI:
+		case TextureFormat::RGBA16UI:
 			RED_LILIUM_NOT_IMPLEMENTED();
 
-		case rl::TextureFormat::RGBA32I:
+		case TextureFormat::RGBA32I:
 			return std::move(ConvertOpencvMat(src, GL_RGBA, GL_INT));
 
-		case rl::TextureFormat::RGBA32UI:
+		case TextureFormat::RGBA32UI:
 			return std::move(ConvertOpencvMat(src, GL_RGBA, GL_UNSIGNED_INT));
 
 		default:
@@ -532,19 +532,19 @@ GpuTexture::~GpuTexture()
 void GpuTexture::Settings(const TextureSettings& settings)
 {
 	m_settings = settings;
-	switch (m_settings.dims)
+	switch (m_settings.type)
 	{
-	case 1:
+	case TextureType::Texture1D:
 		m_glDimensions = GL_TEXTURE_1D;
 		break;
-	case 2:
+	case TextureType::Texture2D:
 		m_glDimensions = GL_TEXTURE_2D;
 		break;
-	case 3:
+	case TextureType::Texture3D:
 		m_glDimensions = GL_TEXTURE_3D;
 		break;
 	default:
-		RED_LILIUM_ASSERT(false && "Wrong texture dimensions");
+		RED_LILIUM_ASSERT(false && "Not supported");
 	}
 
 	Bind();
@@ -610,13 +610,13 @@ const TextureSettings& GpuTexture::Settings()
 bool GpuTexture::SendData(const cv::Mat& mat)
 {
 	Bind();
-	switch (m_settings.dims)
+	switch (m_settings.type)
 	{
-	case 1:
+	case TextureType::Texture1D:
 		RED_LILIUM_ASSERT(false && "cv::Mat cannot have 1 dimension");
 		Unbind();
 		return false;
-	case 2:
+	case TextureType::Texture2D:
 		{
 			auto data = ConvertOpencvMat(mat, m_settings.format);
 			auto glType = GetGlType(m_settings.format);
@@ -632,11 +632,11 @@ bool GpuTexture::SendData(const cv::Mat& mat)
 				data.data.data());
 		}
 		break;
-	case 3:
+	case TextureType::Texture3D:
 		RED_LILIUM_NOT_IMPLEMENTED();
 		break;
 	default:
-		RED_LILIUM_ASSERT(false && "Wrong texture dimensions");
+		RED_LILIUM_ASSERT(false && "Wrong texture type");
 		Unbind();
 		return false;
 	}

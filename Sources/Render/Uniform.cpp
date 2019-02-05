@@ -50,10 +50,26 @@ Uniform::Uniform(const std::string& name, GLenum glType, u64 location)
 
 void Uniform::Set(const sptr<GpuTexture>& value)
 {
-	RED_LILIUM_ASSERT(
-		m_type == UniformType::Sampler1D ||
-		m_type == UniformType::Sampler2D ||
-		m_type == UniformType::Sampler3D);
+	auto textureType = value->Settings().type;
+	switch (textureType)
+	{
+	case TextureType::Texture1D:
+		RED_LILIUM_ASSERT(m_type == UniformType::Sampler1D);
+		break;
+	case TextureType::Texture2D:
+		RED_LILIUM_ASSERT(m_type == UniformType::Sampler2D);
+		break;
+	case TextureType::Texture3D:
+		RED_LILIUM_ASSERT(m_type == UniformType::Sampler3D);
+		break;
+	case TextureType::TextureCube:
+		RED_LILIUM_NOT_IMPLEMENTED();
+		break;
+	default:
+		RED_LILIUM_NOT_IMPLEMENTED();
+		break;
+	}
+
 	m_value = value;
 }
 

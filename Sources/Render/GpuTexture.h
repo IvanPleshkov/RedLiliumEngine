@@ -85,9 +85,17 @@ enum class TextureFiltering : u8
 	Linear
 };
 
+enum class TextureType : u8
+{
+	Texture1D,
+	Texture2D,
+	Texture3D,
+	TextureCube
+};
+
 struct TextureSettings
 {
-	u8 dims							= 2;
+	TextureType type				= TextureType::Texture2D;
 	TextureFormat format			= TextureFormat::RGBA8;
 	TextureWrapping wrapping		= TextureWrapping::Repeat;
 	TextureFiltering filtering		= TextureFiltering::Linear;
