@@ -8,12 +8,16 @@ namespace RED_LILIUM_NAMESPACE
 namespace Geometrics
 {
 
-class InstancedDrawCall : public RedLiliumObject
+class Context;
+
+struct ScopedState
 {
-public:
-	~InstancedDrawCall() override = default;
+	ScopedState(ptr<Context> context);
+	~ScopedState();
 
 private:
+	ptr<Context> m_context;
+	std::vector<std::function<void()>> m_revert;
 };
 
 } // namespace Geometrics
