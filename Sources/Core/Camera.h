@@ -5,16 +5,16 @@
 namespace RED_LILIUM_NAMESPACE
 {
 
-class Camera : public RedLiliumObject
+struct Camera
 {
-public:
-	~Camera() override = default;
+	Camera();
 
 	const mat4& GetView() const;
 	void SetView(const mat4& view);
 	const mat4& GetProj() const;
 	void SetProj(const mat4& proj);
 
+	void LookAt(const vec3& eye, const vec3& center, const vec3 up);
 	void SetPerspective(float fov, float aspect, float znear, float zfar);
 
 	mat4 GetReversedZProj() const;

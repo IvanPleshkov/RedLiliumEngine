@@ -151,7 +151,7 @@ void Uniform::Set(const mat3& value)
 
 void Uniform::Set(const mat4& value)
 {
-	RED_LILIUM_ASSERT(m_type == UniformType::Mat3);
+	RED_LILIUM_ASSERT(m_type == UniformType::Mat4);
 	m_value = value;
 }
 

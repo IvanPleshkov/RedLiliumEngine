@@ -3,6 +3,11 @@
 
 using namespace RED_LILIUM_NAMESPACE;
 
+Camera::Camera()
+	: m_view(1.0f)
+	, m_proj(1.0f)
+{}
+
 const mat4& Camera::GetView() const
 {
 	return m_view;
@@ -21,6 +26,11 @@ const mat4& Camera::GetProj() const
 void Camera::SetProj(const mat4& proj)
 {
 	m_proj = proj;
+}
+
+void Camera::LookAt(const vec3& eye, const vec3& center, const vec3 up)
+{
+	m_view = glm::lookAt(eye, center, up);
 }
 
 void Camera::SetPerspective(float fov, float aspect, float znear, float zfar)

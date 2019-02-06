@@ -73,7 +73,14 @@ namespace RenderTriangleNamespace
 		sptr<GpuMesh> gpuMesh = smake<GpuMesh>(renderDevice.get());
 		gpuMesh->Update(mesh.get());
 
+		mat4 view;
+		view = glm::translate(view, vec3(0.0f, 0.0f, -3.0f));
+		Camera camera;
+		camera.LookAt({ 5.0f, 5.0f, 5.0f }, { 0, 0, 0 }, { 0, 0, 1 });
+		camera.SetPerspective(45.0f, 1.0f, 0.1f, 100.0f);
+
 		quitting = false;
+		float angle = 0.0f;
 		while (!quitting)
 		{
 
@@ -90,7 +97,14 @@ namespace RenderTriangleNamespace
 			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+			mat4 model(1.0f);
+			angle += 0.03f;
+			model = glm::rotate(model, angle, vec3(0.0f, 0.0f, 1.0f));
+			material->Set("g_model", model);
+
 			auto context = renderDevice->CreateRenderContext();
+			context->CurrentCamera(camera);
+
 			context->Set("g_testColor", vec4(0.0f, 1.0f, 1.0f, 1.0f));
 			// context->Set("g_albedo1", texture2);
 			// context->Set("g_albedo2", texture1);

@@ -15,6 +15,6 @@ void main()
 {
     gl_Position = g_proj * g_view * g_model * vec4(position, 1.0f);
 
-    vertexColor = color0 * g_testColor * g_diffuseColor1;
+    vertexColor = color0;
     uv = texcoord0;
 }
