@@ -127,6 +127,32 @@ public:
 	~RestorableObject() override = default;
 };
 
+class NonCopyable
+{
+public:
+	NonCopyable(const NonCopyable&) = delete;
+	NonCopyable& operator=(const NonCopyable&) = delete;
+
+	NonCopyable(NonCopyable&&) = default;
+	NonCopyable& operator=(NonCopyable&&) = default;
+
+protected:
+	NonCopyable() = default;
+};
+
+class NonMovable
+{
+public:
+	NonMovable(const NonMovable&) = default;
+	NonMovable& operator=(const NonMovable&) = default;
+
+	NonMovable(NonMovable&&) = delete;
+	NonMovable& operator=(NonMovable&&) = delete;
+
+protected:
+	NonMovable() = default;
+};
+
 #define RED_LILIUM_LOG_INFO(message) spdlog::info(message);
 #define RED_LILIUM_LOG_WARNING(message) spdlog::warn(message);
 #define RED_LILIUM_LOG_ERROR(message) spdlog::error(message);
