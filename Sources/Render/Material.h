@@ -11,8 +11,6 @@ class Material : public RedLiliumObject
 public:
 	Material(ptr<RenderDevice> renderDevice, std::string_view filename);
 	~Material() override;
-	ptr<VertexDeclaration> GetVertexDeclaration();
-	const sptr<ShaderProgram>& GetShaderProgram();
 
 	template<class T>
 	bool Set(std::string_view name, T& value);
@@ -20,6 +18,8 @@ public:
 /*internal*/ public:
 	void Use(ptr<RenderContext> context);
 	void SetShaderProgram(const sptr<ShaderProgram>& shaderProgram);
+	ptr<VertexDeclaration> GetVertexDeclaration();
+	const sptr<ShaderProgram>& GetShaderProgram();
 
 private:
 	std::vector<Uniform> m_uniforms;

@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "RenderPipeline.h"
+#include "RenderPass.h"
 #include "Components/CameraComponent.h"
 #include "Components/MeshRenderer.h"
 
@@ -8,39 +9,68 @@ using namespace RED_LILIUM_NAMESPACE;
 RenderPipeline::RenderPipeline(ptr<RenderDevice> renderDevice)
 	: RedLiliumObject()
 	, m_renderDevice(renderDevice)
+	, m_perRenderData()
 {}
 
 bool RenderPipeline::Render(const std::vector<ptr<const Entity>>& roots)
 {
-	m_rootEntities = roots;
+	m_perRenderData.Clear();
+	m_perRenderData.m_rootEntities = roots;
 	FindCameraComponents();
 	FindRenderables();
 
-	return true;
+	bool res = true;
+	for (auto& pass : m_passes)
+	{
+		res &= pass->Render();
+	}
+
+	return res;
 }
 
 void RenderPipeline::FindCameraComponents()
 {
-	m_cameraComponents.clear();
-	for (auto rootEntity : m_rootEntities)
+	for (auto rootEntity : m_perRenderData.m_rootEntities)
 	{
 		rootEntity->IterateComponentsWithChildren([this](ptr<const Component> component)
 		{
 			auto cameraComponent = Cast<const CameraComponent>(component);
-			m_cameraComponents.push_back(cameraComponent);
+			if (cameraComponent)
+			{
+				m_perRenderData.m_cameraComponents.push_back(cameraComponent);
+			}
 		});
 	}
 }
 
 void RenderPipeline::FindRenderables()
 {
-	m_meshRenderers.clear();
-	for (auto rootEntity : m_rootEntities)
+	for (auto rootEntity : m_perRenderData.m_rootEntities)
 	{
 		rootEntity->IterateComponentsWithChildren([this](ptr<const Component> component)
 		{
 			auto meshRendererComponent = Cast<const MeshRenderer>(component);
-			m_meshRenderers.push_back(meshRendererComponent);
+			if (meshRendererComponent)
+			{
+				m_perRenderData.m_meshRenderers.push_back(meshRendererComponent);
+			}
 		});
 	}
+}
+
+uptr<RenderPipeline> RenderPipeline::CreateSimpleOpaquePipeline(ptr<RenderDevice> renderDevice)
+{
+	return umake<RenderPipeline>(renderDevice);
+}
+
+void RenderPipeline::SetPassesRelation(ptr<RenderPass> pass, ptr<RenderPass> requiredPass)
+{
+	RED_LILIUM_NOT_IMPLEMENTED();
+}
+
+void RenderPipeline::PerRenderData::Clear()
+{
+	m_rootEntities.clear();
+	m_cameraComponents.clear();
+	m_meshRenderers.clear();
 }
