@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "RenderPipeline.h"
 #include "RenderPass.h"
+#include "StandardPasses/OpaquePass.h"
 #include "Components/CameraComponent.h"
 #include "Components/MeshRenderer.h"
 
@@ -60,7 +61,9 @@ void RenderPipeline::FindRenderables()
 
 uptr<RenderPipeline> RenderPipeline::CreateSimpleOpaquePipeline(ptr<RenderDevice> renderDevice)
 {
-	return umake<RenderPipeline>(renderDevice);
+	uptr<RenderPipeline> pipeline = umake<RenderPipeline>(renderDevice);
+	pipeline->AddPass<OpaquePass>();
+	return std::move(pipeline);
 }
 
 void RenderPipeline::SetPassesRelation(ptr<RenderPass> pass, ptr<RenderPass> requiredPass)

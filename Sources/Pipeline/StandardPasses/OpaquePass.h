@@ -15,6 +15,7 @@ public:
 	bool Render() override;
 
 private:
+	void RenderCamera(ptr<const CameraComponent> camera);
 };
 
 } // namespace RED_LILIUM_NAMESPACE

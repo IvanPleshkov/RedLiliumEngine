@@ -49,7 +49,7 @@ private:
 template<class T>
 inline ptr<T> RenderPipeline::AddPass()
 {
-	uptr<T> pass = umake<T>(m_renderDevice);
+	uptr<T> pass = umake<T>(this);
 	ptr<T> result = pass.get();
 	m_passes.push_back(std::move(pass));
 	return result;
