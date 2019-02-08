@@ -1,4 +1,4 @@
-project(NodesEditor)
+project(Pipeline)
 
 include("../Common.cmake")
 
@@ -9,6 +9,3 @@ target_link_libraries(${PROJECT_NAME} Reflection)
 target_link_libraries(${PROJECT_NAME} Scene)
 target_link_libraries(${PROJECT_NAME} Render)
 target_link_libraries(${PROJECT_NAME} Geometrics)
-target_link_libraries(${PROJECT_NAME} Pipeline)
-target_link_libraries(${PROJECT_NAME} Nodes)
-target_link_libraries(${PROJECT_NAME} Editor)

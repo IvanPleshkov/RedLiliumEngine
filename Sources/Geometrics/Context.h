@@ -26,6 +26,7 @@ public:
 
 /*internal*/ public:
 	const RenderState& GetRenderState() const;
+	void Prepare();
 
 	friend class ScopedState;
 private:

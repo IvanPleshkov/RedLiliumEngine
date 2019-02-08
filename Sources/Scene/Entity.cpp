@@ -133,3 +133,30 @@ ptr<Entity> Entity::AddChild(const std::string& name, u64 position)
 	}
 	return result;
 }
+
+void Entity::IterateComponentsWithChildren(std::function<void(ptr<Component>)> func)
+{
+	for (auto& component : m_components)
+	{
+		func(component.get());
+	}
+
+	for (auto& child : m_children)
+	{
+		child->IterateComponentsWithChildren(func);
+	}
+}
+
+void Entity::IterateComponentsWithChildren(std::function<void(ptr<const Component>)> func) const
+{
+	for (const auto& component : m_components)
+	{
+		func(component.get());
+	}
+
+	for (const auto& child : m_children)
+	{
+		ptr<const Entity> enity = child.get();
+		enity->IterateComponentsWithChildren(func);
+	}
+}

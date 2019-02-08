@@ -76,6 +76,7 @@ using vec4 = glm::vec4;
 using mat4 = glm::mat4;
 using mat3 = glm::mat3;
 using mat2 = glm::mat2;
+using quat = glm::quat;
 
 using dvec2 = glm::dvec2;
 using dvec3 = glm::dvec3;

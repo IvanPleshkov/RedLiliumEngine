@@ -38,6 +38,9 @@ public:
 	template<class T> ptr<const T> GetComponent(u64 index = 0) const;
 	template<class T> ptr<T> AddComponent(u64 position = u64_max);
 
+	void IterateComponentsWithChildren(std::function<void(ptr<Component>)> func);
+	void IterateComponentsWithChildren(std::function<void(ptr<const Component>)> func) const;
+
 private:
 	ptr<Scene> m_scene;
 	ptr<Entity> m_parent;

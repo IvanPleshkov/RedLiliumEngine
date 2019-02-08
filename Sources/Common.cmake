@@ -64,6 +64,7 @@ if (MSVC)
 		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/GlU32.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/GlU32.lib
 		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/OpenGL32.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/OpenGL32.lib
 		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/freetype.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/freetype.lib
+		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/assimp-vc140-mt.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/assimp-vc140-mt.lib
 		
 		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/ade.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/ade.lib
 		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/opencv_calib3d401d.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/opencv_calib3d401.lib
