@@ -10,3 +10,9 @@ CameraControllerComponent::CameraControllerComponent()
 CameraControllerComponent::CameraControllerComponent(ptr<Entity> parent)
 	: Component(parent)
 {}
+
+void CameraControllerComponent::Serialize(ptr<Serializator> serializator) const
+{}
+
+void CameraControllerComponent::Deserialize(ptr<const Serializator> serializator)
+{}

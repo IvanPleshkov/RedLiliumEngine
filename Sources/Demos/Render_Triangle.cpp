@@ -52,19 +52,16 @@ namespace RenderTriangleNamespace
 
 		SDL_AddEventWatch(watch, NULL);
 
-		uptr<RenderDevice> renderDevice = umake<RenderDevice>(settings);
 		uptr<FileSystem> fileSystem = umake<FileSystem>(settings);
-		uptr<MaterialManager> materialManager = umake<MaterialManager>(renderDevice.get(), fileSystem.get());
-		uptr<GpuTextureManager> gpuTextureManager = umake<GpuTextureManager>(renderDevice.get(), fileSystem.get());
-		renderDevice->Init(materialManager.get(), gpuTextureManager.get());
+		uptr<RenderDevice> renderDevice = umake<RenderDevice>(settings, fileSystem.get());
 
 		TextureSettings textureSettings;
 		textureSettings.format = TextureFormat::RGB8;
-		sptr<GpuTexture> texture1 = gpuTextureManager->Get("Textures\\wood.png", textureSettings);
+		sptr<GpuTexture> texture1 = renderDevice->GetGpuTextureManager()->Get("Textures\\wood.png", textureSettings);
 		textureSettings.format = TextureFormat::RGBA8;
-		sptr<GpuTexture> texture2 = gpuTextureManager->Get("Textures\\alphatest.png", textureSettings);
+		sptr<GpuTexture> texture2 = renderDevice->GetGpuTextureManager()->Get("Textures\\alphatest.png", textureSettings);
 
-		sptr<Material> material = materialManager->Get("Shaders\\ColoredTriangle\\material.json");
+		sptr<Material> material = renderDevice->GetMaterialManager()->Get("Shaders\\ColoredTriangle\\material.json");
 		material->Set("g_diffuseColor1", vec4(1.0f, 1.0f, 0.0f, 0.0f));
 		material->Set("g_albedo2", texture2);
 		material->Set("g_albedo1", texture1);

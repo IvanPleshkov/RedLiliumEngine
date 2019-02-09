@@ -1,16 +1,9 @@
 #pragma once
 
-#include <Core/Common.h>
-#include <Scene/Scene.h>
-#include <Scene/Entity.h>
-#include <Render/RenderDevice.h>
+#include "PipelineCommon.h"
 
 namespace RED_LILIUM_NAMESPACE
 {
-
-class RenderPass;
-class CameraComponent;
-class MeshRenderer;
 
 class RenderPipeline : public RedLiliumObject
 {
@@ -31,19 +24,15 @@ private:
 	void FindCameraComponents();
 	void FindRenderables();
 
-	struct PerRenderData
-	{
-		std::vector<ptr<const Entity>> m_rootEntities;
-		std::vector<ptr<const CameraComponent>> m_cameraComponents;
-		std::vector<ptr<const MeshRenderer>> m_meshRenderers;
-
-		void Clear();
-	};
-	PerRenderData m_perRenderData;
-
 	ptr<RenderDevice> m_renderDevice;
 	std::vector<uptr<RenderPass>> m_passes;
 	std::unordered_map<ptr<RenderPass>, std::vector<ptr<RenderPass>>> m_passRelations;
+
+// per render data
+private:
+	std::vector<ptr<const Entity>> m_rootEntities;
+	std::vector<ptr<const CameraComponent>> m_cameraComponents;
+	std::vector<RenderComponentsPair> m_meshRenderers;
 };
 
 template<class T>

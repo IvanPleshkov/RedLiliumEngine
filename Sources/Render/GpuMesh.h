@@ -29,18 +29,9 @@ private:
 	uptr<VertexBuffer> m_normals;
 	uptr<VertexBuffer> m_tangents;
 	uptr<VertexBuffer> m_bitangents;
-	uptr<VertexBuffer> m_colors0;
-	uptr<VertexBuffer> m_colors1;
-	uptr<VertexBuffer> m_colors2;
-	uptr<VertexBuffer> m_colors3;
-	uptr<VertexBuffer> m_texCoords0;
-	uptr<VertexBuffer> m_texCoords1;
-	uptr<VertexBuffer> m_texCoords2;
-	uptr<VertexBuffer> m_texCoords3;
-	uptr<VertexBuffer> m_texCoords4;
-	uptr<VertexBuffer> m_texCoords5;
-	uptr<VertexBuffer> m_texCoords6;
-	uptr<VertexBuffer> m_texCoords7;
+	
+	std::array<uptr<VertexBuffer>, Mesh::COLORS_COUNT> m_colors;
+	std::array<uptr<VertexBuffer>, Mesh::TEXCOORDS_COUNT> m_texCoords;
 };
 
 } // namespace RED_LILIUM_NAMESPACE

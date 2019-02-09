@@ -11,6 +11,7 @@
 #include <Scene/Entity.h>
 #include <Scene/Component.h>
 #include <Pipeline/RenderPipeline.h>
+#include <Pipeline/AssimpLoader.h>
 
 #include "Commands.h"
 #include <SDL/SDL.h>
@@ -28,7 +29,8 @@ namespace RenderPipelineDemoNamespace
 
 	uptr<Scene> CreateDemoScene()
 	{
-		return nullptr;
+		uptr<Scene> scene = umake<Scene>();
+		return std::move(scene);
 	}
 
 	int SDLCALL watch(void *userdata, SDL_Event* event) {
@@ -50,7 +52,7 @@ namespace RenderPipelineDemoNamespace
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 5);
 
-		window = SDL_CreateWindow("title", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 512, 512, SDL_WINDOW_OPENGL);
+		window = SDL_CreateWindow("title", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 800, SDL_WINDOW_OPENGL);
 		gl_context = SDL_GL_CreateContext(window);
 		auto err = glewInit();
 		if (err != GLEW_OK)
@@ -61,19 +63,16 @@ namespace RenderPipelineDemoNamespace
 
 		SDL_AddEventWatch(watch, NULL);
 
-		uptr<RenderDevice> renderDevice = umake<RenderDevice>(settings);
 		uptr<FileSystem> fileSystem = umake<FileSystem>(settings);
-		uptr<MaterialManager> materialManager = umake<MaterialManager>(renderDevice.get(), fileSystem.get());
-		uptr<GpuTextureManager> gpuTextureManager = umake<GpuTextureManager>(renderDevice.get(), fileSystem.get());
-		renderDevice->Init(materialManager.get(), gpuTextureManager.get());
+		uptr<RenderDevice> renderDevice = umake<RenderDevice>(settings, fileSystem.get());
 
-		uptr<Scene> scene = CreateDemoScene();
+		uptr<Scene> scene = umake<Scene>();
+		LoadSceneByAssimp(renderDevice.get(), "Models\\torus.dae", scene->GetRoot());
 		uptr<RenderPipeline> pipeline = RenderPipeline::CreateSimpleOpaquePipeline(renderDevice.get());
 
 		quitting = false;
 		while (!quitting)
 		{
-
 			SDL_Event event;
 			while (SDL_PollEvent(&event)) {
 				if (event.type == SDL_QUIT) {
@@ -83,7 +82,7 @@ namespace RenderPipelineDemoNamespace
 
 			SDL_GL_MakeCurrent(window, gl_context);
 
-			glViewport(0, 0, 512, 512);
+			glViewport(0, 0, 800, 800);
 			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

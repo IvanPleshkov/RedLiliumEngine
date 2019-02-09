@@ -20,6 +20,9 @@ public:
 	void Serialize(ptr<Serializator> serializator) const override;
 	void Deserialize(ptr<const Serializator> serializator) override;
 		
+	ptr<Entity> GetEntity() { return m_parent; }
+	ptr<const Entity> GetEntity() const { return m_parent; }
+
 private:
 	ptr<Entity> m_parent;
 };

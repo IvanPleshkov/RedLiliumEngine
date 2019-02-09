@@ -8,17 +8,23 @@ using namespace RED_LILIUM_NAMESPACE;
 Entity::Entity()
 	: m_parent(nullptr)
 	, m_scene(nullptr)
+	, m_localTransform(1.0f)
+	, m_worldTransform(1.0f)
 {}
 
 Entity::Entity(ptr<Entity> parent)
 	: m_parent(parent)
 	, m_scene(parent->GetScene())
+	, m_localTransform(1.0f)
+	, m_worldTransform(1.0f)
 {
 }
 
 Entity::Entity(ptr<Scene> scene)
 	: m_parent(nullptr)
 	, m_scene(scene)
+	, m_localTransform(1.0f)
+	, m_worldTransform(1.0f)
 {
 }
 
@@ -159,4 +165,41 @@ void Entity::IterateComponentsWithChildren(std::function<void(ptr<const Componen
 		ptr<const Entity> enity = child.get();
 		enity->IterateComponentsWithChildren(func);
 	}
+}
+
+const mat4& Entity::GetLocalTransform() const
+{
+	return m_localTransform;
+}
+
+void Entity::SetLocalTransform(const mat4& transform)
+{
+	RED_LILIUM_GUARD();
+
+	m_localTransform = transform;
+	if (m_parent == nullptr)
+	{
+		m_worldTransform = m_localTransform;
+	}
+	else
+	{
+		m_worldTransform = m_parent->m_worldTransform * m_localTransform;
+	}
+
+	for (auto& child : m_children)
+	{
+		child->SetLocalTransform(child->m_localTransform);
+	}
+}
+
+const mat4& Entity::GetWorldTransform() const
+{
+	return m_worldTransform;
+}
+
+void Entity::SetWorldTransform(const mat4& transform)
+{
+	RED_LILIUM_GUARD();
+
+	RED_LILIUM_NOT_IMPLEMENTED();
 }

@@ -4,19 +4,18 @@
 #include "StandardPasses/OpaquePass.h"
 #include "Components/CameraComponent.h"
 #include "Components/MeshRenderer.h"
+#include "Components/MeshFilter.h"
 
 using namespace RED_LILIUM_NAMESPACE;
 
 RenderPipeline::RenderPipeline(ptr<RenderDevice> renderDevice)
 	: RedLiliumObject()
 	, m_renderDevice(renderDevice)
-	, m_perRenderData()
 {}
 
 bool RenderPipeline::Render(const std::vector<ptr<const Entity>>& roots)
 {
-	m_perRenderData.Clear();
-	m_perRenderData.m_rootEntities = roots;
+	m_rootEntities = roots;
 	FindCameraComponents();
 	FindRenderables();
 
@@ -31,14 +30,15 @@ bool RenderPipeline::Render(const std::vector<ptr<const Entity>>& roots)
 
 void RenderPipeline::FindCameraComponents()
 {
-	for (auto rootEntity : m_perRenderData.m_rootEntities)
+	m_cameraComponents.clear();
+	for (auto rootEntity : m_rootEntities)
 	{
 		rootEntity->IterateComponentsWithChildren([this](ptr<const Component> component)
 		{
 			auto cameraComponent = Cast<const CameraComponent>(component);
 			if (cameraComponent)
 			{
-				m_perRenderData.m_cameraComponents.push_back(cameraComponent);
+				m_cameraComponents.push_back(cameraComponent);
 			}
 		});
 	}
@@ -46,14 +46,16 @@ void RenderPipeline::FindCameraComponents()
 
 void RenderPipeline::FindRenderables()
 {
-	for (auto rootEntity : m_perRenderData.m_rootEntities)
+	m_meshRenderers.clear();
+	for (auto rootEntity : m_rootEntities)
 	{
 		rootEntity->IterateComponentsWithChildren([this](ptr<const Component> component)
 		{
-			auto meshRendererComponent = Cast<const MeshRenderer>(component);
-			if (meshRendererComponent)
+			ptr<const MeshRenderer> meshRendererComponent = Cast<const MeshRenderer>(component);
+			ptr<const MeshFilter> meshFilter = component->GetEntity()->GetComponent<MeshFilter>();
+			if (meshRendererComponent && meshFilter)
 			{
-				m_perRenderData.m_meshRenderers.push_back(meshRendererComponent);
+				m_meshRenderers.push_back({ meshFilter, meshRendererComponent });
 			}
 		});
 	}
@@ -69,11 +71,4 @@ uptr<RenderPipeline> RenderPipeline::CreateSimpleOpaquePipeline(ptr<RenderDevice
 void RenderPipeline::SetPassesRelation(ptr<RenderPass> pass, ptr<RenderPass> requiredPass)
 {
 	RED_LILIUM_NOT_IMPLEMENTED();
-}
-
-void RenderPipeline::PerRenderData::Clear()
-{
-	m_rootEntities.clear();
-	m_cameraComponents.clear();
-	m_meshRenderers.clear();
 }

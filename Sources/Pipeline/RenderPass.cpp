@@ -9,12 +9,17 @@ RenderPass::RenderPass(ptr<RenderPipeline> pipeline)
 	, m_pipeline(pipeline)
 {}
 
-const std::vector<ptr<const CameraComponent>>& RenderPass::GetCameraComponents() const
+ptr<RenderDevice> RenderPass::GetRenderDevice()
 {
-	return m_pipeline->m_perRenderData.m_cameraComponents;
+	return m_pipeline->m_renderDevice;
 }
 
-const std::vector<ptr<const MeshRenderer>>& RenderPass::GetMeshRenderers() const
+const std::vector<ptr<const CameraComponent>>& RenderPass::GetCameraComponents() const
 {
-	return m_pipeline->m_perRenderData.m_meshRenderers;
+	return m_pipeline->m_cameraComponents;
+}
+
+const std::vector<RenderComponentsPair>& RenderPass::GetMeshRenderers() const
+{
+	return m_pipeline->m_meshRenderers;
 }

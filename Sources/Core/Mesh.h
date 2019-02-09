@@ -10,6 +10,9 @@ class Mesh : public RedLiliumObject
 public:
 	~Mesh() override = default;
 
+	static const u32 TEXCOORDS_COUNT = 8;
+	static const u32 COLORS_COUNT = 4;
+
 	static uptr<Mesh> GenerateCube();
 	static uptr<Mesh> GenerateTriangle();
 	static uptr<Mesh> GenerateRectangle();
@@ -19,18 +22,9 @@ public:
 	std::vector<vec3> m_normals;
 	std::vector<vec3> m_tangents;
 	std::vector<vec3> m_bitangents;
-	std::vector<vec4> m_colors0;
-	std::vector<vec4> m_colors1;
-	std::vector<vec4> m_colors2;
-	std::vector<vec4> m_colors3;
-	std::vector<vec2> m_texCoords0;
-	std::vector<vec2> m_texCoords1;
-	std::vector<vec2> m_texCoords2;
-	std::vector<vec2> m_texCoords3;
-	std::vector<vec2> m_texCoords4;
-	std::vector<vec2> m_texCoords5;
-	std::vector<vec2> m_texCoords6;
-	std::vector<vec2> m_texCoords7;
+
+	std::array<std::vector<vec4>, COLORS_COUNT> m_colors;
+	std::array<std::vector<vec2>, TEXCOORDS_COUNT> m_texCoords;
 };
 
 } // namespace RED_LILIUM_NAMESPACE

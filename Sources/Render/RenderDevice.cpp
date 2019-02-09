@@ -2,6 +2,8 @@
 #include "RenderDevice.h"
 #include "VertexDeclaration.h"
 #include "RenderContext.h"
+#include "GpuTextureManager.h"
+#include "MaterialManager.h"
 #include "Uniform.h"
 
 using namespace RED_LILIUM_NAMESPACE;
@@ -80,9 +82,10 @@ static void APIENTRY glDebugCallback(GLenum source, GLenum type, GLuint id, GLen
 }
 }
 
-RenderDevice::RenderDevice(ptr<ApplicationSettings> applicationSettings)
+RenderDevice::RenderDevice(ptr<ApplicationSettings> applicationSettings, ptr<FileSystem> fileSystem)
 	: RedLiliumObject()
 	, m_applicationSettings(applicationSettings)
+	, m_fileSystem(fileSystem)
 {
 #ifdef RED_LILIUM_RENDER_DEBUG
 	glEnable(GL_DEBUG_OUTPUT);
@@ -91,16 +94,13 @@ RenderDevice::RenderDevice(ptr<ApplicationSettings> applicationSettings)
 #endif
 
 	glEnable(GL_MULTISAMPLE);
+
+	m_materialManager = umake<MaterialManager>(this, fileSystem);
+	m_gpuTextureManager = umake<GpuTextureManager>(this, fileSystem);
 }
 
 RenderDevice::~RenderDevice()
 {
-}
-
-void RenderDevice::Init(ptr<MaterialManager> materialManager, ptr<GpuTextureManager> gpuTextureManager)
-{
-	m_materialManager = materialManager;
-	m_gpuTextureManager = gpuTextureManager;
 }
 
 uptr<RenderContext> RenderDevice::CreateRenderContext()
@@ -113,14 +113,19 @@ ptr<ApplicationSettings> RenderDevice::GetApplicationSettings()
 	return m_applicationSettings;
 }
 
+ptr<FileSystem> RenderDevice::GetFileSystem()
+{
+	return m_fileSystem;
+}
+
 ptr<MaterialManager> RenderDevice::GetMaterialManager()
 {
-	return m_materialManager;
+	return m_materialManager.get();
 }
 
 ptr<GpuTextureManager> RenderDevice::GetGpuTextureManager()
 {
-	return m_gpuTextureManager;
+	return m_gpuTextureManager.get();
 }
 
 ptr<VertexDeclaration> RenderDevice::GetVertexDeclaration(const std::vector<VertexInput>& attributes)

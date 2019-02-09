@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Core/Common.h>
+#include "../PipelineCommon.h"
 #include "../RenderPass.h"
 
 namespace RED_LILIUM_NAMESPACE
@@ -15,7 +15,7 @@ public:
 	bool Render() override;
 
 private:
-	void RenderCamera(ptr<const CameraComponent> camera);
+	void RenderCamera(ptr<RenderContext> renderContext, ptr<const CameraComponent> camera);
 };
 
 } // namespace RED_LILIUM_NAMESPACE

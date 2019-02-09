@@ -20,13 +20,13 @@ uptr<Mesh> Mesh::GenerateTriangle()
 	mesh->m_positions.push_back({ 0.5f, -0.5f, 0.0f });
 	mesh->m_positions.push_back({ 0.0f,  0.5f, 0.0f });
 
-	mesh->m_colors0.push_back({ 1.0f, 0.0f, 0.0f, 1.0f });
-	mesh->m_colors0.push_back({ 0.0f, 1.0f, 0.0f, 1.0f });
-	mesh->m_colors0.push_back({ 0.0f, 0.0f, 1.0f, 1.0f });
+	mesh->m_colors[0].push_back({ 1.0f, 0.0f, 0.0f, 1.0f });
+	mesh->m_colors[0].push_back({ 0.0f, 1.0f, 0.0f, 1.0f });
+	mesh->m_colors[0].push_back({ 0.0f, 0.0f, 1.0f, 1.0f });
 
-	mesh->m_texCoords0.push_back({ -1.0f, -1.0f });
-	mesh->m_texCoords0.push_back({ 1.0f, -1.0f });
-	mesh->m_texCoords0.push_back({ 0.0f,  1.0f });
+	mesh->m_texCoords[0].push_back({ -1.0f, -1.0f });
+	mesh->m_texCoords[0].push_back({ 1.0f, -1.0f });
+	mesh->m_texCoords[0].push_back({ 0.0f,  1.0f });
 
 	return std::move(mesh);
 }
@@ -47,15 +47,15 @@ uptr<Mesh> Mesh::GenerateRectangle()
 	mesh->m_positions.push_back({-1.0f, -1.0f, 0.0f});
 	mesh->m_positions.push_back({-1.0f,  1.0f, 0.0f });
 
-	mesh->m_colors0.push_back({ 1.0f, 1.0f, 1.0f, 1.0f });
-	mesh->m_colors0.push_back({ 1.0f, 1.0f, 1.0f, 1.0f });
-	mesh->m_colors0.push_back({ 1.0f, 1.0f, 1.0f, 1.0f });
-	mesh->m_colors0.push_back({ 1.0f, 1.0f, 1.0f, 1.0f });
+	mesh->m_colors[0].push_back({ 1.0f, 1.0f, 1.0f, 1.0f });
+	mesh->m_colors[0].push_back({ 1.0f, 1.0f, 1.0f, 1.0f });
+	mesh->m_colors[0].push_back({ 1.0f, 1.0f, 1.0f, 1.0f });
+	mesh->m_colors[0].push_back({ 1.0f, 1.0f, 1.0f, 1.0f });
 
-	mesh->m_texCoords0.push_back({ 1.0f, 1.0f });
-	mesh->m_texCoords0.push_back({ 1.0f, 0.0f });
-	mesh->m_texCoords0.push_back({ 0.0f, 0.0f });
-	mesh->m_texCoords0.push_back({ 0.0f, 1.0f });
+	mesh->m_texCoords[0].push_back({ 1.0f, 1.0f });
+	mesh->m_texCoords[0].push_back({ 1.0f, 0.0f });
+	mesh->m_texCoords[0].push_back({ 0.0f, 0.0f });
+	mesh->m_texCoords[0].push_back({ 0.0f, 1.0f });
 
 	return std::move(mesh);
 }

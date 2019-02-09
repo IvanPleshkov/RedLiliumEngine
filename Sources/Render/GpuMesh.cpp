@@ -33,19 +33,17 @@ GpuMesh::GpuMesh(ptr<RenderDevice> renderDevice, GpuBufferUsage usage)
 	, m_normals(nullptr)
 	, m_tangents(nullptr)
 	, m_bitangents(nullptr)
-	, m_colors0(nullptr)
-	, m_colors1(nullptr)
-	, m_colors2(nullptr)
-	, m_colors3(nullptr)
-	, m_texCoords0(nullptr)
-	, m_texCoords1(nullptr)
-	, m_texCoords2(nullptr)
-	, m_texCoords3(nullptr)
-	, m_texCoords4(nullptr)
-	, m_texCoords5(nullptr)
-	, m_texCoords6(nullptr)
-	, m_texCoords7(nullptr)
-{}
+{
+	for (auto& color : m_colors)
+	{
+		color = nullptr;
+	}
+
+	for (auto& texCoord : m_texCoords)
+	{
+		texCoord = nullptr;
+	}
+}
 
 GpuMesh::~GpuMesh()
 {}
@@ -65,18 +63,16 @@ void GpuMesh::Update(ptr<const Mesh> mesh)
 	InitVertexBuffer(m_normals, mesh->m_normals, m_renderDevice, m_usage);
 	InitVertexBuffer(m_tangents, mesh->m_tangents, m_renderDevice, m_usage);
 	InitVertexBuffer(m_bitangents, mesh->m_bitangents, m_renderDevice, m_usage);
-	InitVertexBuffer(m_colors0, mesh->m_colors0, m_renderDevice, m_usage);
-	InitVertexBuffer(m_colors1, mesh->m_colors1, m_renderDevice, m_usage);
-	InitVertexBuffer(m_colors2, mesh->m_colors2, m_renderDevice, m_usage);
-	InitVertexBuffer(m_colors3, mesh->m_colors3, m_renderDevice, m_usage);
-	InitVertexBuffer(m_texCoords0, mesh->m_texCoords0, m_renderDevice, m_usage);
-	InitVertexBuffer(m_texCoords1, mesh->m_texCoords1, m_renderDevice, m_usage);
-	InitVertexBuffer(m_texCoords2, mesh->m_texCoords2, m_renderDevice, m_usage);
-	InitVertexBuffer(m_texCoords3, mesh->m_texCoords3, m_renderDevice, m_usage);
-	InitVertexBuffer(m_texCoords4, mesh->m_texCoords4, m_renderDevice, m_usage);
-	InitVertexBuffer(m_texCoords5, mesh->m_texCoords5, m_renderDevice, m_usage);
-	InitVertexBuffer(m_texCoords6, mesh->m_texCoords6, m_renderDevice, m_usage);
-	InitVertexBuffer(m_texCoords7, mesh->m_texCoords7, m_renderDevice, m_usage);
+
+	for (u32 i = 0; i < Mesh::COLORS_COUNT; i++)
+	{
+		InitVertexBuffer(m_colors[i], mesh->m_colors[i], m_renderDevice, m_usage);
+	}
+
+	for (u32 i = 0; i < Mesh::TEXCOORDS_COUNT; i++)
+	{
+		InitVertexBuffer(m_texCoords[i], mesh->m_texCoords[i], m_renderDevice, m_usage);
+	}
 }
 
 u32 GpuMesh::GetIndicesSize() const
@@ -133,51 +129,51 @@ void GpuMesh::InitVertexArrayObject(ptr<VertexArrayObject> va, ptr<VertexDeclara
 			glVertexAttribPointer(e.layout, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), NULL);
 			break;
 		case VertexAttribute::Color0:
-			m_colors0->Bind();
+			m_colors[0]->Bind();
 			glVertexAttribPointer(e.layout, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), NULL);
 			break;
 		case VertexAttribute::Color1:
-			m_colors1->Bind();
+			m_colors[1]->Bind();
 			glVertexAttribPointer(e.layout, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), NULL);
 			break;
 		case VertexAttribute::Color2:
-			m_colors2->Bind();
+			m_colors[2]->Bind();
 			glVertexAttribPointer(e.layout, 4, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL);
 			break;
 		case VertexAttribute::Color3:
-			m_colors3->Bind();
+			m_colors[3]->Bind();
 			glVertexAttribPointer(e.layout, 4, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL);
 			break;
 		case VertexAttribute::TexCoord0:
-			m_texCoords0->Bind();
+			m_texCoords[0]->Bind();
 			glVertexAttribPointer(e.layout, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL);
 			break;
 		case VertexAttribute::TexCoord1:
-			m_texCoords1->Bind();
+			m_texCoords[1]->Bind();
 			glVertexAttribPointer(e.layout, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL);
 			break;
 		case VertexAttribute::TexCoord2:
-			m_texCoords2->Bind();
+			m_texCoords[2]->Bind();
 			glVertexAttribPointer(e.layout, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL);
 			break;
 		case VertexAttribute::TexCoord3:
-			m_texCoords3->Bind();
+			m_texCoords[3]->Bind();
 			glVertexAttribPointer(e.layout, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL);
 			break;
 		case VertexAttribute::TexCoord4:
-			m_texCoords4->Bind();
+			m_texCoords[4]->Bind();
 			glVertexAttribPointer(e.layout, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL);
 			break;
 		case VertexAttribute::TexCoord5:
-			m_texCoords5->Bind();
+			m_texCoords[5]->Bind();
 			glVertexAttribPointer(e.layout, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL);
 			break;
 		case VertexAttribute::TexCoord6:
-			m_texCoords6->Bind();
+			m_texCoords[6]->Bind();
 			glVertexAttribPointer(e.layout, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL);
 			break;
 		case VertexAttribute::TexCoord7:
-			m_texCoords7->Bind();
+			m_texCoords[7]->Bind();
 			glVertexAttribPointer(e.layout, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL);
 			break;
 		}

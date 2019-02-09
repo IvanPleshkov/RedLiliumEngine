@@ -38,6 +38,11 @@ public:
 	template<class T> ptr<const T> GetComponent(u64 index = 0) const;
 	template<class T> ptr<T> AddComponent(u64 position = u64_max);
 
+	const mat4& GetLocalTransform() const;
+	void SetLocalTransform(const mat4& transform);
+	const mat4& GetWorldTransform() const;
+	void SetWorldTransform(const mat4& transform);
+
 	void IterateComponentsWithChildren(std::function<void(ptr<Component>)> func);
 	void IterateComponentsWithChildren(std::function<void(ptr<const Component>)> func) const;
 
@@ -46,7 +51,8 @@ private:
 	ptr<Entity> m_parent;
 	std::vector<uptr<Entity>> m_children;
 	std::vector<uptr<Component>> m_components;
-	mat4 m_transform;
+	mat4 m_localTransform;
+	mat4 m_worldTransform;
 	std::string m_name;
 };
 
@@ -95,7 +101,7 @@ inline ptr<const T> Entity::GetComponent(u64 index) const
 template<class T>
 inline ptr<T> Entity::AddComponent(u64 position)
 {
-	uptr<T> component = umake<T>();
+	uptr<T> component = umake<T>(this);
 	ptr<T> result = component.get();
 	if (position == u64_max)
 	{
