@@ -21,6 +21,10 @@ bool OpaquePass::Render()
 	uptr<RenderContext> renderContext = GetRenderDevice()->CreateRenderContext();
 	renderContext->SetRenderTarget(m_pipeline->GetRenderTarget());
 
+	glViewport(0, 0, static_cast<GLsizei>(m_pipeline->GetTargetSize().x), static_cast<GLsizei>(m_pipeline->GetTargetSize().y));
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	for (auto& camera : GetCameraComponents())
 	{
 		Camera cam = camera->GetCamera();

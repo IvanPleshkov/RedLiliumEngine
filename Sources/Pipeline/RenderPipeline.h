@@ -19,6 +19,7 @@ public:
 	void SetPassesRelation(ptr<RenderPass> pass, ptr<RenderPass> requiredPass);
 
 	const sptr<RenderTarget>& GetRenderTarget() const { return m_renderTarget; }
+	const vec2& GetTargetSize() const { return m_targetSize; }
 
 	static uptr<RenderPipeline> CreateSimpleOpaquePipeline(ptr<RenderDevice> renderDevice);
 
@@ -30,14 +31,14 @@ private:
 	ptr<RenderDevice> m_renderDevice;
 	std::vector<uptr<RenderPass>> m_passes;
 	std::unordered_map<ptr<RenderPass>, std::vector<ptr<RenderPass>>> m_passRelations;
+	vec2 m_targetSize;
+	sptr<RenderTarget> m_renderTarget;
 
 // per render data
 private:
 	std::vector<ptr<const Entity>> m_rootEntities;
 	std::vector<ptr<const CameraComponent>> m_cameraComponents;
 	std::vector<RenderComponentsPair> m_meshRenderers;
-	vec2 m_targetSize;
-	sptr<RenderTarget> m_renderTarget;
 };
 
 template<class T>
