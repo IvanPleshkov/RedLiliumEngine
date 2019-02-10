@@ -3,8 +3,13 @@
 #include "Commands.h"
 #include <imgui/application.h>
 #include <Render/RenderDevice.h>
+#include <Render/RenderTarget.h>
 #include <Render/GpuTexture.h>
 #include <Render/GpuTextureManager.h>
+#include <Pipeline/RenderPipeline.h>
+#include <Pipeline/AssimpLoader.h>
+#include <Pipeline/Components/CameraComponent.h>
+#include <Pipeline/Components/CameraControllerComponent.h>
 
 REGISTER_COMMAND("LoadSceneDemo", LoadSceneDemo)
 
@@ -19,25 +24,34 @@ public:
 	void Init() override
 	{
 		TextureSettings loadSettings;
+		loadSettings.format = TextureFormat::RGB8;
 		m_texture = GetRenderDevice()->GetGpuTextureManager()->Get("Textures\\wood.png", loadSettings);
+		m_texture2 = GetRenderDevice()->GetGpuTextureManager()->Get("Textures\\alphatest.png", loadSettings);
+
+		m_pipeline = RenderPipeline::CreateSimpleOpaquePipeline(GetRenderDevice());
+		m_pipeline->SetTargetSize({ 512, 512 });
+
+		CreateDemoScene();
 	}
 
 	void Tick(f32 dTime) override
 	{
+		m_pipeline->Render({ m_scene->GetRoot() });
+
 		ptr<ImDrawList> imguiDrawList = ImGui::GetWindowDrawList();
 		auto canvasPos = ImGui::GetCursorScreenPos();
 
+		GLuint id = m_pipeline->GetRenderTarget()->GetColor()->GetNative();
+
 		imguiDrawList->AddRect(
 			ImVec2(canvasPos.x + 100, canvasPos.y + 100),
-			ImVec2(canvasPos.x + 200, canvasPos.y + 200),
+			ImVec2(canvasPos.x + 612, canvasPos.y + 612),
 			IM_COL32(100, 0, 0, 255));
 
 		imguiDrawList->AddImage(
-			(void*)(intptr_t)m_texture->GetNative(),
+			(void*)(intptr_t)id,
 			ImVec2(canvasPos.x + 100, canvasPos.y + 100),
-			ImVec2(canvasPos.x + 200, canvasPos.y + 200));
-
-		ImGui::Image((void*)(intptr_t)m_texture->GetNative(), ImVec2(512, 512));
+			ImVec2(canvasPos.x + 612, canvasPos.y + 612));
 	}
 
 	void PollEvent(ptr<SDL_Event> event) override
@@ -56,7 +70,30 @@ public:
 	}
 
 private:
+	void CreateDemoScene()
+	{
+		m_scene = umake<Scene>();
+		LoadSceneByAssimp(GetRenderDevice(), "Models\\torus.dae", m_scene->GetRoot()->AddChild("Loaded Scene"));
+
+		Camera camera;
+		camera.LookAt({ 5.0f, 3.0f, 5.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
+		camera.SetPerspective(45.0f, 1.0f, 0.1f, 100.0f);
+
+		mat4 camView = camera.GetView();
+		camera.SetView(mat4(1.0f));
+
+		ptr<Entity> cameraEntity = m_scene->GetRoot()->AddChild("Camera");
+		ptr<CameraComponent> cameraComponent = cameraEntity->AddComponent<CameraComponent>();
+		cameraComponent->SetCamera(camera);
+		cameraEntity->AddComponent<CameraControllerComponent>();
+
+		cameraEntity->SetLocalTransform(camView);
+	}
+
+	uptr<Scene> m_scene;
+	uptr<RenderPipeline> m_pipeline;
 	sptr<GpuTexture> m_texture;
+	sptr<GpuTexture> m_texture2;
 };
 
 }
