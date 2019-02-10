@@ -11,13 +11,16 @@ public:
 	RenderPipeline(ptr<RenderDevice> renderDevice);
 	~RenderPipeline() override = default;
 
+	void SetTargetSize(vec2 targetSize);
 	bool Render(const std::vector<ptr<const Entity>>& roots);
-
-	static uptr<RenderPipeline> CreateSimpleOpaquePipeline(ptr<RenderDevice> renderDevice);
 
 	template<class T>
 	ptr<T> AddPass();
 	void SetPassesRelation(ptr<RenderPass> pass, ptr<RenderPass> requiredPass);
+
+	const sptr<RenderTarget>& GetRenderTarget() const { return m_renderTarget; }
+
+	static uptr<RenderPipeline> CreateSimpleOpaquePipeline(ptr<RenderDevice> renderDevice);
 
 	friend class RenderPass;
 private:
@@ -33,6 +36,8 @@ private:
 	std::vector<ptr<const Entity>> m_rootEntities;
 	std::vector<ptr<const CameraComponent>> m_cameraComponents;
 	std::vector<RenderComponentsPair> m_meshRenderers;
+	vec2 m_targetSize;
+	sptr<RenderTarget> m_renderTarget;
 };
 
 template<class T>

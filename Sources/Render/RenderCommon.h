@@ -24,6 +24,7 @@ namespace RED_LILIUM_NAMESPACE
 	class MaterialManager;
 	class GpuTextureManager;
 	class UniformBlock;
+	class RenderTarget;
 
 	enum class VertexAttribute : u8
 	{
@@ -55,5 +56,15 @@ namespace RED_LILIUM_NAMESPACE
 		Vertex = 1 << 0,
 		Fragment = 1 << 1,
 	};
+
+	enum class RenderTargetComponent : u8
+	{
+		Color24 = 1 << 0,
+		Depth24 = 1 << 1,
+		Depth32 = 1 << 2,
+		Stencil8 = 1 << 3,
+		NeedSampleDepth = 1 << 4,
+	};
+	using RenderTargetFlags = Flags<RenderTargetComponent>;
 
 } // namespace RED_LILIUM_NAMESPACE

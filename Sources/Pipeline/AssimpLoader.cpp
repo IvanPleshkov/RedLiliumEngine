@@ -189,10 +189,7 @@ void processNode(aiNode *node, const aiScene *scene, ptr<Entity> resultEntity, p
 	ptr<Entity> entity = resultEntity->AddChild(node->mName.C_Str());
 	mat4 localTransform = ConvertMatrix(node->mTransformation);
 
-	if (entity->GetName() != "Scene")
-	{
-		entity->SetLocalTransform(localTransform);
-	}
+	entity->SetLocalTransform(localTransform);
 
 	for (u32 i = 0; i < node->mNumMeshes; i++)
 	{
@@ -207,22 +204,22 @@ void processNode(aiNode *node, const aiScene *scene, ptr<Entity> resultEntity, p
 		renderer->SetMaterial(material);
 	}
 
-	for (u32 i = 0; i < loadedData->m_cameras.size(); i++)
+	if (loadedData->m_importOptions.loadCameras)
 	{
-		if (loadedData->m_cameras[i].second == entity->GetName())
+		for (u32 i = 0; i < loadedData->m_cameras.size(); i++)
 		{
-			continue;
+			if (loadedData->m_cameras[i].second == entity->GetName())
+			{
+				continue;
+			}
+
+			Camera camera;
+			camera.LookAt({ 5.0f, 5.0f, 5.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
+			camera.SetPerspective(45.0f, 1.0f, 0.1f, 100.0f);
+
+			ptr<CameraComponent> cameraComponent = entity->AddComponent<CameraComponent>();
+			cameraComponent->SetCamera(camera);
 		}
-
-		Camera camera;
-		camera.LookAt({ 5.0f, 5.0f, 5.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
-		camera.SetPerspective(45.0f, 1.0f, 0.1f, 100.0f);
-
-		ptr<CameraComponent> filter = entity->AddComponent<CameraComponent>();
-		filter->SetCamera(camera);
-
-		// ptr<CameraComponent> filter = entity->AddComponent<CameraComponent>();
-		// filter->SetCamera(loadedData->m_cameras[i].first);
 	}
 
 	for (u32 i = 0; i < node->mNumChildren; i++)

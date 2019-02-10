@@ -137,6 +137,7 @@ ptr<Entity> Entity::AddChild(const std::string& name, u64 position)
 		RED_LILIUM_ASSERT(position <= m_children.size());
 		m_children.insert(m_children.begin() + position, std::move(entity));
 	}
+	result->SetLocalTransform(mat4(1.0f));
 	return result;
 }
 

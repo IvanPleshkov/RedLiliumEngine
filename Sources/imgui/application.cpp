@@ -33,24 +33,21 @@ i32 ImguiApplication::Start(ptr<ApplicationSettings> applicationSettings)
 		return -1;
 	}
 
-	m_applicationSettings = applicationSettings;
-	Init();
-
 	// Decide GL+GLSL versions
 #if __APPLE__
 	// GL 3.2 Core + GLSL 150
-	const char* glsl_version = "#version 150";
+	const char* glsl_version = "#version 450";
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG); // Always required on Mac
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 5);
 #else
 	// GL 3.0 + GLSL 130
-	const char* glsl_version = "#version 130";
+	const char* glsl_version = "#version 450";
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 5);
 #endif
 
 	// Create window with graphics context
@@ -125,6 +122,11 @@ i32 ImguiApplication::Start(ptr<ApplicationSettings> applicationSettings)
 	RED_LILIUM_ASSERT(font != nullptr);
 
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+	m_fileSystem = umake<FileSystem>(applicationSettings);
+	m_renderDevice = umake<RenderDevice>(applicationSettings, m_fileSystem.get());
+	m_applicationSettings = applicationSettings;
+	Init();
 
 	// Main loop
 	m_isRunning = true;
@@ -266,6 +268,16 @@ ptr<SDL_Window> ImguiApplication::GetMainWindow()
 ptr<const ApplicationSettings> ImguiApplication::GetApplicationSettings() const
 {
 	return m_applicationSettings;
+}
+
+ptr<RenderDevice> ImguiApplication::GetRenderDevice()
+{
+	return m_renderDevice.get();
+}
+
+ptr<FileSystem> ImguiApplication::GetFileSystem()
+{
+	return m_fileSystem.get();
 }
 
 void ImguiDemoApplication::Init()

@@ -506,6 +506,12 @@ namespace
 		case TextureFormat::RGBA32UI:
 			return std::move(ConvertOpencvMat(src, GL_BGRA, GL_UNSIGNED_INT));
 
+		case TextureFormat::D24S8:
+			RED_LILIUM_NOT_IMPLEMENTED();
+
+		case TextureFormat::D32:
+			RED_LILIUM_NOT_IMPLEMENTED();
+
 		default:
 			RED_LILIUM_NOT_IMPLEMENTED();
 		}
@@ -649,6 +655,63 @@ bool GpuTexture::SendData(const cv::Mat& mat)
 	return true;
 }
 
+bool GpuTexture::Create(u32 width, u32 height, u32 depth)
+{
+	Bind();
+
+	switch (m_settings.type)
+	{
+	case TextureType::Texture1D:
+		glTexImage1D(
+			GL_TEXTURE_1D,
+			0,
+			GetGlType(m_settings.format),
+			static_cast<GLsizei>(width),
+			0,
+			GL_RGB,
+			GL_UNSIGNED_BYTE,
+			NULL);
+		break;
+	case TextureType::Texture2D:
+		glTexImage2D(
+			GL_TEXTURE_2D,
+			0,
+			GetGlType(m_settings.format),
+			static_cast<GLsizei>(width),
+			static_cast<GLsizei>(height),
+			0,
+			GL_RGB,
+			GL_UNSIGNED_BYTE,
+			NULL);
+		break;
+	case TextureType::Texture3D:
+		glTexImage3D(
+			GL_TEXTURE_3D,
+			0,
+			GetGlType(m_settings.format),
+			static_cast<GLsizei>(width),
+			static_cast<GLsizei>(height),
+			static_cast<GLsizei>(depth),
+			0,
+			GL_RGB,
+			GL_UNSIGNED_BYTE,
+			NULL);
+		break;
+	default:
+		RED_LILIUM_ASSERT(false && "Wrong texture type");
+		Unbind();
+		return false;
+	}
+
+	if (m_settings.needMips)
+	{
+		glGenerateMipmap(m_glDimensions);
+	}
+
+	Unbind();
+	return true;
+}
+
 GLint GpuTexture::GetGlType(TextureFormat textureFormat)
 {
 	switch (textureFormat)
@@ -775,6 +838,11 @@ GLint GpuTexture::GetGlType(TextureFormat textureFormat)
 		return GL_RGBA32I;
 	case TextureFormat::RGBA32UI:
 		return GL_RGBA32UI;
+	case TextureFormat::D24S8:
+		return GL_DEPTH24_STENCIL8;
+	case TextureFormat::D32:
+		RED_LILIUM_NOT_IMPLEMENTED();
+		return GL_DEPTH32F_STENCIL8;
 	default:
 		RED_LILIUM_ASSERT(false && "Unsupported texture format");
 		return 0;

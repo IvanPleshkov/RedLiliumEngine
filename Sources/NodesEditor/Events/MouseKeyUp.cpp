@@ -5,13 +5,13 @@ using namespace RED_LILIUM_NAMESPACE;
 
 MouseKeyUp::MouseKeyUp()
 	: Event()
-	, m_mouseState()
+	, m_inputState()
 	, m_mouseKey()
 {}
 
-MouseKeyUp::MouseKeyUp(MouseState mouseState, MouseKey key)
+MouseKeyUp::MouseKeyUp(const InputState& inputState, MouseKey key)
 	: Event()
-	, m_mouseState(mouseState)
+	, m_inputState(inputState)
 	, m_mouseKey(key)
 {}
 

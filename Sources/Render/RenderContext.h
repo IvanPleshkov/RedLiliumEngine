@@ -21,6 +21,9 @@ public:
 	void CurrentCamera(const Camera& camera);
 	const Camera& CurrentCamera() const { return m_currentCamera; }
 
+	void SetRenderTarget(const sptr<RenderTarget>& renderTarget);
+	const sptr<RenderTarget>& SetRenderTarget();
+
 	void Clear();
 
 /*internal*/ public:
@@ -31,6 +34,7 @@ private:
 
 	ptr<RenderDevice> m_renderDevice;
 	Camera m_currentCamera;
+	sptr<RenderTarget> m_currentRenderTarget;
 	std::vector<std::pair<ptr<Uniform>, ptr<UniformBlock>>> m_uniformBlocksToUpdate;
 	std::map<std::string, Uniform::ValueVariants, std::less<>> m_contextUniforms;
 };

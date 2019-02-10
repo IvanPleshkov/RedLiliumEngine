@@ -2,7 +2,7 @@
 
 #include <Scene/Component.h>
 #include <Editor/Event.h>
-#include "../UserInput.h"
+#include <Core/InputEvent.h>
 
 namespace RED_LILIUM_NAMESPACE
 {
@@ -13,18 +13,18 @@ public:
 	RED_LILIUM_CLASS(MouseScroll, Event);
 
 	MouseScroll();
-	MouseScroll(MouseState mouseState, float scrollDelta);
+	MouseScroll(const InputState& inputState, float scrollDelta);
 	~MouseScroll() override = default;
 	void Serialize(ptr<Serializator> serializator) const override;
 	void Deserialize(ptr<const Serializator> serializator) override;
 
 	uptr<ActionBase> TriggerAction(ptr<Editor> editor) override;
 
-	MouseState GetMouseState() const;
+	const InputState& GetMouseState() const;
 	float GetScrollDelta() const;
 
 private:
-	MouseState m_mouseState;
+	InputState m_inputState;
 	float m_scrollDelta;
 };
 

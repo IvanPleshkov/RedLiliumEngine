@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Core/Common.h>
+#include <Core/InputEvent.h>
 #include <Reflection/Serialization.h>
 
 namespace RED_LILIUM_NAMESPACE
@@ -22,6 +23,9 @@ public:
 		
 	ptr<Entity> GetEntity() { return m_parent; }
 	ptr<const Entity> GetEntity() const { return m_parent; }
+
+	virtual void Update() { }
+	virtual bool HandleMouseEvent(const MouseEvent& mouseEvent, const InputState& inputState) { return false; }
 
 private:
 	ptr<Entity> m_parent;

@@ -5,13 +5,13 @@ using namespace RED_LILIUM_NAMESPACE;
 
 MouseMove::MouseMove()
 	: Event()
-	, m_mouseState()
+	, m_inputState()
 	, m_prevMousePos()
 {}
 
-MouseMove::MouseMove(MouseState mouseState, vec2 prevMousePos)
+MouseMove::MouseMove(const InputState& inputState, vec2 prevMousePos)
 	: Event()
-	, m_mouseState(mouseState)
+	, m_inputState(inputState)
 	, m_prevMousePos(prevMousePos)
 {}
 

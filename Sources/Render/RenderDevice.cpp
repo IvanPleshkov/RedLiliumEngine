@@ -65,7 +65,6 @@ static void APIENTRY glDebugCallback(GLenum source, GLenum type, GLuint id, GLen
 		break;
 	case GL_DEBUG_SEVERITY_MEDIUM:
 		RED_LILIUM_LOG_ERROR(msg);
-		RED_LILIUM_ASSERT(false && "OpenGL message");
 		break;
 	case GL_DEBUG_SEVERITY_HIGH:
 		RED_LILIUM_LOG_CRITICAL(msg);
@@ -93,7 +92,8 @@ RenderDevice::RenderDevice(ptr<ApplicationSettings> applicationSettings, ptr<Fil
 	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
 #endif
 
-	glEnable(GL_MULTISAMPLE);
+	// glEnable(GL_MULTISAMPLE);
+	glEnable(GL_DEPTH_TEST);
 
 	m_materialManager = umake<MaterialManager>(this, fileSystem);
 	m_gpuTextureManager = umake<GpuTextureManager>(this, fileSystem);

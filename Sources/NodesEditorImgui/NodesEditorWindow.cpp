@@ -4,7 +4,6 @@
 #include "Scene/Entity.h"
 #include "Scene/Component.h"
 #include <Nodes/Components/NodeComponent.h>
-#include <NodesEditor/UserInput.h>
 #include <NodesEditor/Events/MouseKeyDown.h>
 #include <NodesEditor/Events/MouseKeyUp.h>
 #include <NodesEditor/Events/MouseMove.h>
@@ -43,7 +42,7 @@ void NodesEditorWindow::Tick()
 	ptr<const Entity> nodesRoot = root->GetChild("Nodes");
 	RED_LILIUM_ASSERT(nodesRoot != nullptr);
 
-	auto canvasPos = ImGui::GetCursorScreenPos();;
+	auto canvasPos = ImGui::GetCursorScreenPos();
 	m_canvasPos = { canvasPos.x, canvasPos.y };
 	auto canvasSize = ImGui::GetContentRegionAvail();
 	m_canvasSize = { canvasSize.x, canvasSize.y };
@@ -51,20 +50,20 @@ void NodesEditorWindow::Tick()
 	imguiDrawList->AddRect(canvasPos, ImVec2(m_canvasPos.x + m_canvasSize.x, m_canvasPos.y + m_canvasSize.y), IM_COL32(100, 0, 0, 255));
 	ImGui::InvisibleButton("canvas", { m_canvasSize.x, m_canvasSize.y });
 
-	MouseState currentMouseState;
-	currentMouseState.position = { ImGui::GetIO().MousePos.x - m_canvasPos.x, ImGui::GetIO().MousePos.y - m_canvasPos.y };
-	currentMouseState.pressedKeys = Flags<MouseKey>();
+	InputState currentInputState;
+	currentInputState.mousePosition = { ImGui::GetIO().MousePos.x - m_canvasPos.x, ImGui::GetIO().MousePos.y - m_canvasPos.y };
+	currentInputState.pressedMouseKeys = Flags<MouseKey>();
 	if (ImGui::IsMouseDown(0))
 	{
-		currentMouseState.pressedKeys.Add(MouseKey::Left);
+		currentInputState.pressedMouseKeys.Add(MouseKey::Left);
 	}
 	if (ImGui::IsMouseDown(1))
 	{
-		currentMouseState.pressedKeys.Add(MouseKey::Right);
+		currentInputState.pressedMouseKeys.Add(MouseKey::Right);
 	}
 	if (ImGui::IsMouseDown(2))
 	{
-		currentMouseState.pressedKeys.Add(MouseKey::Middle);
+		currentInputState.pressedMouseKeys.Add(MouseKey::Middle);
 	}
 
 	{
@@ -74,36 +73,36 @@ void NodesEditorWindow::Tick()
 		{
 			if (ImGui::GetIO().MouseWheel != 0.0f)
 			{
-				events.push_back(std::move(umake<MouseScroll>(currentMouseState, ImGui::GetIO().MouseWheel)));
+				events.push_back(std::move(umake<MouseScroll>(currentInputState, ImGui::GetIO().MouseWheel)));
 			}
 			if (ImGui::IsMouseClicked(0))
 			{
-				events.push_back(std::move(umake<MouseKeyDown>(currentMouseState, MouseKey::Left)));
+				events.push_back(std::move(umake<MouseKeyDown>(currentInputState, MouseKey::Left)));
 			}
 			if (ImGui::IsMouseClicked(1))
 			{
-				events.push_back(std::move(umake<MouseKeyDown>(currentMouseState, MouseKey::Right)));
+				events.push_back(std::move(umake<MouseKeyDown>(currentInputState, MouseKey::Right)));
 			}
 			if (ImGui::IsMouseClicked(2))
 			{
-				events.push_back(std::move(umake<MouseKeyDown>(currentMouseState, MouseKey::Middle)));
+				events.push_back(std::move(umake<MouseKeyDown>(currentInputState, MouseKey::Middle)));
 			}
 			if (ImGui::IsMouseReleased(0))
 			{
-				events.push_back(std::move(umake<MouseKeyUp>(currentMouseState, MouseKey::Left)));
+				events.push_back(std::move(umake<MouseKeyUp>(currentInputState, MouseKey::Left)));
 			}
 			if (ImGui::IsMouseReleased(1))
 			{
-				events.push_back(std::move(umake<MouseKeyUp>(currentMouseState, MouseKey::Right)));
+				events.push_back(std::move(umake<MouseKeyUp>(currentInputState, MouseKey::Right)));
 			}
 			if (ImGui::IsMouseReleased(2))
 			{
-				events.push_back(std::move(umake<MouseKeyUp>(currentMouseState, MouseKey::Middle)));
+				events.push_back(std::move(umake<MouseKeyUp>(currentInputState, MouseKey::Middle)));
 			}
-			if (m_mousePos != currentMouseState.position)
+			if (m_mousePos != currentInputState.mousePosition)
 			{
-				events.push_back(std::move(umake<MouseMove>(currentMouseState, m_mousePos)));
-				m_mousePos = currentMouseState.position;
+				events.push_back(std::move(umake<MouseMove>(currentInputState, m_mousePos)));
+				m_mousePos = currentInputState.mousePosition;
 			}
 		}
 

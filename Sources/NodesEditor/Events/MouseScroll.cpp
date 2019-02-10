@@ -6,14 +6,14 @@ using namespace RED_LILIUM_NAMESPACE;
 
 MouseScroll::MouseScroll()
 	: Event()
-	, m_mouseState()
+	, m_inputState()
 	, m_scrollDelta()
 {
 }
 
-MouseScroll::MouseScroll(MouseState mouseState, float scrollDelta)
+MouseScroll::MouseScroll(const InputState& inputState, float scrollDelta)
 	: Event()
-	, m_mouseState(mouseState)
+	, m_inputState(inputState)
 	, m_scrollDelta(scrollDelta)
 {
 }
@@ -31,9 +31,9 @@ uptr<ActionBase> MouseScroll::TriggerAction(ptr<Editor> editor)
 	return umake<ZoomEditorByScroll>(editor);
 }
 
-MouseState MouseScroll::GetMouseState() const
+const InputState& MouseScroll::GetMouseState() const
 {
-	return m_mouseState;
+	return m_inputState;
 }
 
 float MouseScroll::GetScrollDelta() const

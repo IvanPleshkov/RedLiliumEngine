@@ -69,6 +69,9 @@ namespace RED_LILIUM_NAMESPACE
 		RGBA16UI,		// 	RGBA	ui16 	ui16 	ui16 	ui16
 		RGBA32I,		// 	RGBA	i32 	i32 	i32 	i32
 		RGBA32UI,		// 	RGBA	ui32 	ui32 	ui32 	ui32
+
+		D24S8,			// DS		24		8
+		D32,			// D		32
 	};
 
 enum class TextureWrapping : u8
@@ -111,6 +114,7 @@ public:
 	void Settings(const TextureSettings& settings);
 	const TextureSettings& Settings();
 	bool SendData(const cv::Mat& mat);
+	bool Create(u32 width, u32 height = 0, u32 depth = 0);
 
 	void Bind();
 	void Unbind();

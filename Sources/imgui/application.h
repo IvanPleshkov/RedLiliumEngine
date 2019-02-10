@@ -2,7 +2,9 @@
 
 #include <Core/Common.h>
 #include <Core/ApplicationSettings.h>
+#include <Core/FileSystem.h>
 #include <SDL/SDL.h>
+#include <Render/RenderDevice.h>
 #include "imgui.h"
 
 namespace RED_LILIUM_NAMESPACE
@@ -24,8 +26,12 @@ protected:
 	void SetStyle();
 	ptr<SDL_Window> GetMainWindow();
 	ptr<const ApplicationSettings> GetApplicationSettings() const;
+	ptr<RenderDevice> GetRenderDevice();
+	ptr<FileSystem> GetFileSystem();
 
 private:
+	uptr<RenderDevice> m_renderDevice;
+	uptr<FileSystem> m_fileSystem;
 	ptr<ApplicationSettings> m_applicationSettings;
 	ptr<SDL_Window> m_mainWindow;
 	bool m_isRunning = true;

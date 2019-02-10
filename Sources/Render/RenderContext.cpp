@@ -5,6 +5,7 @@
 #include "GpuMesh.h"
 #include "VertexDeclaration.h"
 #include "RenderDevice.h"
+#include "RenderTarget.h"
 #include "Uniform.h"
 
 using namespace RED_LILIUM_NAMESPACE;
@@ -15,7 +16,9 @@ RenderContext::RenderContext(ptr<RenderDevice> renderDevice)
 }
 
 RenderContext::~RenderContext()
-{}
+{
+	SetRenderTarget(nullptr);
+}
 
 void RenderContext::Draw(const sptr<GpuMesh>& mesh, const sptr<Material>& material)
 {
@@ -35,6 +38,24 @@ void RenderContext::CurrentCamera(const Camera& camera)
 	Set("g_proj", camera.GetProj());
 	mat4 viewProj = camera.GetProj() * camera.GetView();
 	Set("g_viewProj", viewProj);
+}
+
+void RenderContext::SetRenderTarget(const sptr<RenderTarget>& renderTarget)
+{
+	m_currentRenderTarget = renderTarget;
+	if (m_currentRenderTarget)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, renderTarget->GetNative());
+	}
+	else
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+}
+
+const sptr<RenderTarget>& RenderContext::SetRenderTarget()
+{
+	return m_currentRenderTarget;
 }
 
 void RenderContext::UpdateUniformBlocks()

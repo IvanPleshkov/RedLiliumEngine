@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "RenderPipeline.h"
 #include "RenderPass.h"
+#include <Render/RenderTarget.h>
 #include "StandardPasses/OpaquePass.h"
 #include "Components/CameraComponent.h"
 #include "Components/MeshRenderer.h"
@@ -11,10 +12,28 @@ using namespace RED_LILIUM_NAMESPACE;
 RenderPipeline::RenderPipeline(ptr<RenderDevice> renderDevice)
 	: RedLiliumObject()
 	, m_renderDevice(renderDevice)
+	, m_targetSize(0.0f, 0.0f)
 {}
+
+void RenderPipeline::SetTargetSize(vec2 targetSize)
+{
+	if (m_targetSize != targetSize)
+	{
+		m_targetSize = targetSize;
+		m_renderTarget = nullptr;
+	}
+}
 
 bool RenderPipeline::Render(const std::vector<ptr<const Entity>>& roots)
 {
+	RED_LILIUM_ASSERT(m_targetSize.x > 0.0f && m_targetSize.y > 0.0f && "Pipeline must have target size");
+
+	if (!m_renderTarget)
+	{
+		m_renderTarget = smake<RenderTarget>(m_renderDevice);
+		m_renderTarget->Create(static_cast<u32>(m_targetSize.x), static_cast<u32>(m_targetSize.y));
+	}
+
 	m_rootEntities = roots;
 	FindCameraComponents();
 	FindRenderables();

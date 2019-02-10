@@ -12,6 +12,8 @@
 #include <Scene/Component.h>
 #include <Pipeline/RenderPipeline.h>
 #include <Pipeline/AssimpLoader.h>
+#include <Pipeline/Components/CameraComponent.h>
+#include <Pipeline/Components/CameraControllerComponent.h>
 
 #include "Commands.h"
 #include <SDL/SDL.h>
@@ -27,9 +29,25 @@ namespace RenderPipelineDemoNamespace
 	static SDL_Window *window = NULL;
 	static SDL_GLContext gl_context;
 
-	uptr<Scene> CreateDemoScene()
+	uptr<Scene> CreateDemoScene(ptr<RenderDevice> renderDevice)
 	{
 		uptr<Scene> scene = umake<Scene>();
+		LoadSceneByAssimp(renderDevice, "Models\\torus.dae", scene->GetRoot()->AddChild("Loaded Scene"));
+
+		Camera camera;
+		camera.LookAt({ 5.0f, 3.0f, 5.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
+		camera.SetPerspective(45.0f, 1.0f, 0.1f, 100.0f);
+
+		mat4 camView = camera.GetView();
+		camera.SetView(mat4(1.0f));
+
+		ptr<Entity> cameraEntity = scene->GetRoot()->AddChild("Camera");
+		ptr<CameraComponent> cameraComponent = cameraEntity->AddComponent<CameraComponent>();
+		cameraComponent->SetCamera(camera);
+		cameraEntity->AddComponent<CameraControllerComponent>();
+
+		cameraEntity->SetLocalTransform(camView);
+
 		return std::move(scene);
 	}
 
@@ -66,9 +84,11 @@ namespace RenderPipelineDemoNamespace
 		uptr<FileSystem> fileSystem = umake<FileSystem>(settings);
 		uptr<RenderDevice> renderDevice = umake<RenderDevice>(settings, fileSystem.get());
 
-		uptr<Scene> scene = umake<Scene>();
-		LoadSceneByAssimp(renderDevice.get(), "Models\\torus.dae", scene->GetRoot());
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+		uptr<Scene> scene = CreateDemoScene(renderDevice.get());
 		uptr<RenderPipeline> pipeline = RenderPipeline::CreateSimpleOpaquePipeline(renderDevice.get());
+		pipeline->SetTargetSize({ 500, 500 });
 
 		quitting = false;
 		while (!quitting)

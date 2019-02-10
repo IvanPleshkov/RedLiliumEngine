@@ -5,13 +5,13 @@ using namespace RED_LILIUM_NAMESPACE;
 
 MouseKeyDown::MouseKeyDown()
 	: Event()
-	, m_mouseState()
+	, m_inputState()
 	, m_mouseKey()
 {}
 
-MouseKeyDown::MouseKeyDown(MouseState mouseState, MouseKey mouseKey)
+MouseKeyDown::MouseKeyDown(const InputState& inputState, MouseKey mouseKey)
 	: Event()
-	, m_mouseState(mouseState)
+	, m_inputState(inputState)
 	, m_mouseKey(mouseKey)
 {}
 

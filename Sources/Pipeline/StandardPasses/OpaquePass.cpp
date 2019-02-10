@@ -19,6 +19,7 @@ bool OpaquePass::Render()
 	RED_LILIUM_GUARD();
 
 	uptr<RenderContext> renderContext = GetRenderDevice()->CreateRenderContext();
+	renderContext->SetRenderTarget(m_pipeline->GetRenderTarget());
 
 	for (auto& camera : GetCameraComponents())
 	{
@@ -45,8 +46,8 @@ void OpaquePass::RenderCamera(ptr<RenderContext> renderContext, ptr<const Camera
 			continue;
 		}
 
-		// material->Set("g_model", filter->GetEntity()->GetWorldTransform());
-		renderContext->Set("g_model", filter->GetEntity()->GetWorldTransform());
+		mat4 worldTransform = filter->GetEntity()->GetWorldTransform();
+		renderContext->Set("g_model", worldTransform);
 		renderContext->Draw(gpuMesh, material);
 	}
 }

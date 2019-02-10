@@ -27,6 +27,11 @@ public:
 		return (m_value & static_cast<UnderlyingType>(flag)) != 0;
 	}
 
+	bool Empty() const
+	{
+		return m_value == 0;
+	}
+
 	Flags<T, void>& Add(T flag)
 	{
 		m_value |= static_cast<UnderlyingType>(flag);
