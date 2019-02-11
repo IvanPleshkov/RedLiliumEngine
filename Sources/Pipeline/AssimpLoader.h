@@ -18,8 +18,10 @@ struct AssimpImportOptions
 
 	bool loadCameras = false;
 	bool loadLights = true;
+
+	sptr<Material> material;
 };
 
-bool LoadSceneByAssimp(ptr<RenderDevice> renderDevice, std::string_view filename, ptr<Entity> rootEntity, AssimpImportOptions options = AssimpImportOptions());
+bool LoadSceneByAssimp(ptr<RenderDevice> renderDevice, std::string_view filename, ptr<Entity> rootEntity, const AssimpImportOptions& options);
 
 } // namespace RED_LILIUM_NAMESPACE

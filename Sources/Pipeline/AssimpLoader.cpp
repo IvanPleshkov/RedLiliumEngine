@@ -200,8 +200,7 @@ void processNode(aiNode *node, const aiScene *scene, ptr<Entity> resultEntity, p
 		filter->SetGpuMesh(loadedData->m_gpuMeshes[node->mMeshes[i]]);
 		filter->SetMesh(loadedData->m_cpuMesh[node->mMeshes[i]]);
 
-		const sptr<Material>& material = loadedData->m_renderDevice->GetMaterialManager()->Get("Shaders\\ColoredTriangle\\material.json");
-		renderer->SetMaterial(material);
+		renderer->SetMaterial(loadedData->m_importOptions.material);
 	}
 
 	if (loadedData->m_importOptions.loadCameras)
@@ -230,7 +229,7 @@ void processNode(aiNode *node, const aiScene *scene, ptr<Entity> resultEntity, p
 }
 }
 
-bool RED_LILIUM_NAMESPACE::LoadSceneByAssimp(ptr<RenderDevice> renderDevice, std::string_view filename, ptr<Entity> rootEntity, AssimpImportOptions options)
+bool RED_LILIUM_NAMESPACE::LoadSceneByAssimp(ptr<RenderDevice> renderDevice, std::string_view filename, ptr<Entity> rootEntity, const AssimpImportOptions& options)
 {
 	std::string absoluteFilename = renderDevice->GetFileSystem()->ToAbsolute(filename);
 

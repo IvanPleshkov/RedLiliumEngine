@@ -6,6 +6,8 @@
 #include <Render/RenderTarget.h>
 #include <Render/GpuTexture.h>
 #include <Render/GpuTextureManager.h>
+#include <Render/Material.h>
+#include <Render/MaterialManager.h>
 #include <Pipeline/RenderPipeline.h>
 #include <Pipeline/AssimpLoader.h>
 #include <Pipeline/Components/CameraComponent.h>
@@ -73,10 +75,12 @@ private:
 	void CreateDemoScene()
 	{
 		m_scene = umake<Scene>();
-		LoadSceneByAssimp(GetRenderDevice(), "Models\\torus.dae", m_scene->GetRoot()->AddChild("Loaded Scene"));
+		AssimpImportOptions importOptions;
+		importOptions.material = GetRenderDevice()->GetMaterialManager()->Get("Shaders\\ColoredTriangle\\material.json");
+		LoadSceneByAssimp(GetRenderDevice(), "Models\\nanosuit\\nanosuit.obj", m_scene->GetRoot()->AddChild("Loaded Scene"), importOptions);
 
 		Camera camera;
-		camera.LookAt({ 5.0f, 3.0f, 5.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
+		camera.LookAt({ 25.0f, 25.0f, 25.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f });
 		camera.SetPerspective(45.0f, 1.0f, 0.1f, 100.0f);
 
 		mat4 camView = camera.GetView();

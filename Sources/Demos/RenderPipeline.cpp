@@ -32,7 +32,9 @@ namespace RenderPipelineDemoNamespace
 	uptr<Scene> CreateDemoScene(ptr<RenderDevice> renderDevice)
 	{
 		uptr<Scene> scene = umake<Scene>();
-		LoadSceneByAssimp(renderDevice, "Models\\torus.dae", scene->GetRoot()->AddChild("Loaded Scene"));
+		AssimpImportOptions importOptions;
+		importOptions.material = renderDevice->GetMaterialManager()->Get("Shaders\\ColoredTriangle\\material.json");
+		LoadSceneByAssimp(renderDevice, "Models\\torus.dae", scene->GetRoot()->AddChild("Loaded Scene"), importOptions);
 
 		Camera camera;
 		camera.LookAt({ 5.0f, 3.0f, 5.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
