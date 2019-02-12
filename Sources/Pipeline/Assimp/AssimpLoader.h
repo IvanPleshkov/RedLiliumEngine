@@ -7,6 +7,7 @@ namespace RED_LILIUM_NAMESPACE
 {
 
 class Entity;
+class AssimpMaterial;
 
 struct AssimpImportOptions
 {
@@ -19,7 +20,7 @@ struct AssimpImportOptions
 	bool loadCameras = false;
 	bool loadLights = true;
 
-	sptr<Material> material;
+	sptr<AssimpMaterial> material;
 };
 
 bool LoadSceneByAssimp(ptr<RenderDevice> renderDevice, std::string_view filename, ptr<Entity> rootEntity, const AssimpImportOptions& options);

@@ -11,7 +11,7 @@
 #include <Scene/Entity.h>
 #include <Scene/Component.h>
 #include <Pipeline/RenderPipeline.h>
-#include <Pipeline/AssimpLoader.h>
+#include <Pipeline/Assimp/AssimpLoader.h>
 #include <Pipeline/Components/CameraComponent.h>
 #include <Pipeline/Components/CameraControllerComponent.h>
 

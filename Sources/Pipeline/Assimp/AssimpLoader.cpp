@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "AssimpLoader.h"
+#include "AssimpMaterial.h"
 #include <Render/RenderDevice.h>
 #include <Render/GpuMesh.h>
 #include <Render/Material.h>

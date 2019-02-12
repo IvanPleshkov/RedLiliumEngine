@@ -9,7 +9,7 @@
 #include <Render/Material.h>
 #include <Render/MaterialManager.h>
 #include <Pipeline/RenderPipeline.h>
-#include <Pipeline/AssimpLoader.h>
+#include <Pipeline/Assimp/AssimpLoader.h>
 #include <Pipeline/Components/CameraComponent.h>
 #include <Pipeline/Components/CameraControllerComponent.h>
 
