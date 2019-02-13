@@ -13,7 +13,7 @@ public:
 	~GpuMesh() override;
 
 	void Update(ptr<const Mesh> mesh);
-	const std::string& GetResourceName() const { return m_resourceName; }
+	const std::string& GetName() const { return m_resourceName; }
 
 RED_LILIUM_INTERNAL:
 	ptr<VertexArrayObject> GetVertexArrayObject(ptr<VertexDeclaration> vertexDeclaration);

@@ -23,9 +23,8 @@ struct LoadedData
 	AssimpImportOptions m_importOptions;
 
 	std::vector<sptr<GpuMesh>> m_gpuMeshes;
-	std::vector<std::pair<u32, std::string>> m_meshMaterialAndName;
-	std::vector<sptr<Mesh>> m_cpuMesh;
 	std::vector<sptr<Material>> m_materials;
+	std::vector<sptr<Mesh>> m_cpuMesh;
 	std::vector<std::pair<Camera, std::string>> m_cameras;
 };
 
@@ -80,16 +79,31 @@ void loadData(const aiScene *scene, ptr<LoadedData> loadedData)
 	}
 
 	// scene->mNumMaterials;
+	std::vector<sptr<Material>> uniqueMaterials;
+	uniqueMaterials.reserve(scene->mNumMaterials);
 	for (u32 i = 0; i < scene->mNumMaterials; i++)
 	{
 		aiMaterial* aiMat = scene->mMaterials[i];
-		// aiMat->;
+		sptr<Material> material = loadedData->m_importOptions.materialFabric("");
+
+		ptr<IAssimpMaterial> assimpMaterial = Cast<IAssimpMaterial>(material.get());
+		if (assimpMaterial)
+		{
+		}
+
+		uniqueMaterials.push_back(material);
 	}
 
 	// scene->mNumMeshes;
 	for (u32 i = 0; i < scene->mNumMeshes; i++)
 	{
 		aiMesh* aimesh = scene->mMeshes[i];
+		std::string meshName = std::string(aimesh->mName.C_Str());
+		if (meshName.empty())
+		{
+			meshName = "Mesh";
+		}
+
 		sptr<Mesh> mesh = smake<Mesh>();
 		u32 vertsCount = aimesh->mNumVertices;
 
@@ -168,19 +182,20 @@ void loadData(const aiScene *scene, ptr<LoadedData> loadedData)
 
 		if (loadedData->m_importOptions.generateGpuMeshes && loadedData->m_renderDevice)
 		{
-			sptr<GpuMesh> gpuMesh = smake<GpuMesh>(loadedData->m_renderDevice);
+			sptr<GpuMesh> gpuMesh = smake<GpuMesh>(loadedData->m_renderDevice, meshName);
 			gpuMesh->Update(mesh.get());
 			loadedData->m_gpuMeshes.push_back(std::move(gpuMesh));
 		}
 
-		std::string meshName = std::string(aimesh->mName.C_Str());
-		if (meshName.empty())
-		{
-			meshName = "Mesh";
-		}
-
 		loadedData->m_cpuMesh.push_back(std::move(mesh));
-		loadedData->m_meshMaterialAndName.push_back({ aimesh->mMaterialIndex, meshName });
+		if (aimesh->mMaterialIndex > 0 && aimesh->mMaterialIndex < uniqueMaterials.size())
+		{
+			loadedData->m_materials.push_back(uniqueMaterials[aimesh->mMaterialIndex]);
+		}
+		else
+		{
+			loadedData->m_materials.push_back(nullptr);
+		}
 	}
 }
 
@@ -193,18 +208,14 @@ void processNode(aiNode *node, const aiScene *scene, ptr<Entity> resultEntity, p
 
 	for (u32 i = 0; i < node->mNumMeshes; i++)
 	{
-		ptr<Entity> meshEntity = entity->AddChild("Mesh");
+		ptr<Entity> meshEntity = entity->AddChild(loadedData->m_gpuMeshes[node->mMeshes[i]]->GetName());
 		ptr<MeshFilter> filter = meshEntity->AddComponent<MeshFilter>();
 		ptr<MeshRenderer> renderer = meshEntity->AddComponent<MeshRenderer>();
 
 		filter->SetGpuMesh(loadedData->m_gpuMeshes[node->mMeshes[i]]);
 		filter->SetMesh(loadedData->m_cpuMesh[node->mMeshes[i]]);
 
-		sptr<Material> material = loadedData->m_importOptions.materialFabric("");
-		if (Cast<IAssimpMaterial>(material.get()))
-		{
-			// todo (assimp)
-		}
+		sptr<Material> material = loadedData->m_materials[node->mMeshes[i]];
 		renderer->SetMaterial(material);
 	}
 
