@@ -520,8 +520,8 @@ namespace
 	}
 }
 
-GpuTexture::GpuTexture(ptr<RenderDevice> renderDevice, const TextureSettings& settings)
-	: GpuResource(renderDevice)
+GpuTexture::GpuTexture(ptr<RenderDevice> renderDevice, const TextureSettings& settings, std::string_view resourceName)
+	: GpuResource(renderDevice, resourceName)
 {
 	glGenTextures(1, &m_handler);
 	Settings(settings);

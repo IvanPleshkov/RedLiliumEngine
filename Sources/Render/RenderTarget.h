@@ -9,7 +9,7 @@ namespace RED_LILIUM_NAMESPACE
 class RenderTarget : public GpuResource
 {
 public:
-	RenderTarget(ptr<RenderDevice> renderDevice);
+	RenderTarget(ptr<RenderDevice> renderDevice, std::string_view resourceName = "");
 	~RenderTarget() override;
 
 	void Bind();

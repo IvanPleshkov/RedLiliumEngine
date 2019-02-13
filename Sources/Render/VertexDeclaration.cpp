@@ -18,7 +18,7 @@ const std::vector<VertexInput>& VertexDeclaration::GetVertexElements() const
 }
 
 VertexArrayObject::VertexArrayObject(ptr<RenderDevice> renderDevice, ptr<VertexDeclaration> vertexDeclaration)
-	: GpuResource(renderDevice)
+	: GpuResource(renderDevice, "vao")
 {
 	glGenVertexArrays(1, &m_handler);
 }

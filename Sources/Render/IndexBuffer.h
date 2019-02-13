@@ -9,7 +9,7 @@ namespace RED_LILIUM_NAMESPACE
 class IndexBuffer : public GpuBuffer
 {
 public:
-	IndexBuffer(ptr<RenderDevice> renderDevice, GpuBufferUsage usage = GpuBufferUsage::Static);
+	IndexBuffer(ptr<RenderDevice> renderDevice, std::string_view resourceName = "", GpuBufferUsage usage = GpuBufferUsage::Static);
 	~IndexBuffer() override;
 };
 

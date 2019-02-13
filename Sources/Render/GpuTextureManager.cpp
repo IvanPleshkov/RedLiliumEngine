@@ -22,7 +22,7 @@ const sptr<GpuTexture>& GpuTextureManager::Get(std::string_view filename, const 
 		return i->second;
 	}
 
-	sptr<GpuTexture> texture = smake<GpuTexture>(m_renderDevice, settings);
+	sptr<GpuTexture> texture = smake<GpuTexture>(m_renderDevice, settings, filename);
 	cv::Mat mat = m_filesystem->ReadTexture(filename);
 	texture->SendData(mat);
 	auto [it, inserted] = m_textures.insert({ std::string(filename), texture });

@@ -9,10 +9,13 @@ namespace RED_LILIUM_NAMESPACE
 class GpuMesh : public RedLiliumObject
 {
 public:
-	GpuMesh(ptr<RenderDevice> renderDevice, GpuBufferUsage usage = GpuBufferUsage::Static);
+	GpuMesh(ptr<RenderDevice> renderDevice, std::string_view resourceName = "", GpuBufferUsage usage = GpuBufferUsage::Static);
 	~GpuMesh() override;
 
 	void Update(ptr<const Mesh> mesh);
+	const std::string& GetResourceName() const { return m_resourceName; }
+
+RED_LILIUM_INTERNAL:
 	ptr<VertexArrayObject> GetVertexArrayObject(ptr<VertexDeclaration> vertexDeclaration);
 	u32 GetIndicesSize() const;
 
@@ -20,6 +23,7 @@ private:
 	void InitVertexArrayObject(ptr<VertexArrayObject> va, ptr<VertexDeclaration> vdecl);
 
 	ptr<RenderDevice> m_renderDevice;
+	std::string m_resourceName;
 	GpuBufferUsage m_usage;
 	std::unordered_map<ptr<VertexDeclaration>, uptr<VertexArrayObject>> m_arrayObjects;
 

@@ -108,7 +108,7 @@ struct TextureSettings
 class GpuTexture : public GpuResource
 {
 public:
-	GpuTexture(ptr<RenderDevice> renderDevice, const TextureSettings& settings);
+	GpuTexture(ptr<RenderDevice> renderDevice, const TextureSettings& settings, std::string_view resourceName = "");
 	~GpuTexture();
 
 	void Settings(const TextureSettings& settings);

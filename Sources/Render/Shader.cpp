@@ -4,8 +4,8 @@
 
 using namespace RED_LILIUM_NAMESPACE;
 
-Shader::Shader(ptr<RenderDevice> renderDevice)
-	: GpuResource(renderDevice)
+Shader::Shader(ptr<RenderDevice> renderDevice, std::string_view resourceName)
+	: GpuResource(renderDevice, resourceName)
 {
 }
 
@@ -49,8 +49,8 @@ void Shader::CompileFromString(ShaderType type, const std::string& shader, const
 	}
 }
 
-ShaderProgram::ShaderProgram(ptr<RenderDevice> renderDevice)
-	: GpuResource(renderDevice)
+ShaderProgram::ShaderProgram(ptr<RenderDevice> renderDevice, std::string_view resourceName)
+	: GpuResource(renderDevice, resourceName)
 	, m_vertexDeclaration(nullptr)
 	, m_vertexShader(nullptr)
 	, m_fragmentShader(nullptr)

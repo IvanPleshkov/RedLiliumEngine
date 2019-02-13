@@ -3,8 +3,8 @@
 
 using namespace RED_LILIUM_NAMESPACE;
 
-GpuBuffer::GpuBuffer(ptr<RenderDevice> renderDevice, GLenum bufferType, GpuBufferUsage usage)
-	: GpuResource(renderDevice)
+GpuBuffer::GpuBuffer(ptr<RenderDevice> renderDevice, std::string_view resourceName, GLenum bufferType, GpuBufferUsage usage)
+	: GpuResource(renderDevice, resourceName)
 	, m_bufferType(bufferType)
 	, m_usage(usage)
 {

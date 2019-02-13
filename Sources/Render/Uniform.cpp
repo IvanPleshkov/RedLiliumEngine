@@ -322,11 +322,10 @@ bool Uniform::operator !=(const Uniform& u) const
 }
 
 UniformBlock::UniformBlock(ptr<ShaderProgram> program, std::string_view name)
-	: GpuBuffer(program->GetRenderDevice(), GL_UNIFORM_BUFFER, GpuBufferUsage::Dynamic)
-	, m_name(name)
+	: GpuBuffer(program->GetRenderDevice(), name, GL_UNIFORM_BUFFER, GpuBufferUsage::Dynamic)
 	, m_data()
 {
-	auto blockIndex = glGetUniformBlockIndex(program->GetNative(), m_name.c_str());
+	auto blockIndex = glGetUniformBlockIndex(program->GetNative(), GetName().c_str());
 
 	GLint blockSize;
 	glGetActiveUniformBlockiv(program->GetNative(), blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
@@ -386,7 +385,7 @@ void UniformBlock::SetData(const void* data, size_t size, size_t offset)
 
 std::vector<Uniform> UniformBlock::FindUniformsFromShader(ptr<ShaderProgram> program) const
 {
-	auto blockIndex = glGetUniformBlockIndex(program->GetNative(), m_name.c_str());
+	auto blockIndex = glGetUniformBlockIndex(program->GetNative(), GetName().c_str());
 
 	GLint uniformsCount;
 	const GLsizei bufSize = 64; // maximum name length

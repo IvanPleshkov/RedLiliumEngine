@@ -62,7 +62,7 @@ sptr<ShaderProgram> ShaderManager::GetShaderProgram(std::string_view filename)
 
 sptr<Shader> ShaderManager::NewShader(std::string_view filename, ShaderType type)
 {
-	sptr<Shader> shader = smake<Shader>(m_renderDevice);
+	sptr<Shader> shader = smake<Shader>(m_renderDevice, filename);
 	std::string shaderSource = m_renderDevice->GetFileSystem()->ReadShaderFile(filename);
 	shader->CompileFromString(type, shaderSource);
 	return std::move(shader);
@@ -85,7 +85,7 @@ sptr<ShaderProgram> ShaderManager::NewShaderProgram(std::string_view filename)
 	RED_LILIUM_ASSERT(!fragmentShaderJson.empty());
 	sptr<Shader> fragmentShader = GetShader(fragmentShaderFilename, ShaderType::Fragment);
 
-	sptr<ShaderProgram> shaderProgram = smake<ShaderProgram>(m_renderDevice);
+	sptr<ShaderProgram> shaderProgram = smake<ShaderProgram>(m_renderDevice, filename);
 	shaderProgram->Link(vertexShader, fragmentShader);
 	return std::move(shaderProgram);
 }

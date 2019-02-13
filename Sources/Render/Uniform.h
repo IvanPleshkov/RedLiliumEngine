@@ -85,7 +85,6 @@ public:
 
 	void Check(ptr<ShaderProgram> program);
 	void SendData();
-	const std::string& GetName() const { return m_name; }
 
 /*internal*/ public:
 	void SetData(const void* data, size_t size, size_t offset);
@@ -94,7 +93,6 @@ public:
 	friend class RenderDevice;
 private:
 	std::vector<Uniform> m_uniforms;
-	std::string m_name;
 	std::vector<char> m_data;
 };
 

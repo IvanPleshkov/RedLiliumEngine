@@ -11,20 +11,26 @@ using namespace RED_LILIUM_NAMESPACE;
 namespace
 {
 template<class T>
-void InitVertexBuffer(uptr<VertexBuffer>& vertexBuffer, const std::vector<T>& data, ptr<RenderDevice> renderDevice, GpuBufferUsage usage)
+void InitVertexBuffer(
+	uptr<VertexBuffer>& vertexBuffer,
+	const std::vector<T>& data,
+	ptr<RenderDevice> renderDevice,
+	std::string_view resourceName,
+	GpuBufferUsage usage)
 {
 	vertexBuffer = nullptr; // Render TODO: reuse buffer, dont't delete
 	if (!data.empty())
 	{
-		vertexBuffer = umake<VertexBuffer>(renderDevice, usage);
+		vertexBuffer = umake<VertexBuffer>(renderDevice, resourceName, usage);
 		vertexBuffer->SendData(data.data(), data.size() * sizeof(T));
 	}
 }
 }
 
-GpuMesh::GpuMesh(ptr<RenderDevice> renderDevice, GpuBufferUsage usage)
+GpuMesh::GpuMesh(ptr<RenderDevice> renderDevice, std::string_view resourceName, GpuBufferUsage usage)
 	: RedLiliumObject()
 	, m_renderDevice(renderDevice)
+	, m_resourceName(resourceName)
 	, m_usage(usage)
 	, m_arrayObjects()
 	, m_indicesSize(0)
@@ -56,22 +62,22 @@ void GpuMesh::Update(ptr<const Mesh> mesh)
 	m_indicesSize = mesh->m_indices.size();
 	m_indices = nullptr;
 	RED_LILIUM_ASSERT(!mesh->m_indices.empty());
-	m_indices = umake<IndexBuffer>(m_renderDevice, m_usage);
+	m_indices = umake<IndexBuffer>(m_renderDevice, m_resourceName + "_indices", m_usage);
 	m_indices->SendData(mesh->m_indices.data(), mesh->m_indices.size() * sizeof(u32));
 
-	InitVertexBuffer(m_positions, mesh->m_positions, m_renderDevice, m_usage);
-	InitVertexBuffer(m_normals, mesh->m_normals, m_renderDevice, m_usage);
-	InitVertexBuffer(m_tangents, mesh->m_tangents, m_renderDevice, m_usage);
-	InitVertexBuffer(m_bitangents, mesh->m_bitangents, m_renderDevice, m_usage);
+	InitVertexBuffer(m_positions, mesh->m_positions, m_renderDevice, m_resourceName + "_positions", m_usage);
+	InitVertexBuffer(m_normals, mesh->m_normals, m_renderDevice, m_resourceName + "_normals", m_usage);
+	InitVertexBuffer(m_tangents, mesh->m_tangents, m_renderDevice, m_resourceName + "_tangents", m_usage);
+	InitVertexBuffer(m_bitangents, mesh->m_bitangents, m_renderDevice, m_resourceName + "_bitangents", m_usage);
 
 	for (u32 i = 0; i < Mesh::COLORS_COUNT; i++)
 	{
-		InitVertexBuffer(m_colors[i], mesh->m_colors[i], m_renderDevice, m_usage);
+		InitVertexBuffer(m_colors[i], mesh->m_colors[i], m_renderDevice, m_resourceName + "_colors", m_usage);
 	}
 
 	for (u32 i = 0; i < Mesh::TEXCOORDS_COUNT; i++)
 	{
-		InitVertexBuffer(m_texCoords[i], mesh->m_texCoords[i], m_renderDevice, m_usage);
+		InitVertexBuffer(m_texCoords[i], mesh->m_texCoords[i], m_renderDevice, m_resourceName + "_texcoords", m_usage);
 	}
 }
 

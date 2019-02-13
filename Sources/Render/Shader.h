@@ -10,7 +10,7 @@ namespace RED_LILIUM_NAMESPACE
 class Shader : public GpuResource
 {
 public:
-	Shader(ptr<RenderDevice> renderDevice);
+	Shader(ptr<RenderDevice> renderDevice, std::string_view resourceName);
 	~Shader() override;
 
 	void CompileFromString(ShaderType type, const std::string& shader, const std::string& includeFilename = "");
@@ -23,7 +23,7 @@ private:
 class ShaderProgram : public GpuResource
 {
 public:
-	ShaderProgram(ptr<RenderDevice> renderDevice);
+	ShaderProgram(ptr<RenderDevice> renderDevice, std::string_view resourceName);
 	~ShaderProgram() override;
 
 	void Link(const sptr<Shader>& vertexShader, const sptr<Shader>& fragmentShader);

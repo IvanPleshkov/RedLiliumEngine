@@ -4,8 +4,8 @@
 
 using namespace RED_LILIUM_NAMESPACE;
 
-RenderTarget::RenderTarget(ptr<RenderDevice> renderDevice)
-	: GpuResource(renderDevice)
+RenderTarget::RenderTarget(ptr<RenderDevice> renderDevice, std::string_view resourceName)
+	: GpuResource(renderDevice, resourceName)
 	, m_width(0)
 	, m_height(0)
 	, m_depth(nullptr)
