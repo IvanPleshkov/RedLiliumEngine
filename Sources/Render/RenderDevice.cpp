@@ -3,7 +3,7 @@
 #include "VertexDeclaration.h"
 #include "RenderContext.h"
 #include "GpuTextureManager.h"
-#include "MaterialManager.h"
+#include "ShaderManager.h"
 #include "Uniform.h"
 
 using namespace RED_LILIUM_NAMESPACE;
@@ -95,7 +95,7 @@ RenderDevice::RenderDevice(ptr<ApplicationSettings> applicationSettings, ptr<Fil
 	// glEnable(GL_MULTISAMPLE);
 	glEnable(GL_DEPTH_TEST);
 
-	m_materialManager = umake<MaterialManager>(this, fileSystem);
+	m_shaderManager = umake<ShaderManager>(this);
 	m_gpuTextureManager = umake<GpuTextureManager>(this, fileSystem);
 }
 
@@ -118,9 +118,9 @@ ptr<FileSystem> RenderDevice::GetFileSystem()
 	return m_fileSystem;
 }
 
-ptr<MaterialManager> RenderDevice::GetMaterialManager()
+ptr<ShaderManager> RenderDevice::GetShaderManager()
 {
-	return m_materialManager.get();
+	return m_shaderManager.get();
 }
 
 ptr<GpuTextureManager> RenderDevice::GetGpuTextureManager()
@@ -174,7 +174,7 @@ ptr<UniformBlock> RenderDevice::GetUniformBlock(ptr<ShaderProgram> program, std:
 		{
 			if (auto i = m_globalUniforms.find(uniform.GetName()); i != m_globalUniforms.end())
 			{
-				std::string s = "Gloabl Uniform " + uniform.GetName() + " is already present in block " + i->second.second->GetName();
+				std::string s = "Global Uniform " + uniform.GetName() + " is already present in block " + i->second.second->GetName();
 				RED_LILIUM_LOG_ERROR(s);
 				RED_LILIUM_ASSERT(false && "Gloabl Uniform is already present in other uniform block");
 			}

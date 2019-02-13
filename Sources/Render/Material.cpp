@@ -4,6 +4,8 @@
 #include "Uniform.h"
 #include "RenderContext.h"
 #include "GpuTexture.h"
+#include "ShaderManager.h"
+#include "RenderDevice.h"
 
 using namespace RED_LILIUM_NAMESPACE;
 
@@ -12,10 +14,17 @@ Material::Material(ptr<RenderDevice> renderDevice, std::string_view filename)
 	, m_renderDevice(renderDevice)
 	, m_filename(filename)
 	, m_vertexDeclaration(nullptr)
-{}
+{
+	SetShaderProgram(m_renderDevice->GetShaderManager()->GetShaderProgram(filename));
+}
 
 Material::~Material()
 {}
+
+sptr<Material> Material::Create(ptr<RenderDevice> renderDevice, std::string_view filename)
+{
+	return smake<Material>(renderDevice, filename);
+}
 
 ptr<VertexDeclaration> Material::GetVertexDeclaration()
 {

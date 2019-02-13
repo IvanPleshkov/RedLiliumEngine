@@ -18,7 +18,7 @@ public:
 
 	ptr<ApplicationSettings> GetApplicationSettings();
 	ptr<FileSystem> GetFileSystem();
-	ptr<MaterialManager> GetMaterialManager();
+	ptr<ShaderManager> GetShaderManager();
 	ptr<GpuTextureManager> GetGpuTextureManager();
 
 	ptr<VertexDeclaration> GetVertexDeclaration(const std::vector<VertexInput>& attributes);
@@ -29,7 +29,7 @@ public:
 private:
 	ptr<ApplicationSettings> m_applicationSettings;
 	ptr<FileSystem> m_fileSystem;
-	uptr<MaterialManager> m_materialManager;
+	uptr<ShaderManager> m_shaderManager;
 	uptr<GpuTextureManager> m_gpuTextureManager;
 	std::map<std::string, uptr<VertexDeclaration>, std::less<>> m_vertexDeclarations;
 	std::map<std::string, uptr<UniformBlock>, std::less<>> m_uniformBlocks;

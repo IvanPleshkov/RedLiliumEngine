@@ -4,7 +4,6 @@
 #include <Render/RenderDevice.h>
 #include <Render/GpuMesh.h>
 #include <Render/Material.h>
-#include <Render/MaterialManager.h>
 #include <Core/FileSystem.h>
 #include <Core/Camera.h>
 #include <Scene/Component.h>
@@ -24,7 +23,7 @@ struct LoadedData
 	AssimpImportOptions m_importOptions;
 
 	std::vector<sptr<GpuMesh>> m_gpuMeshes;
-	std::vector< std::pair<u32, std::string>> m_meshMaterialAndName;
+	std::vector<std::pair<u32, std::string>> m_meshMaterialAndName;
 	std::vector<sptr<Mesh>> m_cpuMesh;
 	std::vector<sptr<Material>> m_materials;
 	std::vector<std::pair<Camera, std::string>> m_cameras;
@@ -201,7 +200,12 @@ void processNode(aiNode *node, const aiScene *scene, ptr<Entity> resultEntity, p
 		filter->SetGpuMesh(loadedData->m_gpuMeshes[node->mMeshes[i]]);
 		filter->SetMesh(loadedData->m_cpuMesh[node->mMeshes[i]]);
 
-		renderer->SetMaterial(loadedData->m_importOptions.material);
+		sptr<Material> material = loadedData->m_importOptions.materialFabric("");
+		if (Cast<IAssimpMaterial>(material.get()))
+		{
+			// todo (assimp)
+		}
+		renderer->SetMaterial(material);
 	}
 
 	if (loadedData->m_importOptions.loadCameras)

@@ -1,7 +1,6 @@
 #include "pch.h"
 
 #include <Render/RenderDevice.h>
-#include <Render/MaterialManager.h>
 #include <Render/GpuTextureManager.h>
 #include <Render/Shader.h>
 #include <Render/Material.h>
@@ -61,7 +60,7 @@ namespace RenderTriangleNamespace
 		textureSettings.format = TextureFormat::RGBA8;
 		sptr<GpuTexture> texture2 = renderDevice->GetGpuTextureManager()->Get("Textures\\alphatest.png", textureSettings);
 
-		sptr<Material> material = renderDevice->GetMaterialManager()->Get("Shaders\\ColoredTriangle\\material.json");
+		sptr<Material> material = Material::Create(renderDevice.get(), "Shaders\\ColoredTriangle\\material.json");
 		material->Set("g_diffuseColor1", vec4(1.0f, 1.0f, 0.0f, 0.0f));
 		material->Set("g_albedo2", texture2);
 		material->Set("g_albedo1", texture1);

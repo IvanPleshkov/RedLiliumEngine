@@ -7,34 +7,31 @@
 namespace RED_LILIUM_NAMESPACE
 {
 
-class AssimpMaterial : public Material
+/*interface*/ struct IAssimpMaterial
 {
-public:
-	~AssimpMaterial() override = default;
-
 	 /** The texture is combined with the result of the diffuse
      *  lighting equation.
      */
 	virtual u8 GetRequiredDiffuseTexture() { return 0; }
-	virtual void SetDiffuseTexture(sptr<GpuTexture> texture, u8 index) = 0;
+	virtual void SetDiffuseTexture(sptr<GpuTexture> texture, u8 index) {}
 
     /** The texture is combined with the result of the specular
      *  lighting equation.
      */
 	virtual u8 GetRequiredSpecularTexture() { return 0; }
-	virtual void SetSpecularTexture(sptr<GpuTexture> texture, u8 index) = 0;
+	virtual void SetSpecularTexture(sptr<GpuTexture> texture, u8 index) {}
 
     /** The texture is combined with the result of the ambient
      *  lighting equation.
      */
 	virtual u8 GetRequiredAmbientTexture() { return 0; }
-	virtual void SetAmbientTexture(sptr<GpuTexture> texture, u8 index) = 0;
+	virtual void SetAmbientTexture(sptr<GpuTexture> texture, u8 index) {}
 
     /** The texture is added to the result of the lighting
      *  calculation. It isn't influenced by incoming light.
      */
 	virtual u8 GetRequiredEmissiveTexture() { return 0; }
-	virtual void SetEmissiveTexture(sptr<GpuTexture> texture, u8 index) = 0;
+	virtual void SetEmissiveTexture(sptr<GpuTexture> texture, u8 index) {}
 
     /** The texture is a height map.
      *
@@ -42,7 +39,7 @@ public:
      *  higher elevations from the base height.
      */
 	virtual u8 GetRequiredHeightTexture() { return 0; }
-	virtual void SetHeightTexture(sptr<GpuTexture> texture, u8 index) = 0;
+	virtual void SetHeightTexture(sptr<GpuTexture> texture, u8 index) {}
 
     /** The texture is a (tangent space) normal-map.
      *
@@ -51,7 +48,7 @@ public:
      *  distinguish here.
      */
 	virtual u8 GetRequiredNormalsTexture() { return 0; }
-	virtual void SetNormalsTexture(sptr<GpuTexture> texture, u8 index) = 0;
+	virtual void SetNormalsTexture(sptr<GpuTexture> texture, u8 index) {}
 
     /** The texture defines the glossiness of the material.
      *
@@ -61,7 +58,7 @@ public:
      *  texture to a suitable exponent. Have fun.
     */
 	virtual u8 GetRequiredShininessTexture() { return 0; }
-	virtual void SetShininessTexture(sptr<GpuTexture> texture, u8 index) = 0;
+	virtual void SetShininessTexture(sptr<GpuTexture> texture, u8 index) {}
 
     /** The texture defines per-pixel opacity.
      *
@@ -69,7 +66,7 @@ public:
      *  'transparency'. Or quite the opposite. Have fun.
     */
 	virtual u8 GetRequiredOpacityTexture() { return 0; }
-	virtual void SetOpacityTexture(sptr<GpuTexture> texture, u8 index) = 0;
+	virtual void SetOpacityTexture(sptr<GpuTexture> texture, u8 index) {}
 
     /** Displacement texture
      *
@@ -77,7 +74,7 @@ public:
      *  Higher color values stand for higher vertex displacements.
     */
 	virtual u8 GetRequiredDisplacementTexture() { return 0; }
-	virtual void SetDisplacementTexture(sptr<GpuTexture> texture, u8 index) = 0;
+	virtual void SetDisplacementTexture(sptr<GpuTexture> texture, u8 index) {}
 
     /** Lightmap texture (aka Ambient Occlusion)
      *
@@ -87,7 +84,7 @@ public:
      *  intensity is not affected by incoming light.
     */
 	virtual u8 GetRequiredLightmapTexture() { return 0; }
-	virtual void SetLightmapTexture(sptr<GpuTexture> texture, u8 index) = 0;
+	virtual void SetLightmapTexture(sptr<GpuTexture> texture, u8 index) {}
 
     /** Reflection texture
      *
@@ -95,7 +92,7 @@ public:
      * Rarely used, almost never for real-time applications.
     */
 	virtual u8 GetRequiredReflectionTexture() { return 0; }
-	virtual void SetReflectionTexture(sptr<GpuTexture> texture, u8 index) = 0;
+	virtual void SetReflectionTexture(sptr<GpuTexture> texture, u8 index) {}
 
     /** Unknown texture
      *
@@ -104,7 +101,7 @@ public:
      *  but is excluded from any further postprocessing.
     */
 	virtual u8 GetRequiredOtherTexture() { return 0; }
-	virtual void SetOtherTexture(sptr<GpuTexture> texture, u8 index) = 0;
+	virtual void SetOtherTexture(sptr<GpuTexture> texture, u8 index) {}
 };
 
 } // namespace RED_LILIUM_NAMESPACE

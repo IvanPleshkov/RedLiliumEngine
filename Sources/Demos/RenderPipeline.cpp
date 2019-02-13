@@ -1,7 +1,6 @@
 #include "pch.h"
 
 #include <Render/RenderDevice.h>
-#include <Render/MaterialManager.h>
 #include <Render/GpuTextureManager.h>
 #include <Render/Shader.h>
 #include <Render/Material.h>
@@ -33,7 +32,10 @@ namespace RenderPipelineDemoNamespace
 	{
 		uptr<Scene> scene = umake<Scene>();
 		AssimpImportOptions importOptions;
-		importOptions.material = renderDevice->GetMaterialManager()->Get("Shaders\\ColoredTriangle\\material.json");
+		importOptions.materialFabric = [renderDevice](auto)
+		{
+			return Material::Create(renderDevice, "Shaders\\ColoredTriangle\\material.json");
+		};
 		LoadSceneByAssimp(renderDevice, "Models\\torus.dae", scene->GetRoot()->AddChild("Loaded Scene"), importOptions);
 
 		Camera camera;

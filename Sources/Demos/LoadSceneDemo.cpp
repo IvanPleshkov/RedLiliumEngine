@@ -7,7 +7,6 @@
 #include <Render/GpuTexture.h>
 #include <Render/GpuTextureManager.h>
 #include <Render/Material.h>
-#include <Render/MaterialManager.h>
 #include <Pipeline/RenderPipeline.h>
 #include <Pipeline/Assimp/AssimpLoader.h>
 #include <Pipeline/Components/CameraComponent.h>
@@ -76,7 +75,10 @@ private:
 	{
 		m_scene = umake<Scene>();
 		AssimpImportOptions importOptions;
-		importOptions.material = GetRenderDevice()->GetMaterialManager()->Get("Shaders\\ColoredTriangle\\material.json");
+		importOptions.materialFabric = [renderDevice = GetRenderDevice()](auto)
+		{
+			return Material::Create(renderDevice, "Shaders\\ColoredTriangle\\material.json");
+		};
 		LoadSceneByAssimp(GetRenderDevice(), "Models\\nanosuit\\nanosuit.obj", m_scene->GetRoot()->AddChild("Loaded Scene"), importOptions);
 
 		Camera camera;

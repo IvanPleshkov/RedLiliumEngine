@@ -1,51 +1,26 @@
 #include "pch.h"
-#include "MaterialManager.h"
+#include "ShaderManager.h"
 #include "Shader.h"
 #include "VertexDeclaration.h"
 #include "Material.h"
+#include "RenderDevice.h"
 
 using namespace RED_LILIUM_NAMESPACE;
 
-MaterialManager::MaterialManager(ptr<RenderDevice> renderDevice, ptr<FileSystem> fileSystem)
+ShaderManager::ShaderManager(ptr<RenderDevice> renderDevice)
 	: RedLiliumObject()
 	, m_renderDevice(renderDevice)
-	, m_fileSystem(fileSystem)
 	, m_shaders()
 	, m_shaderPrograms()
 	, m_materials()
 {
 }
 
-MaterialManager::~MaterialManager()
+ShaderManager::~ShaderManager()
 {
 }
 
-sptr<Material> MaterialManager::Get(std::string_view filename, bool createCopy)
-{
-	if (createCopy)
-	{
-		return NewMaterial(filename);
-	}
-
-	auto i = m_materials.find(filename);
-	if (i != m_materials.end())
-	{
-		if (i->second != nullptr)
-		{
-			return i->second;
-		}
-		else
-		{
-			m_materials.erase(i);
-		}
-	}
-
-	sptr<Material> material = NewMaterial(filename);
-	m_materials.insert({ std::string(filename), material });
-	return std::move(material);
-}
-
-sptr<Shader> MaterialManager::GetShader(std::string_view filename, ShaderType type)
+sptr<Shader> ShaderManager::GetShader(std::string_view filename, ShaderType type)
 {
 	auto i = m_shaders.find(filename);
 	if (i != m_shaders.end())
@@ -65,7 +40,7 @@ sptr<Shader> MaterialManager::GetShader(std::string_view filename, ShaderType ty
 	return std::move(shader);
 }
 
-sptr<ShaderProgram> MaterialManager::GetShaderProgram(std::string_view filename, const json& materialJson)
+sptr<ShaderProgram> ShaderManager::GetShaderProgram(std::string_view filename)
 {
 	auto i = m_shaderPrograms.find(filename);
 	if (i != m_shaderPrograms.end())
@@ -80,32 +55,24 @@ sptr<ShaderProgram> MaterialManager::GetShaderProgram(std::string_view filename,
 		}
 	}
 
-	sptr<ShaderProgram> shaderProgram = NewShaderProgram(filename, materialJson);
+	sptr<ShaderProgram> shaderProgram = NewShaderProgram(filename);
 	m_shaderPrograms.insert({ std::string(filename), shaderProgram });
 	return std::move(shaderProgram);
 }
 
-sptr<Material> MaterialManager::NewMaterial(std::string_view filename)
-{
-	json materialJson = m_fileSystem->ReadJson(filename);
-	sptr<ShaderProgram> shaderProgram = GetShaderProgram(filename, materialJson);
-
-	sptr<Material> material = smake<Material>(m_renderDevice, filename);
-	material->SetShaderProgram(shaderProgram);
-
-	return std::move(material);
-}
-
-sptr<Shader> MaterialManager::NewShader(std::string_view filename, ShaderType type)
+sptr<Shader> ShaderManager::NewShader(std::string_view filename, ShaderType type)
 {
 	sptr<Shader> shader = smake<Shader>(m_renderDevice);
-	std::string shaderSource = m_fileSystem->ReadShaderFile(filename);
+	std::string shaderSource = m_renderDevice->GetFileSystem()->ReadShaderFile(filename);
 	shader->CompileFromString(type, shaderSource);
 	return std::move(shader);
 }
 
-sptr<ShaderProgram> MaterialManager::NewShaderProgram(std::string_view filename, const json& materialJson)
+sptr<ShaderProgram> ShaderManager::NewShaderProgram(std::string_view filename)
 {
+	json materialJson = m_renderDevice->GetFileSystem()->ReadJson(filename);
+	RED_LILIUM_ASSERT(!materialJson.empty());
+
 	const json& vertexShaderJson = materialJson["VertexShader"];
 	RED_LILIUM_ASSERT(!vertexShaderJson.is_null());
 	std::string vertexShaderFilename = vertexShaderJson["Filename"].get<std::string>();

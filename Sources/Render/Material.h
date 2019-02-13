@@ -15,13 +15,16 @@ public:
 	template<class T>
 	bool Set(std::string_view name, T& value);
 
+	static sptr<Material> Create(ptr<RenderDevice> renderDevice, std::string_view filename);
+
 /*internal*/ public:
 	void Use(ptr<RenderContext> context);
-	void SetShaderProgram(const sptr<ShaderProgram>& shaderProgram);
 	ptr<VertexDeclaration> GetVertexDeclaration();
 	const sptr<ShaderProgram>& GetShaderProgram();
 
 private:
+	void SetShaderProgram(const sptr<ShaderProgram>& shaderProgram);
+
 	std::vector<Uniform> m_uniforms;
 	std::map<std::string, size_t, std::less<>> m_nameToUniform;
 	ptr<RenderDevice> m_renderDevice;
@@ -29,7 +32,6 @@ private:
 	ptr<VertexDeclaration> m_vertexDeclaration;
 	sptr<ShaderProgram> m_shaderProgram;
 };
-
 
 template<class T>
 inline bool Material::Set(std::string_view name, T & value)
