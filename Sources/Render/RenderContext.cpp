@@ -25,7 +25,8 @@ void RenderContext::Draw(const sptr<GpuMesh>& mesh, const sptr<Material>& materi
 	UpdateUniformBlocks();
 	material->Use(this);
 
-	ptr<VertexArrayObject> vao = mesh->GetVertexArrayObject(material->GetVertexDeclaration());
+	const sptr<ShaderProgram>& shaderProgram = material->GetShaderProgram();
+	ptr<VertexArrayObject> vao = mesh->GetVertexArrayObject(shaderProgram->GetVertexDeclaration());
 	glBindVertexArray(vao->GetNative());
 	glDrawElements(GL_TRIANGLES, mesh->GetIndicesSize(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);

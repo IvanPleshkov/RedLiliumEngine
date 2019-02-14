@@ -11,25 +11,16 @@ using namespace RED_LILIUM_NAMESPACE;
 
 Material::Material(ptr<RenderDevice> renderDevice, std::string_view filename)
 	: RedLiliumObject()
-	, m_renderDevice(renderDevice)
-	, m_filename(filename)
-	, m_vertexDeclaration(nullptr)
 {
-	SetShaderProgram(m_renderDevice->GetShaderManager()->GetShaderProgram(filename));
+	SetShaderProgram(renderDevice->GetShaderManager()->GetShaderProgram(filename));
 }
 
 Material::~Material()
 {}
 
-sptr<Material> Material::Create(ptr<RenderDevice> renderDevice, std::string_view filename)
+const std::string& Material::GetName() const
 {
-	return smake<Material>(renderDevice, filename);
-}
-
-ptr<VertexDeclaration> Material::GetVertexDeclaration()
-{
-	RED_LILIUM_ASSERT(m_vertexDeclaration != nullptr);
-	return m_vertexDeclaration;
+	return m_shaderProgram->GetName();
 }
 
 const sptr<ShaderProgram>& Material::GetShaderProgram()
@@ -41,8 +32,6 @@ const sptr<ShaderProgram>& Material::GetShaderProgram()
 void Material::SetShaderProgram(const sptr<ShaderProgram>& shaderProgram)
 {
 	m_shaderProgram = shaderProgram;
-	m_vertexDeclaration = m_shaderProgram->GetVertexDeclaration();
-
 	m_uniforms = shaderProgram->GetUniforms();
 	m_nameToUniform.clear();
 	for (size_t i = 0; i < m_uniforms.size(); i++)
