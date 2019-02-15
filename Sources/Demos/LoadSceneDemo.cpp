@@ -11,6 +11,7 @@
 #include <Pipeline/Assimp/AssimpLoader.h>
 #include <Pipeline/Components/CameraComponent.h>
 #include <Pipeline/Components/CameraControllerComponent.h>
+#include <Pipeline/Effects/SimpleForwardTexturedOpaque.h>
 
 REGISTER_COMMAND("LoadSceneDemo", LoadSceneDemo)
 
@@ -77,7 +78,7 @@ private:
 		AssimpImportOptions importOptions;
 		importOptions.materialFabric = [renderDevice = GetRenderDevice()](auto)
 		{
-			return Material::Create(renderDevice, "Shaders\\ColoredTriangle\\material.json");
+			return smake<SimpleForwardTexturedOpaque>(renderDevice);
 		};
 		LoadSceneByAssimp(GetRenderDevice(), "Models\\nanosuit\\nanosuit.obj", m_scene->GetRoot()->AddChild("Loaded Scene"), importOptions);
 
