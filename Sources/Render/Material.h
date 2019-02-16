@@ -27,13 +27,22 @@ public:
 	template <class T>
 	struct Handler
 	{
-		Handler(ptr<Material> material, std::string_view name, const T& defaultValue)
+		Handler(ptr<Material> material, std::string_view name)
 			: m_uniform(nullptr)
 		{
-			auto i = m_nameToUniform.find(name);
-			if (i != m_nameToUniform.end())
+			auto i = material->m_nameToUniform.find(name);
+			if (i != material->m_nameToUniform.end())
 			{
-				m_uniform = &m_uniforms[i->second];
+				m_uniform = &material->m_uniforms[i->second];
+			}
+		}
+
+		Handler(ptr<Material> material, std::string_view name, const T& defaultValue)
+			: Handler(material, name)
+		{
+			if (m_uniform != nullptr)
+			{
+				m_uniform->Set(defaultValue);
 			}
 		}
 
@@ -50,13 +59,13 @@ public:
 	};
 
 	using Sampler = Handler<sptr<GpuTexture>>;
-	using Float = Handler<sptr<float>>;
-	using Vec2 = Handler<sptr<vec2>>;
-	using Vec3 = Handler<sptr<vec3>>;
-	using Vec4 = Handler<sptr<vec4>>;
-	using Mat2 = Handler<sptr<mat2>>;
-	using Mat3 = Handler<sptr<mat3>>;
-	using Mat4 = Handler<sptr<mat4>>;
+	using Float = Handler<float>;
+	using Vec2 = Handler<vec2>;
+	using Vec3 = Handler<vec3>;
+	using Vec4 = Handler<vec4>;
+	using Mat2 = Handler<mat2>;
+	using Mat3 = Handler<mat3>;
+	using Mat4 = Handler<mat4>;
 
 RED_LILIUM_INTERNAL:
 	void Use(ptr<RenderContext> context);
