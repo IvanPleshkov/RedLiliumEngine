@@ -19,20 +19,3 @@ void CameraControllerComponent::Serialize(ptr<Serializator> serializator) const
 
 void CameraControllerComponent::Deserialize(ptr<const Serializator> serializator)
 {}
-
-void CameraControllerComponent::Update()
-{}
-
-bool CameraControllerComponent::HandleMouseEvent(const MouseEvent& mouseEvent, const InputState& inputState)
-{
-	if (!m_cameraController)
-	{
-		m_cameraController = GetEntity()->GetComponent<CameraComponent>();
-		if (!m_cameraController)
-		{
-			return false;
-		}
-	}
-
-	return true;
-}
