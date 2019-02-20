@@ -117,6 +117,7 @@ public: // only for iterator
 
 			if (m_stack.size() == 1)
 			{
+
 			}
 			else
 			{
