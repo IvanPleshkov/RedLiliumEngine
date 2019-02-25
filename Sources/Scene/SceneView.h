@@ -53,36 +53,40 @@ struct SceneView
 
 public:
 	SceneView(ptr<Entity> root)
-		: m_roots()
-		, m_stack()
-		, m_parentIndex()
+		: m_trees()
 	{
-		m_roots.push_back(root);
+		m_trees.push_back(IteratorTree(root));
 	}
 	SceneView(std::initializer_list<ptr<Entity>> roots)
-		: m_roots(roots)
-		, m_stack()
-		, m_parentIndex()
-	{}
+		: m_trees()
+	{
+		for (auto& root : roots)
+		{
+			m_trees.push(IteratorTree(root));
+		}
+	}
 	~SceneView() = default;
 
 	Iterator begin()
 	{
-		if (m_roots.empty())
+		if (m_trees.empty())
 		{
 			return Iterator(nullptr);
 		}
-
-		RED_LILIUM_ASSERT(m_stack.empty() && m_parentIndex.empty());
-		m_stack.push(m_roots.front());
-		m_parentIndex.push(0);
-		if (FindNext())
+		if (IsValid())
 		{
 			return Iterator(this);
 		}
 		else
 		{
-			return Iterator(nullptr);
+			if (FindNext())
+			{
+				return Iterator(this);
+			}
+			else
+			{
+				return Iterator(nullptr);
+			}
 		}
 	}
 	Iterator end()
@@ -93,47 +97,51 @@ public:
 public: // only for iterator
 	bool IsValid()
 	{
-		return (m_stack.top()->GetComponent<Ts>() != nullptr)...;
+		return (... && (GetCurrent()->GetComponent<Ts>() != nullptr));
 	}
 	bool FindNext()
 	{
-		if (m_stack.empty())
+		do
 		{
-			m_stack.push(m_roots.front());
-			m_parentIndex.push(0);
-		}
-
-		while (true)
-		{
-			if (m_stack.empty())
+			if (!m_trees.top().Next())
 			{
-				return false;
+				m_trees.pop();
 			}
-
-			if (IsValid())
-			{
-				return true;
-			}
-
-			if (m_stack.size() == 1)
-			{
-
-			}
-			else
-			{
-			}
-		}
-		return false;
+		} while (!m_trees.empty() && !IsValid());
+		return !m_trees.empty();
 	}
 	Tuple GetCurrent()
 	{
-		return Tuple(m_stack.top()->GetComponent<Ts>()...);
+		return Tuple(m_trees.top().GetCurrent()->GetComponent<Ts>()...);
 	}
 
 private:
-	std::vector<ptr<Entity>> m_roots;
-	std::stack<ptr<Entity>> m_stack;
-	std::stack<u32> m_parentIndex;
+	struct IteratorTree
+	{
+		IteratorTree(ptr<Entity> root)
+			: m_stack()
+			, m_index()
+		{
+			m_stack.push(root);
+		}
+
+		ptr<Entity> GetCurrent()
+		{
+			return m_stack.top();
+		}
+
+		bool Next()
+		{
+			RED_LILIUM_ASSERT(!m_stack.empty());
+			
+			return !m_stack.empty();
+		}
+
+		std::stack<ptr<Entity>> m_stack;
+		std::stack<u32> m_index;
+	};
+
+	std::stack<IteratorTree> m_trees;
 };
 
 } // namespace RED_LILIUM_NAMESPACE
