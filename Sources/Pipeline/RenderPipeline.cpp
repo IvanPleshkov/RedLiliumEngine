@@ -6,6 +6,7 @@
 #include "Components/CameraComponent.h"
 #include "Components/MeshRenderer.h"
 #include "Components/MeshFilter.h"
+#include <Scene/SceneView.h>
 
 using namespace RED_LILIUM_NAMESPACE;
 
@@ -50,33 +51,25 @@ bool RenderPipeline::Render(const std::vector<ptr<const Entity>>& roots)
 void RenderPipeline::FindCameraComponents()
 {
 	m_cameraComponents.clear();
-	for (auto rootEntity : m_rootEntities)
+	for (auto cameraEntity : SceneView<CameraComponent>(m_rootEntities))
 	{
-		rootEntity->IterateComponentsWithChildren([this](ptr<const Component> component)
-		{
-			auto cameraComponent = Cast<const CameraComponent>(component);
-			if (cameraComponent)
-			{
-				m_cameraComponents.push_back(cameraComponent);
-			}
-		});
+		m_cameraComponents.push_back(cameraEntity->GetComponent<const CameraComponent>());
+
+		RED_LILIUM_ASSERT(m_cameraComponents.back());
 	}
 }
 
 void RenderPipeline::FindRenderables()
 {
 	m_meshRenderers.clear();
-	for (auto rootEntity : m_rootEntities)
+	for (auto rendererEntity : SceneView<MeshRenderer, MeshFilter>(m_rootEntities))
 	{
-		rootEntity->IterateComponentsWithChildren([this](ptr<const Component> component)
-		{
-			ptr<const MeshRenderer> meshRendererComponent = Cast<const MeshRenderer>(component);
-			ptr<const MeshFilter> meshFilter = component->GetEntity()->GetComponent<MeshFilter>();
-			if (meshRendererComponent && meshFilter)
-			{
-				m_meshRenderers.push_back({ meshFilter, meshRendererComponent });
-			}
-		});
+		auto meshRenderer = rendererEntity->GetComponent<const MeshRenderer>();
+		auto meshFilter = rendererEntity->GetComponent<const MeshFilter>();
+		m_meshRenderers.push_back({ meshFilter, meshRenderer });
+
+		RED_LILIUM_ASSERT(m_meshRenderers.back().first);
+		RED_LILIUM_ASSERT(m_meshRenderers.back().second);
 	}
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Core/Common.h>
+#include <Scene/Entity.h>
 
 namespace RED_LILIUM_NAMESPACE
 {
@@ -8,140 +9,74 @@ namespace RED_LILIUM_NAMESPACE
 class Entity;
 class Component;
 
-template<class ...Ts>
+template<class ...Components>
 struct SceneView
 {
-	using Tuple = std::tuple<ptr<Ts>...>;
+	using Tuple = std::tuple<ptr<const Components>...>;
+	using Entities = std::deque<ptr<const Entity>>;
 
-	struct Iterator
+	SceneView(ptr<const Entity> root)
+		: m_entities()
 	{
-		Iterator(ptr<SceneView> sceneView)
-			: m_sceneView(sceneView)
-		{}
-
-		Iterator operator++()
-		{
-			if (m_sceneView->FindNext())
-			{
-				return Iterator(m_sceneView);
-			}
-			else
-			{
-				return Iterator(nullptr);
-			}
-		}
-		Tuple operator*()
-		{
-			return m_sceneView->GetCurrent();
-		}
-		Tuple operator->()
-		{
-			return m_sceneView->GetCurrent();
-		}
-		bool operator == (const Iterator& i)
-		{
-			return m_sceneView == i.m_sceneView;
-		}
-		bool operator != (const Iterator& i)
-		{
-			return m_sceneView != i.m_sceneView;
-		}
-
-	private:
-		ptr<SceneView> m_sceneView;
-	};
-
-public:
-	SceneView(ptr<Entity> root)
-		: m_trees()
-	{
-		m_trees.push_back(IteratorTree(root));
+		FindEntities(root);
 	}
-	SceneView(std::initializer_list<ptr<Entity>> roots)
-		: m_trees()
+
+	SceneView(std::initializer_list<ptr<const Entity>> roots)
+		: m_entities()
 	{
 		for (auto& root : roots)
 		{
-			m_trees.push(IteratorTree(root));
+			FindEntities(root);
 		}
 	}
+
+	SceneView(std::vector<ptr<const Entity>> roots)
+		: m_entities()
+	{
+		for (auto& root : roots)
+		{
+			FindEntities(root);
+		}
+	}
+
 	~SceneView() = default;
 
-	Iterator begin()
+	Entities::iterator begin()
 	{
-		if (m_trees.empty())
-		{
-			return Iterator(nullptr);
-		}
-		if (IsValid())
-		{
-			return Iterator(this);
-		}
-		else
-		{
-			if (FindNext())
-			{
-				return Iterator(this);
-			}
-			else
-			{
-				return Iterator(nullptr);
-			}
-		}
-	}
-	Iterator end()
-	{
-		return Iterator(nullptr);
+		return m_entities.begin();
 	}
 
-public: // only for iterator
-	bool IsValid()
+	Entities::iterator end()
 	{
-		return (... && (GetCurrent()->GetComponent<Ts>() != nullptr));
-	}
-	bool FindNext()
-	{
-		do
-		{
-			if (!m_trees.top().Next())
-			{
-				m_trees.pop();
-			}
-		} while (!m_trees.empty() && !IsValid());
-		return !m_trees.empty();
-	}
-	Tuple GetCurrent()
-	{
-		return Tuple(m_trees.top().GetCurrent()->GetComponent<Ts>()...);
+		return m_entities.end();
 	}
 
 private:
-	struct IteratorTree
+	static bool IsValid(ptr<const Entity> entity)
 	{
-		IteratorTree(ptr<Entity> root)
-			: m_stack()
-			, m_index()
+		return (... && (entity->GetComponent<const Components>() != nullptr));
+	}
+
+	static Tuple GetTuple(ptr<const Entity> entity)
+	{
+		return Tuple(entity->GetComponent<const Components>()...);
+	}
+
+	void FindEntities(ptr<const Entity> root)
+	{
+		if (IsValid(root))
 		{
-			m_stack.push(root);
+			m_entities.push_back(root);
 		}
 
-		ptr<Entity> GetCurrent()
+		auto cnt = root->GetChildrenCount();
+		for (u32 i = 0; i < cnt; ++i)
 		{
-			return m_stack.top();
+			FindEntities(root->GetChild(i));
 		}
+	}
 
-		bool Next()
-		{
-			RED_LILIUM_ASSERT(!m_stack.empty());
-			
-			return !m_stack.empty();
-		}
-
-		std::stack<ptr<Entity>> m_stack;
-		std::stack<u32> m_index;
-	};
-
-	std::stack<IteratorTree> m_trees;
+	Entities m_entities;
 };
 
 } // namespace RED_LILIUM_NAMESPACE
