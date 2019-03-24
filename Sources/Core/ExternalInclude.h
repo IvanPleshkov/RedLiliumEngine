@@ -1,6 +1,7 @@
 #pragma once
 
 #include "StdInclude.h"
+#include <nonstd/span.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #define GLM_FORCE_SILENT_WARNINGS

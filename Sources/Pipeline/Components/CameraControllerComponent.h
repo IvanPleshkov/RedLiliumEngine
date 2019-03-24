@@ -2,6 +2,7 @@
 
 #include "../PipelineCommon.h"
 #include <Scene/Component.h>
+#include <Core/InputEvent.h>
 
 namespace RED_LILIUM_NAMESPACE
 {
@@ -24,5 +25,7 @@ private:
 	vec3 m_up;
 	vec3 m_lookAt;
 };
+
+bool HandleEvent(const MouseEvent& mouseEvent, span<ptr<const Entity>> entities);
 
 } // namespace RED_LILIUM_NAMESPACE

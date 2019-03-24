@@ -30,6 +30,15 @@ struct SceneView
 		}
 	}
 
+	SceneView(span<ptr<const Entity>> roots)
+		: m_entities()
+	{
+		for (auto& root : roots)
+		{
+			FindEntities(root);
+		}
+	}
+
 	SceneView(std::vector<ptr<const Entity>> roots)
 		: m_entities()
 	{

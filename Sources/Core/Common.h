@@ -51,6 +51,9 @@ using uptr = std::unique_ptr<T>;
 
 using json = nlohmann::json;
 
+template<class T>
+using span = nonstd::span_lite::span<T>;
+
 template<class T, class... _Types>
 [[nodiscard]] inline uptr<T> umake(_Types&&... _Args)
 {
