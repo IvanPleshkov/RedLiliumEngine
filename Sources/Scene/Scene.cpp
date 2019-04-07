@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "Scene.h"
+
+/*
 #include "Entity.h"
 #include "Component.h"
 
@@ -25,3 +27,4 @@ ptr<const Entity> Scene::GetRoot() const
 {
 	return m_root.get();
 }
+*/

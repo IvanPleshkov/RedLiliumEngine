@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "AssimpLoader.h"
 #include "AssimpMaterial.h"
+
+/*
 #include <Render/RenderDevice.h>
 #include <Render/GpuMesh.h>
 #include <Render/Material.h>
@@ -282,3 +284,4 @@ bool RED_LILIUM_NAMESPACE::LoadSceneByAssimp(ptr<RenderDevice> renderDevice, std
 
 	return true;
 }
+*/

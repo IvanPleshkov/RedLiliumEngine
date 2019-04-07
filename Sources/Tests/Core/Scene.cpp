@@ -8,7 +8,7 @@ using namespace RED_LILIUM_NAMESPACE;
 
 TEST(Scene, Constructor)
 {
-	uptr<Scene> scene = umake<Scene>();
+	// uptr<Scene> scene = umake<Scene>();
 }
 
 TEST(Entity, AddChildren)

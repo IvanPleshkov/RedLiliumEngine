@@ -1,6 +1,8 @@
 #pragma once
 
 #include <Core/Common.h>
+
+/*
 #include <Reflection/Serialization.h>
 #include "Component.h"
 
@@ -116,3 +118,4 @@ inline ptr<T> Entity::AddComponent(u64 position)
 }
 
 } // namespace RED_LILIUM_NAMESPACE
+*/

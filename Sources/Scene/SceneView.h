@@ -1,5 +1,7 @@
 #pragma once
 
+/*
+
 #include <Core/Common.h>
 #include <Scene/Entity.h>
 
@@ -89,3 +91,5 @@ private:
 };
 
 } // namespace RED_LILIUM_NAMESPACE
+
+*/

@@ -1,5 +1,7 @@
 #pragma once
 
+/*
+
 #include <Core/Common.h>
 #include <Reflection/Serialization.h>
 #include "Entity.h"
@@ -27,3 +29,5 @@ private:
 };
 
 } // namespace RED_LILIUM_NAMESPACE
+
+*/

@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "Entity.h"
+
+/*
 #include "Component.h"
 #include "Scene.h"
 
@@ -204,3 +206,5 @@ void Entity::SetWorldTransform(const mat4& transform)
 
 	RED_LILIUM_NOT_IMPLEMENTED();
 }
+
+*/

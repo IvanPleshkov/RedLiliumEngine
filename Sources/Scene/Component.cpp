@@ -1,6 +1,8 @@
 #include "pch.h"
-#include "Entity.h"
 #include "Component.h"
+
+/*
+#include "Entity.h"
 #include "Scene.h"
 
 using namespace RED_LILIUM_NAMESPACE;
@@ -20,3 +22,4 @@ void Component::Serialize(ptr<Serializator> serializator) const
 
 void Component::Deserialize(ptr<const Serializator> serializator)
 {}
+*/

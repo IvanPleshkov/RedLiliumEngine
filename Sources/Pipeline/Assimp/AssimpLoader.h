@@ -23,6 +23,6 @@ struct AssimpImportOptions
 	std::function<sptr<Material>(std::string_view)> materialFabric;
 };
 
-bool LoadSceneByAssimp(ptr<RenderDevice> renderDevice, std::string_view filename, ptr<Entity> rootEntity, const AssimpImportOptions& options);
+// bool LoadSceneByAssimp(ptr<RenderDevice> renderDevice, std::string_view filename, ptr<Entity> rootEntity, const AssimpImportOptions& options);
 
 } // namespace RED_LILIUM_NAMESPACE
