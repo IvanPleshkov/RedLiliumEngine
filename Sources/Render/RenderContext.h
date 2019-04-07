@@ -25,6 +25,7 @@ public:
 	const sptr<RenderTarget>& SetRenderTarget();
 
 	void Clear();
+	ptr<RenderDevice> GetRenderDevice() { return m_renderDevice; }
 
 /*internal*/ public:
 	ptr<const Uniform::ValueVariants> GetUniformValue(std::string_view name);

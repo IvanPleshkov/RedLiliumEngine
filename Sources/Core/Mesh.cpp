@@ -3,12 +3,12 @@
 
 using namespace RED_LILIUM_NAMESPACE;
 
-uptr<Mesh> Mesh::GenerateCube()
+sptr<Mesh> Mesh::GenerateCube()
 {
 	return nullptr;
 }
 
-uptr<Mesh> Mesh::GenerateTriangle()
+sptr<Mesh> Mesh::GenerateTriangle()
 {
 	uptr<Mesh> mesh = umake<Mesh>();
 
@@ -31,7 +31,7 @@ uptr<Mesh> Mesh::GenerateTriangle()
 	return std::move(mesh);
 }
 
-uptr<Mesh> Mesh::GenerateRectangle()
+sptr<Mesh> Mesh::GenerateRectangle()
 {
 	uptr<Mesh> mesh = umake<Mesh>();
 

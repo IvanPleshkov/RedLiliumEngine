@@ -65,7 +65,7 @@ namespace RenderTriangleNamespace
 		material->Set("g_albedo2", texture2);
 		material->Set("g_albedo1", texture1);
 
-		uptr<Mesh> mesh = Mesh::GenerateRectangle();
+		sptr<Mesh> mesh = Mesh::GenerateRectangle();
 		sptr<GpuMesh> gpuMesh = smake<GpuMesh>(renderDevice.get());
 		gpuMesh->Update(mesh.get());
 

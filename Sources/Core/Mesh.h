@@ -13,9 +13,9 @@ public:
 	static const u32 TEXCOORDS_COUNT = 8;
 	static const u32 COLORS_COUNT = 4;
 
-	static uptr<Mesh> GenerateCube();
-	static uptr<Mesh> GenerateTriangle();
-	static uptr<Mesh> GenerateRectangle();
+	static sptr<Mesh> GenerateCube();
+	static sptr<Mesh> GenerateTriangle();
+	static sptr<Mesh> GenerateRectangle();
 
 	std::vector<u32> m_indices;
 	std::vector<vec3> m_positions;

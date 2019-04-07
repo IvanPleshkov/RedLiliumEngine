@@ -9,11 +9,10 @@
 
 namespace RED_LILIUM_NAMESPACE
 {
-
 namespace Geometrics
 {
 
-class Context : public RedLiliumObject
+class Context final : public RedLiliumObject
 {
 public:
 	Context();
@@ -24,7 +23,7 @@ public:
 	Cube& AddCube();
 	Sphere& AddSphere();
 
-/*internal*/ public:
+RED_LILIUM_INTERNAL:
 	const RenderState& GetRenderState() const;
 	void Prepare();
 
@@ -41,5 +40,4 @@ private:
 };
 
 } // namespace Geometrics
-
 } // namespace RED_LILIUM_NAMESPACE
