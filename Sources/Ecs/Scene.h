@@ -54,27 +54,6 @@ private:
 	std::vector<bool> m_enable;
 };
 
-class Transaction final
-{
-public:
-	Transaction(ptr<Scene> scene, TransactionFlags flags);
-	~Transaction();
-
-	void Remove(Entity entity);
-	void ChangeParent(Entity entity, Entity newParent);
-	Entity AddChild(Entity entity, const std::string& name, u64 position = u64_max);
-	void SetName(Entity entity, const std::string& name);
-
-	template<class T>
-	void SetComponent(Entity entity, ptr<const T> component) const;
-
-	void Apply();
-
-private:
-	ptr<Scene> m_scene;
-	TransactionFlags m_flags;
-};
-
 template<class T>
 inline void Scene::RegisterComponent()
 {
@@ -100,27 +79,6 @@ inline ptr<const T> Scene::GetComponent(Entity entity) const
 	const auto componentIndex = m_componentsIndex.find(std::type_index(typeid(T)));
 
 	return Cast<const T>(components[componentIndex]);
-}
-
-template<class T>
-inline void Transaction::SetComponent(Entity entity, ptr<const T> component) const
-{
-	RED_LILIUM_ASSERT(m_scene->m_componentsIndex.find(std::type_index(typeid(T))) != m_scene->m_componentsIndex.end());
-
-	if (m_flags.Test(TransactionOptions::Immediate))
-	{
-		const auto& components = m_scene->m_components[entity.m_index];
-		const auto componentIndex = m_scene->m_componentsIndex.find(std::type_index(typeid(T)));
-		if (!components[componentIndex])
-		{
-			components[componentIndex] = umake<T>();
-		}
-		*components[componentIndex] = *component;
-	}
-	else
-	{
-		RED_LILIUM_NOT_IMPLEMENTED();
-	}
 }
 
 } // namespace RED_LILIUM_NAMESPACE

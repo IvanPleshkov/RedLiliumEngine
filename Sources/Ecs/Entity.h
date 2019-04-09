@@ -19,7 +19,6 @@ public:
 	}
 
 	friend class Scene;
-	friend class Transaction;
 private:
 
 	u32 m_index = u32_max;
