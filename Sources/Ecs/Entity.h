@@ -5,25 +5,23 @@
 namespace RED_LILIUM_NAMESPACE
 {
 
-class Entity final
+using ChunkIndex = u16;
+const ChunkIndex nullChunkIndex = u16_max;
+
+using EntityGeneration = u16;
+
+using EntityIndex = u32;
+
+struct Entity final
 {
-public:
 	bool IsValid()
 	{
-		return !IsTemporary() && m_index != u32_max;
+		return m_index != u32_max;
 	}
 
-	bool IsTemporary()
-	{
-		return m_cluster == u16_max;
-	}
-
-	friend class Scene;
-private:
-
-	u32 m_index = u32_max;
-	u16 m_generation = u16_max;
-	u16 m_cluster = u16_max;
+	EntityIndex m_index = u32_max;
+	EntityGeneration m_generation = u16_max;
+	ChunkIndex m_chunk = nullChunkIndex;
 };
 
 } // namespace RED_LILIUM_NAMESPACE

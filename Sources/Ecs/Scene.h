@@ -10,12 +10,55 @@ namespace RED_LILIUM_NAMESPACE
 
 class Component;
 
-enum class TransactionOptions : u8
+using ComponentTypeId = u32;
+
+ComponentTypeId GenerateComponentTypeId()
 {
-	Immediate			= 1 << 0,
-	RollbackFeature		= 1 << 1,
+	static ComponentTypeId id = 0;
+	return id++;
+}
+
+template<class T>
+ComponentTypeId GetComponentTypeId()
+{
+	static ComponentTypeId id = GenerateComponentTypeId();
+	return id;
+}
+
+ComponentTypeId GenerateSystemTypeId()
+{
+	static ComponentTypeId id = 0;
+	return id++;
+}
+
+template<class T>
+ComponentTypeId GetSystemTypeId()
+{
+	static ComponentTypeId id = GenerateSystemTypeId();
+	return id;
+}
+
+class ComponentContainerBase
+{
+public:
+	virtual ~ComponentContainerBase() = default;
+
+private:
+	std::type_index m_componentTypeIndex;
 };
-using TransactionFlags = Flags<TransactionOptions>;
+
+template<class TComponent>
+class ComponentContainer : ComponentContainerBase
+{
+public:
+	~ComponentContainer() override = default;
+
+private:
+	std::deque<TComponent> m_components;
+};
+
+class MetaType
+{};
 
 class Scene final
 {
@@ -23,28 +66,60 @@ public:
 	Scene();
 	~Scene();
 
-	Entity GetRoot() const;
+public: // Entity
+	Entity Add();
+	void Add(Entity entity);
+	void Remove(Entity entity);
+	bool Exists(Entity entity) const;
 
-	template<class T>
-	void RegisterComponent();
 
-	const std::string& GetName(Entity entity) const;
-	Entity GetParent(Entity entity) const;
-	u32 GetChildrenCount(Entity entity) const;
-	Entity GetChild(Entity entity, u32 index) const;
-	Entity GetChild(Entity entity, std::string_view name, u32 index = 0) const;
+public: // Component
+	template<class TComponent, class... Args>
+	TComponent& AddComponent(Entity entity, Args&&... args);
 
-	template<class T>
-	ptr<const T> GetComponent(Entity entity) const;
+	template<class TComponent>
+	void RemoveComponent(Entity entity);
 
-	sptr<Transaction> CreateTransaction(TransactionFlags flags = TransactionFlags(TransactionOptions::Immediate));
-	void ApplyTransactions();
+	template<class ...TComponents>
+	void RemoveComponents(Entity entity);
 
-	friend class Transaction;
+	template<class TComponent>
+	bool HasComponent(Entity entity) const;
+
+	template<class ...TComponents>
+	bool HasComponents(Entity entity) const;
+
+	template<class TComponent>
+	TComponent& GetComponent(Entity entity);
+
+	template<class ...TComponents>
+	std::tuple<TComponents&...> GetComponents(Entity entity);
+
+	template<class TComponent>
+	ptr<const TComponent> GetComponent(Entity entity) const;
+
+	template<class ...TComponents>
+	std::tuple<const TComponents&...> GetComponents(Entity entity) const;
+
+public: // System
+	template<class TSystem, class... Args>
+	TSystem& AddSystem(Args&&... args);
+
+	template<class TSystem>
+	void RemoveSystem();
+
+	template<class TSystem>
+	bool HasSystem() const;
+
+	template<class TSystem>
+	ptr<TSystem> GetSystem();
+
+	template<class TSystem>
+	ptr<const TSystem> GetSystem() const;
+
 private:
-	Entity m_root;
-	std::mutex m_transactionMutex;
-	std::vector<sptr<Transaction>> m_transactions;
+	std::vector<Entity> m_entities;
+
 
 	std::unordered_map<std::type_index, u32> m_componentsIndex;
 	std::vector<std::vector<uptr<Component>>> m_components;
@@ -54,16 +129,6 @@ private:
 	std::vector<bool> m_enable;
 };
 
-template<class T>
-inline void Scene::RegisterComponent()
-{
-	m_componentsIndex.insert({ std::type_index(typeid(T)), m_componentsIndex.size() });
-
-	for (auto& components = m_components)
-	{
-		components.push_back(nullptr);
-	}
-}
 
 template<class T>
 inline ptr<const T> Scene::GetComponent(Entity entity) const
