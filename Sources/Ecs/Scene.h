@@ -21,7 +21,7 @@ ComponentTypeId GenerateComponentTypeId()
 template<class T>
 ComponentTypeId GetComponentTypeId()
 {
-	static ComponentTypeId id = GenerateComponentTypeId();
+	static const ComponentTypeId id = GenerateComponentTypeId();
 	return id;
 }
 
@@ -34,7 +34,7 @@ ComponentTypeId GenerateSystemTypeId()
 template<class T>
 ComponentTypeId GetSystemTypeId()
 {
-	static ComponentTypeId id = GenerateSystemTypeId();
+	static const ComponentTypeId id = GenerateSystemTypeId();
 	return id;
 }
 
@@ -42,13 +42,10 @@ class ComponentContainerBase
 {
 public:
 	virtual ~ComponentContainerBase() = default;
-
-private:
-	std::type_index m_componentTypeIndex;
 };
 
 template<class TComponent>
-class ComponentContainer : ComponentContainerBase
+class ComponentContainer : public ComponentContainerBase
 {
 public:
 	~ComponentContainer() override = default;
@@ -71,7 +68,6 @@ public: // Entity
 	void Add(Entity entity);
 	void Remove(Entity entity);
 	bool Exists(Entity entity) const;
-
 
 public: // Component
 	template<class TComponent, class... Args>
@@ -128,22 +124,5 @@ private:
 	std::vector<std::string> m_names;
 	std::vector<bool> m_enable;
 };
-
-
-template<class T>
-inline ptr<const T> Scene::GetComponent(Entity entity) const
-{
-	RED_LILIUM_ASSERT(m_componentsIndex.find(std::type_index(typeid(T))) != m_componentsIndex.end());
-
-	if (!entity.IsValid() || entity.m_index >= m_components.size())
-	{
-		return nullptr;
-	}
-
-	const auto& components = m_components[entity.m_index];
-	const auto componentIndex = m_componentsIndex.find(std::type_index(typeid(T)));
-
-	return Cast<const T>(components[componentIndex]);
-}
 
 } // namespace RED_LILIUM_NAMESPACE
