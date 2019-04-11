@@ -113,16 +113,11 @@ public: // System
 	template<class TSystem>
 	ptr<const TSystem> GetSystem() const;
 
+public: // Views
+
+
 private:
-	std::vector<Entity> m_entities;
 
-
-	std::unordered_map<std::type_index, u32> m_componentsIndex;
-	std::vector<std::vector<uptr<Component>>> m_components;
-	std::vector<std::vector<Entity>> m_children;
-	std::vector<Entity> m_parents;
-	std::vector<std::string> m_names;
-	std::vector<bool> m_enable;
 };
 
 } // namespace RED_LILIUM_NAMESPACE
