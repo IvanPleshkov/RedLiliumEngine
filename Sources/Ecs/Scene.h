@@ -10,52 +10,52 @@ namespace RED_LILIUM_NAMESPACE
 
 class Component;
 
-using ComponentTypeId = u32;
-
-ComponentTypeId GenerateComponentTypeId()
-{
-	static ComponentTypeId id = 0;
-	return id++;
-}
-
-template<class T>
-ComponentTypeId GetComponentTypeId()
-{
-	static const ComponentTypeId id = GenerateComponentTypeId();
-	return id;
-}
-
-ComponentTypeId GenerateSystemTypeId()
-{
-	static ComponentTypeId id = 0;
-	return id++;
-}
-
-template<class T>
-ComponentTypeId GetSystemTypeId()
-{
-	static const ComponentTypeId id = GenerateSystemTypeId();
-	return id;
-}
-
-class ComponentContainerBase
-{
-public:
-	virtual ~ComponentContainerBase() = default;
-};
-
-template<class TComponent>
-class ComponentContainer : public ComponentContainerBase
-{
-public:
-	~ComponentContainer() override = default;
-
-private:
-	std::deque<TComponent> m_components;
-};
-
-class MetaType
-{};
+//using ComponentTypeId = u32;
+//
+//ComponentTypeId GenerateComponentTypeId()
+//{
+//	static ComponentTypeId id = 0;
+//	return id++;
+//}
+//
+//template<class T>
+//ComponentTypeId GetComponentTypeId()
+//{
+//	static const ComponentTypeId id = GenerateComponentTypeId();
+//	return id;
+//}
+//
+//ComponentTypeId GenerateSystemTypeId()
+//{
+//	static ComponentTypeId id = 0;
+//	return id++;
+//}
+//
+//template<class T>
+//ComponentTypeId GetSystemTypeId()
+//{
+//	static const ComponentTypeId id = GenerateSystemTypeId();
+//	return id;
+//}
+//
+//class ComponentContainerBase
+//{
+//public:
+//	virtual ~ComponentContainerBase() = default;
+//};
+//
+//template<class TComponent>
+//class ComponentContainer : public ComponentContainerBase
+//{
+//public:
+//	~ComponentContainer() override = default;
+//
+//private:
+//	std::deque<TComponent> m_components;
+//};
+//
+//class MetaType
+//{};
 
 class Scene final
 {
@@ -117,7 +117,8 @@ public: // Views
 
 
 private:
-
+	std::vector<EntityGeneration> m_entityGenerations;
+	std::unordered_set<Entity> m_freeEntities;
 };
 
 } // namespace RED_LILIUM_NAMESPACE
