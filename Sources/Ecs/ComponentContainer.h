@@ -24,6 +24,7 @@ class ComponentContainerBase
 {
 public:
 	virtual ~ComponentContainerBase() = default;
+	virtual uptr<ComponentContainerBase> CreateWithSameType() const = 0;
 };
 
 template<class TComponent>
@@ -31,9 +32,12 @@ class ComponentContainer : public ComponentContainerBase
 {
 public:
 	~ComponentContainer() override = default;
+	uptr<ComponentContainerBase> CreateWithSameType() const override
+	{
+		return umake<ComponentContainer<TComponent>>();
+	}
 
-private:
-	std::deque<TComponent> m_components;
+	std::vector<TComponent> m_components;
 };
 
 } // namespace RED_LILIUM_NAMESPACE

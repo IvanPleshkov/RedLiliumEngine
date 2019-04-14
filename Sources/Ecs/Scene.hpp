@@ -23,48 +23,43 @@ inline void Scene::RemoveComponents(Entity entity)
 template<class TComponent>
 inline bool Scene::HasComponent(Entity entity) const
 {
-	return false;
+	auto& metaData = m_metaData[m_entityMetaClass[entity.m_index]];
+	return metaData.HasComponent<TComponent>(m_entityMetaIndex[entity.m_index]);
 }
 
 template<class ...TComponents>
 inline bool Scene::HasComponents(Entity entity) const
 {
-	return false;
+	auto& metaData = m_metaData[m_entityMetaClass[entity.m_index]];
+	return metaData.HasComponents<TComponents...>(m_entityMetaIndex[entity.m_index]);
 }
 
 template<class TComponent>
 inline ptr<TComponent> Scene::GetComponent(Entity entity)
 {
-	return ptr<TComponent>();
+	auto& metaData = m_metaData[m_entityMetaClass[entity.m_index]];
+	return metaData.GetComponent<TComponent>(m_entityMetaIndex[entity.m_index]);
 }
 
 template<class ...TComponents>
 inline std::tuple<ptr<TComponents>...> Scene::GetComponents(Entity entity)
 {
-	return std::tuple<ptr<TComponents>...>();
+	auto& metaData = m_metaData[m_entityMetaClass[entity.m_index]];
+	return metaData.GetComponents<TComponents...>(m_entityMetaIndex[entity.m_index]);
 }
 
 template<class TComponent>
 inline ptr<const TComponent> Scene::GetComponent(Entity entity) const
 {
-	return ptr<const TComponent>();
+	auto& metaData = m_metaData[m_entityMetaClass[entity.m_index]];
+	return metaData.GetComponent<TComponent>(m_entityMetaIndex[entity.m_index]);
 }
 
 template<class ...TComponents>
 inline std::tuple<ptr<const TComponents>...> Scene::GetComponents(Entity entity) const
 {
-	return std::tuple<ptr<const TComponents>...>();
-}
-
-template<class TComponent>
-inline ComponentContainer<TComponent>& Scene::GetComponentContainer()
-{
-}
-
-template<class TComponent>
-inline const ComponentContainer<TComponent>& Scene::GetComponentContainer() const
-{
-
+	auto& metaData = m_metaData[m_entityMetaClass[entity.m_index]];
+	return metaData.GetComponents<TComponents...>(m_entityMetaIndex[entity.m_index]);
 }
 
 } // namespace RED_LILIUM_NAMESPACE

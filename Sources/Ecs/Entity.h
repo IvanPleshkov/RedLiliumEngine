@@ -15,30 +15,10 @@ using EntityIndex = u32;
 
 struct Entity final
 {
-	bool IsValid()
-	{
-		return m_index != u32_max;
-	}
-
-	u64 Hash() const
-	{
-		return *reinterpret_cast<ptr<const u64>>(this);
-	}
-
-	bool operator ==(const Entity& other) const
-	{
-		return Hash() == other.Hash();
-	}
-
-	bool operator !=(const Entity& other) const
-	{
-		return Hash() != other.Hash();
-	}
-
-	bool operator <(const Entity& other) const
-	{
-		return Hash() < other.Hash();
-	}
+	u64 Hash() const;
+	bool operator==(const Entity& other) const;
+	bool operator!=(const Entity& other) const;
+	bool operator<(const Entity& other) const;
 
 	EntityIndex m_index = u32_max;
 	EntityGeneration m_generation = u16_max;
