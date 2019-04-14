@@ -25,6 +25,7 @@ class ComponentContainerBase
 public:
 	virtual ~ComponentContainerBase() = default;
 	virtual uptr<ComponentContainerBase> CreateWithSameType() const = 0;
+	virtual ComponentTypeId GetComponentTypeId() const = 0;
 };
 
 template<class TComponent>
@@ -35,6 +36,11 @@ public:
 	uptr<ComponentContainerBase> CreateWithSameType() const override
 	{
 		return umake<ComponentContainer<TComponent>>();
+	}
+
+	ComponentTypeId GetComponentTypeId() const override
+	{
+		return GetComponentTypeId<TComponent>();
 	}
 
 	std::vector<TComponent> m_components;

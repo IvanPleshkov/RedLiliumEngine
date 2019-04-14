@@ -7,17 +7,24 @@ namespace RED_LILIUM_NAMESPACE
 template<class TComponent, class ...Args>
 inline ptr<TComponent> Scene::AddComponent(Entity entity, Args && ...args)
 {
-	// TODO: insert return statement here
+	return nullptr;
 }
 
 template<class TComponent>
 inline void Scene::RemoveComponent(Entity entity)
 {
+	if (!HasComponent<TComponent>(entity))
+	{
+		return;
+	}
+
+
 }
 
 template<class ...TComponents>
 inline void Scene::RemoveComponents(Entity entity)
 {
+	RemoveComponent<TComponents>(entity)...;
 }
 
 template<class TComponent>

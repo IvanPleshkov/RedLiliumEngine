@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Core/Common.h>
-#include <ComponentContainer.h>
+#include "ComponentContainer.h"
 
 namespace RED_LILIUM_NAMESPACE
 {
@@ -11,9 +11,20 @@ class Scene;
 class MetaData final
 {
 public:
-	MetaData(Scene& scene);
-	MetaData(Scene& scene, ptr<MetaData> parent, ComponentTypeId addedType);
-	MetaData(Scene& scene, ptr<MetaData> parent, ComponentTypeId removedType);
+	MetaData()
+	{}
+
+	MetaData(ptr<MetaData> parent, uptr<ComponentContainerBase> componentContainer)
+	{
+		InitComponents(parent);
+		m_components.insert({ componentContainer->GetComponentTypeId(), std::move(componentContainer) });
+	}
+
+	MetaData(ptr<MetaData> parent, ComponentTypeId removedComponent)
+	{
+		InitComponents(parent);
+		m_components.erase(removedComponent);
+	}
 
 	template<class TComponent>
 	bool HasComponent() const
@@ -68,8 +79,16 @@ public:
 	}
 
 private:
-	std::unordered_map<ComponentTypeId, uptr<ComponentContainerBase>> m_components;
+	void InitComponents(ptr<MetaData> parent)
+	{
+		for (auto&[k, v] : parent->m_components)
+		{
+			m_components.insert({ k, std::move(v->CreateWithSameType()) });
+		}
+	}
+
 	std::vector<Entity> m_entities;
+	std::unordered_map<ComponentTypeId, uptr<ComponentContainerBase>> m_components;
 };
 
 } // namespace RED_LILIUM_NAMESPACE

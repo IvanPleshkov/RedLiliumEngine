@@ -13,19 +13,19 @@ Scene::~Scene()
 
 Entity Scene::Add()
 {
+	Entity entity;
+
 	if (m_freeEntities.empty())
 	{
-		Entity entity;
 		entity.m_chunk = 0;
 		entity.m_generation = 1;
 		entity.m_index = m_entityGenerations.size();
 		m_entityGenerations.push_back(entity.m_generation);
-		return entity;
 	}
 	else
 	{
 		auto entityIterator = m_freeEntities.begin();
-		Entity entity = *entityIterator;
+		entity = *entityIterator;
 		m_freeEntities.erase(entityIterator);
 
 		if (entity.m_generation == maxEntityGeneration)
@@ -36,8 +36,20 @@ Entity Scene::Add()
 		entity.m_generation++;
 		RED_LILIUM_ASSERT(m_entityGenerations[entity.m_index] == 0);
 		m_entityGenerations[entity.m_index] = entity.m_generation;
-		return entity;
 	}
+
+	if (m_entityMetaClass.size() >= entity.m_index)
+	{
+		m_entityMetaClass.resize(entity.m_index + 1);
+	}
+	m_entityMetaClass[entity.m_index] = 0;
+
+	if (m_entityMetaIndex.size() >= entity.m_index)
+	{
+		m_entityMetaIndex.resize(entity.m_index + 1);
+	}
+	m_entityMetaIndex[entity.m_index] = 0;
+	return entity;
 }
 
 void Scene::Add(Entity entity)
@@ -50,6 +62,8 @@ void Scene::Add(Entity entity)
 		m_freeEntities.erase(entityIterator);
 	}
 	m_entityGenerations[entity.m_index] = entity.m_generation;
+	m_entityMetaClass[entity.m_index] = 0;
+	m_entityMetaIndex[entity.m_index] = 0;
 }
 
 void Scene::Remove(Entity entity)

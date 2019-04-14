@@ -57,8 +57,9 @@ private:
 	std::vector<EntityGeneration> m_entityGenerations;
 	std::vector<u32> m_entityMetaClass;
 	std::vector<u32> m_entityMetaIndex;
-	std::vector<MetaData> m_metaData;
 	std::unordered_set<Entity> m_freeEntities;
+
+	std::vector<uptr<MetaData>> m_metaData;
 };
 
 } // namespace RED_LILIUM_NAMESPACE
