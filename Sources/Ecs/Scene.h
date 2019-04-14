@@ -4,58 +4,12 @@
 #include <Core/Flags.h>
 #include <Reflection/Serialization.h>
 #include "Entity.h"
+#include "MetaClass.h"
 
 namespace RED_LILIUM_NAMESPACE
 {
 
 class Component;
-
-//using ComponentTypeId = u32;
-//
-//ComponentTypeId GenerateComponentTypeId()
-//{
-//	static ComponentTypeId id = 0;
-//	return id++;
-//}
-//
-//template<class T>
-//ComponentTypeId GetComponentTypeId()
-//{
-//	static const ComponentTypeId id = GenerateComponentTypeId();
-//	return id;
-//}
-//
-//ComponentTypeId GenerateSystemTypeId()
-//{
-//	static ComponentTypeId id = 0;
-//	return id++;
-//}
-//
-//template<class T>
-//ComponentTypeId GetSystemTypeId()
-//{
-//	static const ComponentTypeId id = GenerateSystemTypeId();
-//	return id;
-//}
-//
-//class ComponentContainerBase
-//{
-//public:
-//	virtual ~ComponentContainerBase() = default;
-//};
-//
-//template<class TComponent>
-//class ComponentContainer : public ComponentContainerBase
-//{
-//public:
-//	~ComponentContainer() override = default;
-//
-//private:
-//	std::deque<TComponent> m_components;
-//};
-//
-//class MetaType
-//{};
 
 class Scene final
 {
@@ -71,7 +25,7 @@ public: // Entity
 
 public: // Component
 	template<class TComponent, class... Args>
-	TComponent& AddComponent(Entity entity, Args&&... args);
+	ptr<TComponent> AddComponent(Entity entity, Args&&... args);
 
 	template<class TComponent>
 	void RemoveComponent(Entity entity);
@@ -86,16 +40,22 @@ public: // Component
 	bool HasComponents(Entity entity) const;
 
 	template<class TComponent>
-	TComponent& GetComponent(Entity entity);
+	ptr<TComponent> GetComponent(Entity entity);
 
 	template<class ...TComponents>
-	std::tuple<TComponents&...> GetComponents(Entity entity);
+	std::tuple<ptr<TComponents>...> GetComponents(Entity entity);
 
 	template<class TComponent>
 	ptr<const TComponent> GetComponent(Entity entity) const;
 
 	template<class ...TComponents>
-	std::tuple<const TComponents&...> GetComponents(Entity entity) const;
+	std::tuple<ptr<const TComponents>...> GetComponents(Entity entity) const;
+
+	template<class TComponent>
+	ComponentContainer<TComponent>& GetComponentContainer();
+
+	template<class TComponent>
+	const ComponentContainer<TComponent>& GetComponentContainer() const;
 
 public: // System
 	template<class TSystem, class... Args>
@@ -119,6 +79,9 @@ public: // Views
 private:
 	std::vector<EntityGeneration> m_entityGenerations;
 	std::unordered_set<Entity> m_freeEntities;
+	std::unordered_map<ComponentTypeId, uptr<ComponentContainerBase>> m_components;
 };
 
 } // namespace RED_LILIUM_NAMESPACE
+
+#include "Scene.hpp"
