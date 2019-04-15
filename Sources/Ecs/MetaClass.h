@@ -78,6 +78,34 @@ public:
 		return std::tuple<TComponents&...>{ GetComponents<TComponents>(index)... };
 	}
 
+	void SwapComponents(u32 index1, u32 index2)
+	{
+		std::swap(m_entities[index1], m_entities[index2]);
+		for (auto&[k, v] : m_components)
+		{
+			v->SwapComponents(index1, index2);
+		}
+	}
+
+	void Invalidate(u32 index)
+	{
+		m_entities[index] = Entity();
+		for (auto&[k, v] : m_components)
+		{
+			v->Invalidate(index);
+		}
+	}
+
+	template<class TComponent>
+	void SetComponent(u32 index, TComponent component)
+	{
+		auto i = m_components.find(GetComponentTypeId<TComponent>());
+		RED_LILIUM_ASSERT(i != m_components.end());
+		ptr<ComponentContainerBase> base = i->get();
+		ptr<ComponentContainer<TComponent>> casted = static_cast<ptr<ComponentContainer<TComponent>>>(base);
+		casted->m_components[index] = std::move(component);
+	}
+
 private:
 	void InitComponents(ptr<MetaData> parent)
 	{

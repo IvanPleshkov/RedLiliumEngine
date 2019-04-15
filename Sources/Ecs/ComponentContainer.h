@@ -26,6 +26,8 @@ public:
 	virtual ~ComponentContainerBase() = default;
 	virtual uptr<ComponentContainerBase> CreateWithSameType() const = 0;
 	virtual ComponentTypeId GetComponentTypeId() const = 0;
+	virtual void SwapComponents(u32 index1, u32 index2) = 0;
+	virtual void Invalidate(u32 index) = 0;
 };
 
 template<class TComponent>
@@ -41,6 +43,16 @@ public:
 	ComponentTypeId GetComponentTypeId() const override
 	{
 		return GetComponentTypeId<TComponent>();
+	}
+
+	void SwapComponents(u32 index1, u32 index2) override
+	{
+		std::swap(m_components[index1], m_components[index2]);
+	}
+
+	void Invalidate(u32 index) override
+	{
+		m_components[index] = TComponent();
 	}
 
 	std::vector<TComponent> m_components;
