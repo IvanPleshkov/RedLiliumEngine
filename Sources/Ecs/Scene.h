@@ -54,12 +54,24 @@ public: // Component
 public: // Views
 
 private:
+	using ComponentsSet = std::unordered_set<ComponentTypeId>;
+	static size_t ComponentsSetHash(const ComponentsSet& set)
+	{
+		size_t result;
+		for (const auto id : set)
+		{
+			result ^= id;
+		}
+		return result;
+	}
+
 	std::vector<EntityGeneration> m_entityGenerations;
 	std::vector<u32> m_entityMetaClass;
 	std::vector<u32> m_entityMetaIndex;
 	std::unordered_set<Entity> m_freeEntities;
 
 	std::vector<uptr<MetaData>> m_metaData;
+	std::unordered_map<ComponentsSet, ptr<MetaData>, decltype(&ComponentsSetHash)> m_metaClasses;
 };
 
 } // namespace RED_LILIUM_NAMESPACE
