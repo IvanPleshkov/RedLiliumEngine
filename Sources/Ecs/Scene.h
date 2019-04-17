@@ -54,16 +54,10 @@ public: // Component
 public: // Views
 
 private:
+	void SwapEntitiesInsideGroup(Entity e1, Entity e2);
+
 	using ComponentsSet = std::unordered_set<ComponentTypeId>;
-	static size_t ComponentsSetHash(const ComponentsSet& set)
-	{
-		size_t result;
-		for (const auto id : set)
-		{
-			result ^= id;
-		}
-		return result;
-	}
+	static size_t ComponentsSetHash(const ComponentsSet& set);
 
 	std::vector<EntityGeneration> m_entityGenerations;
 	std::vector<u32> m_entityMetaClass;

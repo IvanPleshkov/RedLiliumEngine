@@ -7,6 +7,26 @@ namespace RED_LILIUM_NAMESPACE
 template<class TComponent, class ...Args>
 inline ptr<TComponent> Scene::AddComponent(Entity entity, Args && ...args)
 {
+	RED_LILIUM_ASSERT(HasComponent<TComponent>(entity) == false);
+
+	ptr<MetaData> oldData = m_metaData[m_entityMetaClass[entity.m_index]].get();
+	SwapEntitiesInsideGroup(entity, oldData->GetEntities().back());
+
+	ptr<MetaData> newData = nullptr;
+	{
+		ComponentsSet newComponentsSet = oldData->GetComponentsSet();
+		newComponentsSet.insert(GetComponentTypeId<TComponent>());
+		auto it = m_metaClasses.find(newComponentsSet);
+		if (it == m_metaClasses.end())
+		{
+
+		}
+		else
+		{
+			newData = it->second;
+		}
+	}
+
 	return nullptr;
 }
 

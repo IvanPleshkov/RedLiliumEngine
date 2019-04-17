@@ -81,3 +81,21 @@ bool Scene::Exists(Entity entity) const
 	}
 	return m_entityGenerations[entity.m_index] == entity.m_generation;
 }
+
+size_t Scene::ComponentsSetHash(const Scene::ComponentsSet& set)
+{
+	size_t result;
+	for (const auto id : set)
+	{
+		result ^= id;
+	}
+	return result;
+}
+
+void Scene::SwapEntitiesInsideGroup(Entity entity1, Entity entity2)
+{
+	if (entity1 == entity2)
+	{
+		return;
+	}
+}

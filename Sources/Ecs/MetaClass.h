@@ -19,15 +19,15 @@ public:
 	{
 		InitComponents(parent);
 		m_components.insert({ GetComponentTypeId<TComponent>(), umake<ComponentContainer<TComponent>>() });
-		m_componentTypes.insert(GetComponentTypeId<TComponent>());
+		m_componentsSet.insert(GetComponentTypeId<TComponent>());
 	}
 
 	MetaData(ptr<MetaData> parent, ComponentTypeId removedComponent)
 	{
-		RED_LILIUM_ASSERT(m_componentTypes.find(removedComponent) != m_componentTypes.end());
+		RED_LILIUM_ASSERT(m_componentsSet.find(removedComponent) != m_componentsSet.end());
 		InitComponents(parent);
 		m_components.erase(removedComponent);
-		m_componentTypes.erase(removedComponent);
+		m_componentsSet.erase(removedComponent);
 	}
 
 	template<class TComponent>
@@ -82,9 +82,14 @@ public:
 		return std::tuple<TComponents&...>{ GetComponent<TComponents>(index)... };
 	}
 
-	const std::unordered_set<ComponentTypeId>& GetComponentTypes() const
+	const std::unordered_set<ComponentTypeId>& GetComponentsSet() const
 	{
-		return m_componentTypes;
+		return m_componentsSet;
+	}
+
+	const std::vector<Entity>& GetEntities() const
+	{
+		return m_entities;
 	}
 
 	void SwapComponents(u32 index1, u32 index2)
@@ -115,9 +120,29 @@ public:
 		casted->m_components[index] = std::move(component);
 	}
 
-	void MoveComponents(MetaData& other, u32 otherIndex, u32 index)
+	void MoveComponents(ptr<MetaData> other, u32 otherIndex, u32 index)
 	{
+		RED_LILIUM_ASSERT(other != nullptr);
+		RED_LILIUM_ASSERT(otherIndex < other->m_entities.size());
+		RED_LILIUM_ASSERT(index < m_entities.size());
+		m_entities[index] = other->m_entities[otherIndex];
+		for (auto&[componentId, otherComponents] : other->m_components)
+		{
+			auto it = m_components.find(componentId);
+			if (it != m_components.end())
+			{
+				it->second->MoveComponents(otherComponents.get(), otherIndex, index);
+			}
+		}
+	}
 
+	void Resize(u32 newSize)
+	{
+		m_entities.resize(newSize);
+		for (auto&[k, v] : m_components)
+		{
+			v->Resize(newSize);
+		}
 	}
 
 private:
@@ -127,12 +152,12 @@ private:
 		{
 			m_components.insert({ k, std::move(v->CreateWithSameType()) });
 		}
-		m_componentTypes = parent->m_componentTypes;
+		m_componentsSet = parent->m_componentsSet;
 	}
 
 	std::vector<Entity> m_entities;
 	std::unordered_map<ComponentTypeId, uptr<ComponentContainerBase>> m_components;
-	std::unordered_set<ComponentTypeId> m_componentTypes;
+	std::unordered_set<ComponentTypeId> m_componentsSet;
 };
 
 } // namespace RED_LILIUM_NAMESPACE
