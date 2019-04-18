@@ -54,16 +54,16 @@ using json = nlohmann::json;
 template<class T>
 using span = nonstd::span_lite::span<T>;
 
-template<class T, class... _Types>
-[[nodiscard]] inline uptr<T> umake(_Types&&... _Args)
+template<class T, class... TArgs>
+[[nodiscard]] inline uptr<T> umake(TArgs&&... args)
 {
-	return std::make_unique<T>(std::forward<_Types>(_Args)...);
+	return std::make_unique<T>(std::forward<TArgs>(args)...);
 }
 
-template<class T, class... _Types>
-[[nodiscard]] inline sptr<T> smake(_Types&&... _Args)
+template<class T, class... TArgs>
+[[nodiscard]] inline sptr<T> smake(TArgs&&... args)
 {
-	return std::make_shared<T>(std::forward<_Types>(_Args)...);
+	return std::make_shared<T>(std::forward<TArgs>(args)...);
 }
 
 /*

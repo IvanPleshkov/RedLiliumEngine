@@ -15,19 +15,21 @@ public:
 	{}
 
 	template<class TComponent>
-	MetaData(ptr<MetaData> parent)
+	void InitComponentByAdding(ptr<MetaData> parent)
 	{
+		RED_LILIUM_ASSERT(m_componentsSet.find(GetComponentTypeId<TComponent>()) == m_componentsSet.end());
 		InitComponents(parent);
 		m_components.insert({ GetComponentTypeId<TComponent>(), umake<ComponentContainer<TComponent>>() });
 		m_componentsSet.insert(GetComponentTypeId<TComponent>());
 	}
 
-	MetaData(ptr<MetaData> parent, ComponentTypeId removedComponent)
+	template<class TComponent>
+	void InitComponentByRemoving(ptr<MetaData> parent)
 	{
-		RED_LILIUM_ASSERT(m_componentsSet.find(removedComponent) != m_componentsSet.end());
+		RED_LILIUM_ASSERT(m_componentsSet.find(GetComponentTypeId<TComponent>()) != m_componentsSet.end());
 		InitComponents(parent);
-		m_components.erase(removedComponent);
-		m_componentsSet.erase(removedComponent);
+		m_components.erase(GetComponentTypeId<TComponent>());
+		m_componentsSet.erase(GetComponentTypeId<TComponent>());
 	}
 
 	template<class TComponent>
@@ -101,48 +103,64 @@ public:
 		}
 	}
 
-	void Invalidate(u32 index)
+	void PopComponents()
 	{
-		m_entities[index] = Entity();
+		m_entities.pop_back();
 		for (auto&[k, v] : m_components)
 		{
-			v->Invalidate(index);
+			v->PopComponent();
 		}
 	}
 
+	u32 PushEmptyEntity(Entity entity)
+	{
+		RED_LILIUM_ASSERT(m_components.empty());
+		m_entities.push_back(entity);
+		return static_cast<u32>(m_entities.size() - 1);
+	}
+
 	template<class TComponent>
-	void SetComponent(u32 index, TComponent component)
+	void MoveComponents(ptr<MetaData> other, TComponent&& addedComponent)
 	{
 		auto i = m_components.find(GetComponentTypeId<TComponent>());
 		RED_LILIUM_ASSERT(i != m_components.end());
 		ptr<ComponentContainerBase> base = i->get();
 		ptr<ComponentContainer<TComponent>> casted = static_cast<ptr<ComponentContainer<TComponent>>>(base);
-		casted->m_components[index] = std::move(component);
+		casted->PushComponent(std::move(addedComponent));
+		MoveComponents(other);
 	}
 
-	void MoveComponents(ptr<MetaData> other, u32 otherIndex, u32 index)
+	void MoveComponents(ptr<MetaData> other)
 	{
 		RED_LILIUM_ASSERT(other != nullptr);
-		RED_LILIUM_ASSERT(otherIndex < other->m_entities.size());
-		RED_LILIUM_ASSERT(index < m_entities.size());
-		m_entities[index] = other->m_entities[otherIndex];
+		RED_LILIUM_ASSERT(!other->m_entities.empty());
+
+		m_entities.push_back(other->m_entities.back());
+		other->m_entities.pop_back();
+
 		for (auto&[componentId, otherComponents] : other->m_components)
 		{
 			auto it = m_components.find(componentId);
 			if (it != m_components.end())
 			{
-				it->second->MoveComponents(otherComponents.get(), otherIndex, index);
+				it->second->MoveComponent(otherComponents.get());
+			}
+			else
+			{
+				otherComponents->PopComponent();
 			}
 		}
-	}
 
-	void Resize(u32 newSize)
-	{
-		m_entities.resize(newSize);
-		for (auto&[k, v] : m_components)
+		#if RED_LILIUM_USE_ASSERTS
+		for (auto&[id, components] : other->m_components)
 		{
-			v->Resize(newSize);
+			RED_LILIUM_ASSERT(components->Size() == other->m_entities.size());
 		}
+		for (auto&[id, components] : m_components)
+		{
+			RED_LILIUM_ASSERT(components->Size() == m_entities.size());
+		}
+		#endif
 	}
 
 private:

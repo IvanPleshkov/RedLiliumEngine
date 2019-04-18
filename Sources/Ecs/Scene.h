@@ -55,16 +55,26 @@ public: // Views
 
 private:
 	void SwapEntitiesInsideGroup(Entity e1, Entity e2);
+	void CheckEmptyMetaData(ptr<MetaData> metaData);
+
+	template<class TComponent>
+	ptr<MetaData> CreateMetaDataByAddComponent(ptr<MetaData> metaData);
+
+	template<class TComponent>
+	ptr<MetaData> CreateMetaDataByRemoveComponent(ptr<MetaData> metaData);
+
+	ptr<MetaData> GetComponentsFreeMetaData();
 
 	using ComponentsSet = std::unordered_set<ComponentTypeId>;
 	static size_t ComponentsSetHash(const ComponentsSet& set);
 
+private:
 	std::vector<EntityGeneration> m_entityGenerations;
-	std::vector<u32> m_entityMetaClass;
+	std::vector<ptr<MetaData>> m_entityMetaClass;
 	std::vector<u32> m_entityMetaIndex;
 	std::unordered_set<Entity> m_freeEntities;
 
-	std::vector<uptr<MetaData>> m_metaData;
+	std::unordered_map<uptr<MetaData>> m_metaData;
 	std::unordered_map<ComponentsSet, ptr<MetaData>, decltype(&ComponentsSetHash)> m_metaClasses;
 };
 
