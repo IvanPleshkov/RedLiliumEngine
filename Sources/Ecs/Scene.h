@@ -63,8 +63,6 @@ private:
 	template<class TComponent>
 	ptr<MetaData> CreateMetaDataByRemoveComponent(ptr<MetaData> metaData);
 
-	ptr<MetaData> GetComponentsFreeMetaData();
-
 	using ComponentsSet = std::unordered_set<ComponentTypeId>;
 	static size_t ComponentsSetHash(const ComponentsSet& set);
 
@@ -74,7 +72,8 @@ private:
 	std::vector<u32> m_entityMetaIndex;
 	std::unordered_set<Entity> m_freeEntities;
 
-	std::unordered_map<uptr<MetaData>> m_metaData;
+	ptr<MetaData> m_noComponentsMetaData;
+	std::unordered_map<ptr<MetaData>, uptr<MetaData>> m_metaData;
 	std::unordered_map<ComponentsSet, ptr<MetaData>, decltype(&ComponentsSetHash)> m_metaClasses;
 };
 

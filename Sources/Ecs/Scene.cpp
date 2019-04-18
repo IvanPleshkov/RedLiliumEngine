@@ -7,7 +7,9 @@ using namespace RED_LILIUM_NAMESPACE;
 
 Scene::Scene()
 {
-	m_metaData.push_back(umake<MetaData>());
+	auto noComponentsMetaData = umake<MetaData>();
+	m_noComponentsMetaData = noComponentsMetaData.get();
+	m_metaData.insert({ m_noComponentsMetaData, std::move(noComponentsMetaData) });
 }
 
 Scene::~Scene()
@@ -42,8 +44,8 @@ Entity Scene::Add()
 		m_entityGenerations[entity.m_index] = entity.m_generation;
 	}
 
-	m_entityMetaClass[entity.m_index] = GetComponentsFreeMetaData();
-	m_entityMetaIndex[entity.m_index] = GetComponentsFreeMetaData()->PushEmptyEntity(entity);
+	m_entityMetaClass[entity.m_index] = m_noComponentsMetaData;
+	m_entityMetaIndex[entity.m_index] = m_noComponentsMetaData->PushEmptyEntity(entity);
 
 	return entity;
 }
@@ -58,8 +60,8 @@ void Scene::Add(Entity entity)
 		m_freeEntities.erase(entityIterator);
 	}
 	m_entityGenerations[entity.m_index] = entity.m_generation;
-	m_entityMetaClass[entity.m_index] = GetComponentsFreeMetaData();
-	m_entityMetaIndex[entity.m_index] = GetComponentsFreeMetaData()->PushEmptyEntity(entity);
+	m_entityMetaClass[entity.m_index] = m_noComponentsMetaData;
+	m_entityMetaIndex[entity.m_index] = m_noComponentsMetaData->PushEmptyEntity(entity);
 }
 
 void Scene::Remove(Entity entity)
@@ -108,11 +110,6 @@ void Scene::CheckEmptyMetaData(ptr<MetaData> metaData)
 	{
 		return;
 	}
-}
-
-ptr<MetaData> Scene::GetComponentsFreeMetaData()
-{
-	return m_metaData.front().get();
 }
 
 size_t Scene::ComponentsSetHash(const Scene::ComponentsSet& set)
