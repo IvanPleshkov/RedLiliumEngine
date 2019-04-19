@@ -67,14 +67,18 @@ private:
 	static size_t ComponentsSetHash(const ComponentsSet& set);
 
 private:
+	// entity data
 	std::vector<EntityGeneration> m_entityGenerations;
 	std::vector<ptr<MetaData>> m_entityMetaClass;
 	std::vector<u32> m_entityMetaIndex;
 	std::unordered_set<Entity> m_freeEntities;
 
+	// components data
 	ptr<MetaData> m_noComponentsMetaData;
 	std::unordered_map<ptr<MetaData>, uptr<MetaData>> m_metaData;
 	std::unordered_map<ComponentsSet, ptr<MetaData>, decltype(&ComponentsSetHash)> m_metaClasses;
+
+	// views data
 };
 
 } // namespace RED_LILIUM_NAMESPACE

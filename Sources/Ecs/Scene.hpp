@@ -117,7 +117,7 @@ inline ptr<MetaData> Scene::CreateMetaDataByAddComponent(ptr<MetaData> metaData)
 	uptr<MetaData> newMetaData = umake<MetaData>();
 	newMetaData->InitComponentByAdding<TComponent>(metaData);
 	ptr<MetaData> result = newMetaData.get();
-	m_metaData.push_back({ newMetaData.get(), std::move(newMetaData) });
+	m_metaData.push_back({ result, std::move(newMetaData) });
 	return result;
 }
 
@@ -127,7 +127,7 @@ inline ptr<MetaData> Scene::CreateMetaDataByRemoveComponent(ptr<MetaData> metaDa
 	uptr<MetaData> newMetaData = umake<MetaData>();
 	newMetaData->InitComponentByRemoving<TComponent>(metaData);
 	ptr<MetaData> result = newMetaData.get();
-	m_metaData.push_back({ newMetaData.get(), std::move(newMetaData) });
+	m_metaData.push_back({ result, std::move(newMetaData) });
 	return result;
 }
 

@@ -15,24 +15,6 @@ public:
 	{}
 
 	template<class TComponent>
-	void InitComponentByAdding(ptr<MetaData> parent)
-	{
-		RED_LILIUM_ASSERT(m_componentsSet.find(GetComponentTypeId<TComponent>()) == m_componentsSet.end());
-		InitComponents(parent);
-		m_components.insert({ GetComponentTypeId<TComponent>(), umake<ComponentContainer<TComponent>>() });
-		m_componentsSet.insert(GetComponentTypeId<TComponent>());
-	}
-
-	template<class TComponent>
-	void InitComponentByRemoving(ptr<MetaData> parent)
-	{
-		RED_LILIUM_ASSERT(m_componentsSet.find(GetComponentTypeId<TComponent>()) != m_componentsSet.end());
-		InitComponents(parent);
-		m_components.erase(GetComponentTypeId<TComponent>());
-		m_componentsSet.erase(GetComponentTypeId<TComponent>());
-	}
-
-	template<class TComponent>
 	bool HasComponent() const
 	{
 		return m_components.find(GetComponentTypeId<TComponent>()) != m_components.end();
@@ -161,6 +143,24 @@ public:
 			RED_LILIUM_ASSERT(components->Size() == m_entities.size());
 		}
 		#endif
+	}
+
+	template<class TComponent>
+	void InitComponentByAdding(ptr<MetaData> parent)
+	{
+		RED_LILIUM_ASSERT(m_componentsSet.find(GetComponentTypeId<TComponent>()) == m_componentsSet.end());
+		InitComponents(parent);
+		m_components.insert({ GetComponentTypeId<TComponent>(), umake<ComponentContainer<TComponent>>() });
+		m_componentsSet.insert(GetComponentTypeId<TComponent>());
+	}
+
+	template<class TComponent>
+	void InitComponentByRemoving(ptr<MetaData> parent)
+	{
+		RED_LILIUM_ASSERT(m_componentsSet.find(GetComponentTypeId<TComponent>()) != m_componentsSet.end());
+		InitComponents(parent);
+		m_components.erase(GetComponentTypeId<TComponent>());
+		m_componentsSet.erase(GetComponentTypeId<TComponent>());
 	}
 
 private:
