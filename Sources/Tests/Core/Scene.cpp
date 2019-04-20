@@ -3,8 +3,10 @@
 #include "gtest/gtest.h"
 #include <Ecs/Scene.h>
 #include <Ecs/Entity.h>
-#include <Ecs/Component.h>
 #include <Ecs/World.h>
+#include <Ecs/StandardSystems/HierarchySystem.h>
+#include <Ecs/StandardSystems/TransformSystem.h>
+#include <Ecs/StandardSystems/RenderSystem.h>
 
 using namespace RED_LILIUM_NAMESPACE;
 

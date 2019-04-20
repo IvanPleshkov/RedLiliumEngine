@@ -55,13 +55,13 @@ public: // Views
 
 private:
 	void SwapEntitiesInsideGroup(Entity e1, Entity e2);
-	void CheckEmptyMetaData(ptr<MetaData> metaData);
+	void CheckEmptyEntityGroupData(ptr<EntityGroupData> entityGroupData);
 
 	template<class TComponent>
-	ptr<MetaData> CreateMetaDataByAddComponent(ptr<MetaData> metaData);
+	ptr<EntityGroupData> CreateEntityGroupDataByAddComponent(ptr<EntityGroupData> entityGroupData);
 
 	template<class TComponent>
-	ptr<MetaData> CreateMetaDataByRemoveComponent(ptr<MetaData> metaData);
+	ptr<EntityGroupData> CreateEntityGroupDataByRemoveComponent(ptr<EntityGroupData> entityGroupData);
 
 	using ComponentsSet = std::unordered_set<ComponentTypeId>;
 	static size_t ComponentsSetHash(const ComponentsSet& set);
@@ -69,14 +69,14 @@ private:
 private:
 	// entity data
 	std::vector<EntityGeneration> m_entityGenerations;
-	std::vector<ptr<MetaData>> m_entityMetaClass;
+	std::vector<ptr<EntityGroupData>> m_entityMetaClass;
 	std::vector<u32> m_entityMetaIndex;
 	std::unordered_set<Entity> m_freeEntities;
 
 	// components data
-	ptr<MetaData> m_noComponentsMetaData;
-	std::unordered_map<ptr<MetaData>, uptr<MetaData>> m_metaData;
-	std::unordered_map<ComponentsSet, ptr<MetaData>, decltype(&ComponentsSetHash)> m_metaClasses;
+	ptr<EntityGroupData> m_entityEmptyGroupData;
+	std::unordered_map<ptr<EntityGroupData>, uptr<EntityGroupData>> m_entityGroupData;
+	std::unordered_map<ComponentsSet, ptr<EntityGroupData>, decltype(&ComponentsSetHash)> m_metaClasses;
 
 	// views data
 };

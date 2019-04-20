@@ -31,7 +31,7 @@ inline ptr<TComponent> Scene::AddComponent(Entity entity, Args && ...args)
 	newData->MoveComponents(oldData, TComponent(std::forward(args...)));
 	m_entityMetaClass[entity.m_index] = newData;
 	m_entityMetaIndex[entity.m_index] = newData->GetEntities().size() - 1;
-	CheckEmptyMetaData(oldData);
+	CheckEmptyEntityGroupData(oldData);
 
 	return GetComponent<TComponent>(entity);
 }
@@ -112,22 +112,24 @@ inline std::tuple<ptr<const TComponents>...> Scene::GetComponents(Entity entity)
 }
 
 template<class TComponent>
-inline ptr<MetaData> Scene::CreateMetaDataByAddComponent(ptr<MetaData> metaData)
+inline ptr<EntityGroupData> Scene::CreateEntityGroupDataByAddComponent(ptr<EntityGroupData> entityGroupData)
 {
-	uptr<MetaData> newMetaData = umake<MetaData>();
-	newMetaData->InitComponentByAdding<TComponent>(metaData);
-	ptr<MetaData> result = newMetaData.get();
-	m_metaData.push_back({ result, std::move(newMetaData) });
+	uptr<EntityGroupData> newMetaData = umake<EntityGroupData>();
+	newMetaData->InitComponentByAdding<TComponent>(entityGroupData);
+	ptr<EntityGroupData> result = newMetaData.get();
+	m_entityGroupData.push_back({ result, std::move(newMetaData) });
+	m_metaClasses.insert({ newMetaData->GetComponentsSet(), result });
 	return result;
 }
 
 template<class TComponent>
-inline ptr<MetaData> Scene::CreateMetaDataByRemoveComponent(ptr<MetaData> metaData)
+inline ptr<EntityGroupData> Scene::CreateEntityGroupDataByRemoveComponent(ptr<EntityGroupData> entityGroupData)
 {
-	uptr<MetaData> newMetaData = umake<MetaData>();
-	newMetaData->InitComponentByRemoving<TComponent>(metaData);
-	ptr<MetaData> result = newMetaData.get();
-	m_metaData.push_back({ result, std::move(newMetaData) });
+	uptr<EntityGroupData> newMetaData = umake<EntityGroupData>();
+	newMetaData->InitComponentByRemoving<TComponent>(entityGroupData);
+	ptr<EntityGroupData> result = newMetaData.get();
+	m_entityGroupData.push_back({ result, std::move(newMetaData) });
+	m_metaClasses.insert({ newMetaData->GetComponentsSet(), result });
 	return result;
 }
 

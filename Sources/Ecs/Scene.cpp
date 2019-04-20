@@ -1,15 +1,14 @@
 #include "pch.h"
 #include "Scene.h"
 #include "Entity.h"
-#include "Component.h"
 
 using namespace RED_LILIUM_NAMESPACE;
 
 Scene::Scene()
 {
-	auto noComponentsMetaData = umake<MetaData>();
-	m_noComponentsMetaData = noComponentsMetaData.get();
-	m_metaData.insert({ m_noComponentsMetaData, std::move(noComponentsMetaData) });
+	auto entityEmptyGroupData = umake<EntityGroupData>();
+	m_entityEmptyGroupData = entityEmptyGroupData.get();
+	m_entityGroupData.insert({ m_entityEmptyGroupData, std::move(entityEmptyGroupData) });
 }
 
 Scene::~Scene()
@@ -44,8 +43,8 @@ Entity Scene::Add()
 		m_entityGenerations[entity.m_index] = entity.m_generation;
 	}
 
-	m_entityMetaClass[entity.m_index] = m_noComponentsMetaData;
-	m_entityMetaIndex[entity.m_index] = m_noComponentsMetaData->PushEmptyEntity(entity);
+	m_entityMetaClass[entity.m_index] = m_entityEmptyGroupData;
+	m_entityMetaIndex[entity.m_index] = m_entityEmptyGroupData->PushEmptyEntity(entity);
 
 	return entity;
 }
@@ -60,8 +59,8 @@ void Scene::Add(Entity entity)
 		m_freeEntities.erase(entityIterator);
 	}
 	m_entityGenerations[entity.m_index] = entity.m_generation;
-	m_entityMetaClass[entity.m_index] = m_noComponentsMetaData;
-	m_entityMetaIndex[entity.m_index] = m_noComponentsMetaData->PushEmptyEntity(entity);
+	m_entityMetaClass[entity.m_index] = m_entityEmptyGroupData;
+	m_entityMetaIndex[entity.m_index] = m_entityEmptyGroupData->PushEmptyEntity(entity);
 }
 
 void Scene::Remove(Entity entity)
@@ -70,10 +69,10 @@ void Scene::Remove(Entity entity)
 	m_entityGenerations[entity.m_index] = 0;
 	m_freeEntities.insert(entity);
 	
-	ptr<MetaData> oldData = m_entityMetaClass[entity.m_index];
+	ptr<EntityGroupData> oldData = m_entityMetaClass[entity.m_index];
 	SwapEntitiesInsideGroup(entity, oldData->GetEntities().back());
 	oldData->PopComponents();
-	CheckEmptyMetaData(oldData);
+	CheckEmptyEntityGroupData(oldData);
 
 	m_entityMetaClass[entity.m_index] = nullptr;
 	m_entityMetaIndex[entity.m_index] = u32_max;
@@ -104,9 +103,9 @@ void Scene::SwapEntitiesInsideGroup(Entity entity1, Entity entity2)
 	std::swap(m_entityMetaIndex[entity1.m_index], m_entityMetaIndex[entity2.m_index]);
 }
 
-void Scene::CheckEmptyMetaData(ptr<MetaData> metaData)
+void Scene::CheckEmptyEntityGroupData(ptr<EntityGroupData> entityGroupData)
 {
-	if (!metaData->GetEntities().empty() || metaData->GetComponentsSet().empty())
+	if (!entityGroupData->GetEntities().empty() || entityGroupData->GetComponentsSet().empty())
 	{
 		return;
 	}

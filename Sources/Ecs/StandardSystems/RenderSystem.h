@@ -1,16 +1,14 @@
 #pragma once
 
 #include <Core/Common.h>
-#include <Reflection/Serialization.h>
+#include <Core/Camera.h>
 
 namespace RED_LILIUM_NAMESPACE
 {
 
-class Component
+struct CameraComponent
 {
-public:
-	Component() = default;
-	~Component() = default;
+	Camera m_camera;
 };
 
 } // namespace RED_LILIUM_NAMESPACE
