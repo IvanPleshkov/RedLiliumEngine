@@ -25,7 +25,7 @@ class ComponentContainerBase
 public:
 	virtual ~ComponentContainerBase() = default;
 	virtual uptr<ComponentContainerBase> CreateWithSameType() const = 0;
-	virtual ComponentTypeId GetComponentTypeId() const = 0;
+	virtual ComponentTypeId GetTypeId() const = 0;
 	virtual size_t Size() const = 0;
 	virtual void SwapComponents(u32 index1, u32 index2) = 0;
 	virtual void MoveComponent(ptr<ComponentContainerBase> other) = 0;
@@ -42,7 +42,7 @@ public:
 		return umake<ComponentContainer<TComponent>>();
 	}
 
-	ComponentTypeId GetComponentTypeId() const override
+	ComponentTypeId GetTypeId() const override
 	{
 		return GetComponentTypeId<TComponent>();
 	}
@@ -57,7 +57,7 @@ public:
 		std::swap(m_components[index1], m_components[index2]);
 	}
 
-	void PushComponent(TComponent&& component) override
+	void PushComponent(TComponent&& component)
 	{
 		m_components.push_back(std::move(component));
 	}

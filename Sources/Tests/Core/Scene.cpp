@@ -10,7 +10,7 @@
 
 using namespace RED_LILIUM_NAMESPACE;
 
-TEST(Scene, Add1)
+TEST(Ecs, Test1)
 {
 	Scene scene;
 	Entity e1 = scene.Add();
@@ -22,7 +22,7 @@ TEST(Scene, Add1)
 	ASSERT_TRUE(scene.Exists(e3));
 }
 
-TEST(Scene, Add2)
+TEST(Ecs, Test2)
 {
 	Scene scene;
 	Entity e1 = scene.Add();
@@ -37,7 +37,7 @@ TEST(Scene, Add2)
 	ASSERT_TRUE(scene.Exists(e3));
 }
 
-TEST(Scene, Add3)
+TEST(Ecs, Test3)
 {
 	Scene scene;
 	Entity e1 = scene.Add();
@@ -55,12 +55,13 @@ TEST(Scene, Add3)
 	ASSERT_TRUE(scene.Exists(e3));
 }
 
-TEST(Entity, AddChildren)
+TEST(Ecs, Test4)
 {
-	// uptr<Scene> scene = umake<Scene>();
-	// ptr<Entity> root = scene->Root();
-	// root->AddChild<Entity>();
-	// root->AddChild<Entity>();
+	Scene scene;
+	Entity e1 = scene.Add();
 
-	// auto j = Serialize(scene.get());
+	scene.AddComponent<HierarchyComponent>(e1);
+
+	ASSERT_TRUE(scene.HasComponent<HierarchyComponent>(e1));
+	ASSERT_TRUE(!scene.HasComponent<TransformComponent>(e1));
 }

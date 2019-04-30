@@ -9,6 +9,7 @@ Scene::Scene()
 	auto entityEmptyGroupData = umake<EntityGroupData>();
 	m_entityEmptyGroupData = entityEmptyGroupData.get();
 	m_entityGroupData.insert({ m_entityEmptyGroupData, std::move(entityEmptyGroupData) });
+	m_metaClasses.insert({ m_entityEmptyGroupData->GetComponentsSet(), m_entityEmptyGroupData });
 }
 
 Scene::~Scene()

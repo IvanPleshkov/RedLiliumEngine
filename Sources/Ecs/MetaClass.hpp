@@ -27,9 +27,9 @@ ptr<TComponent> EntityGroupData::GetComponent(u32 index)
 		return nullptr;
 	}
 
-	ptr<ComponentContainerBase> base = i->get();
+	ptr<ComponentContainerBase> base = i->second.get();
 	ptr<ComponentContainer<TComponent>> casted = static_cast<ptr<ComponentContainer<TComponent>>>(base);
-	return casted.m_components[index];
+	return &casted->m_components[index];
 }
 
 template<class ...TComponents>
@@ -47,9 +47,9 @@ ptr<const TComponent> EntityGroupData::GetComponent(u32 index) const
 		return nullptr;
 	}
 
-	ptr<const ComponentContainerBase> base = i->get();
+	ptr<const ComponentContainerBase> base = i->second.get();
 	ptr<const ComponentContainer<TComponent>> casted = static_cast<ptr<const ComponentContainer<TComponent>>>(base);
-	return casted.m_components[index];
+	return &casted->m_components[index];
 }
 
 template<class ...TComponents>
@@ -63,7 +63,7 @@ void EntityGroupData::MoveComponents(ptr<EntityGroupData> other, TComponent&& ad
 {
 	auto i = m_components.find(GetComponentTypeId<TComponent>());
 	RED_LILIUM_ASSERT(i != m_components.end());
-	ptr<ComponentContainerBase> base = i->get();
+	ptr<ComponentContainerBase> base = i->second.get();
 	ptr<ComponentContainer<TComponent>> casted = static_cast<ptr<ComponentContainer<TComponent>>>(base);
 	casted->PushComponent(std::move(addedComponent));
 	MoveComponents(other);
