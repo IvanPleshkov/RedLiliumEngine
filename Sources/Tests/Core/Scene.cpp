@@ -1,6 +1,7 @@
 #include "pch.h"
 
-#include "gtest/gtest.h"
+#include <catch2/catch.hpp>
+
 #include <Ecs/Scene.h>
 #include <Ecs/Entity.h>
 #include <Ecs/World.h>
@@ -10,19 +11,19 @@
 
 using namespace RED_LILIUM_NAMESPACE;
 
-TEST(Ecs, Test1)
+TEST_CASE("Ecs.Test1")
 {
 	Scene scene;
 	Entity e1 = scene.Add();
 	Entity e2 = scene.Add();
 	Entity e3 = scene.Add();
 
-	ASSERT_TRUE(scene.Exists(e1));
-	ASSERT_TRUE(scene.Exists(e2));
-	ASSERT_TRUE(scene.Exists(e3));
+	REQUIRE(scene.Exists(e1));
+	REQUIRE(scene.Exists(e2));
+	REQUIRE(scene.Exists(e3));
 }
 
-TEST(Ecs, Test2)
+TEST_CASE("Ecs.Test2")
 {
 	Scene scene;
 	Entity e1 = scene.Add();
@@ -32,12 +33,12 @@ TEST(Ecs, Test2)
 
 	Entity e3 = scene.Add();
 
-	ASSERT_TRUE(!scene.Exists(e1));
-	ASSERT_TRUE(!scene.Exists(e2));
-	ASSERT_TRUE(scene.Exists(e3));
+	REQUIRE(!scene.Exists(e1));
+	REQUIRE(!scene.Exists(e2));
+	REQUIRE(scene.Exists(e3));
 }
 
-TEST(Ecs, Test3)
+TEST_CASE("Ecs.Test3")
 {
 	Scene scene;
 	Entity e1 = scene.Add();
@@ -50,18 +51,63 @@ TEST(Ecs, Test3)
 	scene.Add(e1);
 	scene.Add(e3);
 
-	ASSERT_TRUE(scene.Exists(e1));
-	ASSERT_TRUE(!scene.Exists(e2));
-	ASSERT_TRUE(scene.Exists(e3));
+	REQUIRE(scene.Exists(e1));
+	REQUIRE(!scene.Exists(e2));
+	REQUIRE(scene.Exists(e3));
 }
 
-TEST(Ecs, Test4)
+TEST_CASE("Ecs.Test4")
 {
 	Scene scene;
 	Entity e1 = scene.Add();
 
 	scene.AddComponent<HierarchyComponent>(e1);
 
-	ASSERT_TRUE(scene.HasComponent<HierarchyComponent>(e1));
-	ASSERT_TRUE(!scene.HasComponent<TransformComponent>(e1));
+	REQUIRE(scene.HasComponent<HierarchyComponent>(e1));
+	REQUIRE(!scene.HasComponent<TransformComponent>(e1));
+}
+
+TEST_CASE("Ecs.Test5")
+{
+	Scene scene;
+	Entity e1 = scene.Add();
+
+	scene.AddComponent<HierarchyComponent>(e1);
+	scene.RemoveComponent<HierarchyComponent>(e1);
+
+	REQUIRE(!scene.HasComponent<HierarchyComponent>(e1));
+	REQUIRE(!scene.HasComponent<TransformComponent>(e1));
+}
+
+TEST_CASE("Ecs.Test6")
+{
+	Scene scene;
+	Entity e1 = scene.Add();
+
+	scene.AddComponent<HierarchyComponent>(e1);
+	scene.Remove(e1);
+
+	REQUIRE(!scene.Exists(e1));
+}
+
+TEST_CASE("Ecs.Test7")
+{
+	Scene scene;
+	Entity e1 = scene.Add();
+
+	scene.AddComponent<HierarchyComponent>(e1);
+	auto hierarchyComponent = scene.GetComponent<HierarchyComponent>(e1);
+
+	REQUIRE(hierarchyComponent != nullptr);
+}
+
+TEST_CASE("Ecs.Test8")
+{
+	Scene scene;
+	Entity e1 = scene.Add();
+
+	scene.AddComponent<HierarchyComponent>(e1);
+	const auto hierarchyComponent = scene.GetComponent<HierarchyComponent>(e1);
+
+	REQUIRE(hierarchyComponent != nullptr);
 }

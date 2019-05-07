@@ -67,7 +67,6 @@ void Scene::Add(Entity entity)
 void Scene::Remove(Entity entity)
 {
 	RED_LILIUM_ASSERT(Exists(entity));
-	m_entityGenerations[entity.m_index] = 0;
 	m_freeEntities.insert(entity);
 	
 	ptr<EntityGroupData> oldData = m_entityMetaClass[entity.m_index];
@@ -75,6 +74,7 @@ void Scene::Remove(Entity entity)
 	oldData->PopComponents();
 	CheckEmptyEntityGroupData(oldData);
 
+	m_entityGenerations[entity.m_index] = 0;
 	m_entityMetaClass[entity.m_index] = nullptr;
 	m_entityMetaIndex[entity.m_index] = u32_max;
 }
@@ -110,14 +110,4 @@ void Scene::CheckEmptyEntityGroupData(ptr<EntityGroupData> entityGroupData)
 	{
 		return;
 	}
-}
-
-size_t Scene::ComponentsSetHash(const Scene::ComponentsSet& set)
-{
-	size_t result;
-	for (const auto id : set)
-	{
-		result ^= id;
-	}
-	return result;
 }

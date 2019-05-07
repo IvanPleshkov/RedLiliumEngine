@@ -98,6 +98,7 @@ using Color32 = u32;
 
 #if RED_LILIUM_USE_ASSERTS
 #define RED_LILIUM_ASSERT(condition) assert(condition);
+// #define RED_LILIUM_ASSERT(condition) if(!(condition)) { throw std::exception(); }
 #define RED_LILIUM_NOT_IMPLEMENTED() assert(false && "Not Implemented!");
 #else
 #define RED_LILIUM_ASSERT(condition)

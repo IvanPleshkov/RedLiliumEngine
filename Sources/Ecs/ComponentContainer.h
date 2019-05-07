@@ -20,6 +20,14 @@ inline ComponentTypeId GetComponentTypeId()
 	return id;
 }
 
+using ComponentsSet = std::set<ComponentTypeId>;
+
+template<class ...TComponents>
+inline ComponentsSet GetComponentTypesId()
+{
+	return { GetComponentTypeId<TComponents>()... };
+}
+
 class ComponentContainerBase
 {
 public:

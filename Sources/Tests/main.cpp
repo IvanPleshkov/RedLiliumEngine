@@ -1,18 +1,21 @@
 #include "pch.h"
 
-#include "gtest/gtest.h"
+#define CATCH_CONFIG_MAIN
+#include <catch2/catch.hpp>
 
-using namespace RED_LILIUM_NAMESPACE;
-
-TEST(Test, Test)
+TEST_CASE("Failing test", "[failing]")
 {
-	vec2 v;
-	v.x = 5;
-	v.y = 6;
-	ASSERT_TRUE(v.x + v.y == 11);
+	REQUIRE(1 == 1);
 }
 
-int main(int argc, char **argv) {
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
-}
+//#include <Core/Common.h>
+//
+//using namespace RED_LILIUM_NAMESPACE;
+//
+//TEST_CASE("Test", "Test")
+//{
+//	vec2 v;
+//	v.x = 5;
+//	v.y = 6;
+//	REQUIRE(v.x + v.y == 11);
+//}

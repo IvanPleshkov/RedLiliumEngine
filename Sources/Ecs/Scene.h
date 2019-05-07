@@ -2,9 +2,9 @@
 
 #include <Core/Common.h>
 #include <Core/Flags.h>
-#include <Reflection/Serialization.h>
 #include "Entity.h"
 #include "MetaClass.h"
+#include "View.h"
 
 namespace RED_LILIUM_NAMESPACE
 {
@@ -52,6 +52,8 @@ public: // Component
 	std::tuple<ptr<const TComponents>...> GetComponents(Entity entity) const;
 
 public: // Views
+	template<class ...TComponents>
+	View<TComponents...>& View();
 
 private:
 	void SwapEntitiesInsideGroup(Entity e1, Entity e2);
@@ -63,10 +65,9 @@ private:
 	template<class TComponent>
 	ptr<EntityGroupData> CreateEntityGroupDataByRemoveComponent(ptr<EntityGroupData> entityGroupData);
 
-	using ComponentsSet = std::unordered_set<ComponentTypeId>;
-	static size_t ComponentsSetHash(const ComponentsSet& set);
-
 private:
+	u32 m_sceneIndex;
+
 	// entity data
 	std::vector<EntityGeneration> m_entityGenerations;
 	std::vector<ptr<EntityGroupData>> m_entityMetaClass;
@@ -76,9 +77,10 @@ private:
 	// components data
 	ptr<EntityGroupData> m_entityEmptyGroupData;
 	std::unordered_map<ptr<EntityGroupData>, uptr<EntityGroupData>> m_entityGroupData;
-	std::unordered_map<ComponentsSet, ptr<EntityGroupData>, decltype(&ComponentsSetHash)> m_metaClasses;
+	std::map<ComponentsSet, ptr<EntityGroupData>> m_metaClasses;
 
 	// views data
+	std::map<ComponentsSet, uptr<ViewBase>> m_views;
 };
 
 } // namespace RED_LILIUM_NAMESPACE

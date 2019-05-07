@@ -66,7 +66,7 @@ inline void Scene::RemoveComponent(Entity entity)
 	newData->MoveComponents(oldData);
 	m_entityMetaClass[entity.m_index] = newData;
 	m_entityMetaIndex[entity.m_index] = newData->GetEntities().size() - 1;
-	CheckEmptyMetaData(oldData);
+	CheckEmptyEntityGroupData(oldData);
 }
 
 template<class ...TComponents>
@@ -111,14 +111,20 @@ inline std::tuple<ptr<const TComponents>...> Scene::GetComponents(Entity entity)
 	return m_entityMetaClass[entity.m_index]->GetComponents<TComponents...>(m_entityMetaIndex[entity.m_index]);
 }
 
+template<class ...TComponents>
+inline View<TComponents...>& Scene::View()
+{
+	return View<TComponents...>();
+}
+
 template<class TComponent>
 inline ptr<EntityGroupData> Scene::CreateEntityGroupDataByAddComponent(ptr<EntityGroupData> entityGroupData)
 {
 	uptr<EntityGroupData> newMetaData = umake<EntityGroupData>();
 	newMetaData->InitComponentByAdding<TComponent>(entityGroupData);
 	ptr<EntityGroupData> result = newMetaData.get();
-	m_entityGroupData.insert({ result, std::move(newMetaData) });
 	m_metaClasses.insert({ newMetaData->GetComponentsSet(), result });
+	m_entityGroupData.insert({ result, std::move(newMetaData) });
 	return result;
 }
 
@@ -128,8 +134,8 @@ inline ptr<EntityGroupData> Scene::CreateEntityGroupDataByRemoveComponent(ptr<En
 	uptr<EntityGroupData> newMetaData = umake<EntityGroupData>();
 	newMetaData->InitComponentByRemoving<TComponent>(entityGroupData);
 	ptr<EntityGroupData> result = newMetaData.get();
-	m_entityGroupData.insert({ result, std::move(newMetaData) });
 	m_metaClasses.insert({ newMetaData->GetComponentsSet(), result });
+	m_entityGroupData.insert({ result, std::move(newMetaData) });
 	return result;
 }
 

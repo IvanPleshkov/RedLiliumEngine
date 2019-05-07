@@ -11,7 +11,7 @@ EntityGroupData::EntityGroupData()
 EntityGroupData::~EntityGroupData()
 {}
 
-const std::unordered_set<ComponentTypeId>& EntityGroupData::GetComponentsSet() const
+const ComponentsSet& EntityGroupData::GetComponentsSet() const
 {
 	return m_componentsSet;
 }
@@ -19,6 +19,11 @@ const std::unordered_set<ComponentTypeId>& EntityGroupData::GetComponentsSet() c
 const std::vector<Entity>& EntityGroupData::GetEntities() const
 {
 	return m_entities;
+}
+
+u32 EntityGroupData::GetEntitiesCount() const
+{
+	return static_cast<u32>(m_entities.size());
 }
 
 void EntityGroupData::SwapComponents(u32 index1, u32 index2)

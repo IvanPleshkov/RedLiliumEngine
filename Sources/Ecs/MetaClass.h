@@ -32,9 +32,11 @@ public:
 	template<class ...TComponents>
 	std::tuple<ptr<const TComponents>...> GetComponents(u32 index) const;
 
-	const std::unordered_set<ComponentTypeId>& GetComponentsSet() const;
+	const ComponentsSet& GetComponentsSet() const;
 
 	const std::vector<Entity>& GetEntities() const;
+
+	u32 GetEntitiesCount() const;
 
 	void SwapComponents(u32 index1, u32 index2);
 
@@ -58,7 +60,7 @@ private:
 
 	std::vector<Entity> m_entities;
 	std::unordered_map<ComponentTypeId, uptr<ComponentContainerBase>> m_components;
-	std::unordered_set<ComponentTypeId> m_componentsSet;
+	ComponentsSet m_componentsSet;
 };
 
 } // namespace RED_LILIUM_NAMESPACE
