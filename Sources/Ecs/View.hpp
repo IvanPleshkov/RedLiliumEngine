@@ -14,18 +14,24 @@ inline View<TComponents...>::~View()
 {}
 
 template<class ...TComponents>
-inline View<TComponents...>::Iterator::Iterator(ptr<ViewBase> viewBase, GroupsIterator groupsIterator, u32 index)
+inline View<TComponents...>::Iterator::Iterator(ptr<ViewBase> viewBase, GroupsIterator groupsEndIterator, GroupsIterator groupsIterator, u32 index)
 	: m_viewBase(viewBase)
+	, m_groupsEndIterator(groupsEndIterator)
 	, m_groupsIterator(groupsIterator)
 	, m_index(index)
 {
+	while (m_groupsIterator != m_groupsEndIterator && m_index >= (*m_groupsIterator)->GetEntitiesCount())
+	{
+		m_groupsIterator++;
+		m_index = 0;
+	}
 }
 
 template<class ...TComponents>
 inline typename View<TComponents...>::Iterator View<TComponents...>::Iterator::operator++()
 {
 	m_index++;
-	if (m_index == (*m_groupsIterator)->GetEntitiesCount())
+	while (m_groupsIterator != m_groupsEndIterator && m_index >= (*m_groupsIterator)->GetEntitiesCount())
 	{
 		m_groupsIterator++;
 		m_index = 0;
@@ -71,13 +77,13 @@ inline typename View<TComponents...>::Iterator::ValueType View<TComponents...>::
 template<class ...TComponents>
 inline typename View<TComponents...>::Iterator View<TComponents...>::begin()
 {
-	return Iterator(this, m_groups.begin(), 0);
+	return Iterator(this, m_groups.end(), m_groups.begin(), 0);
 }
 
 template<class ...TComponents>
 inline typename View<TComponents...>::Iterator View<TComponents...>::end()
 {
-	return Iterator(this, m_groups.end(), 0);
+	return Iterator(this, m_groups.end(), m_groups.end(), 0);
 }
 
 } // namespace RED_LILIUM_NAMESPACE

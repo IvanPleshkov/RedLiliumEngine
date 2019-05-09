@@ -294,35 +294,27 @@ private:
 		cameraComponent.m_renderTarget->Create(u32(512), u32(512));
 
 		entity = m_scene.Add();
-		auto& meshRendererComponent = *m_scene.AddComponent<MeshRendererComponent>(entity);
-		auto& meshFilterComponent = *m_scene.AddComponent<MeshFilterComponent>(entity);
-
-		{
-			auto& view = m_scene.GetView<MeshFilterComponent, MeshRendererComponent>();
-			for (auto[entity, filter, renderer] : view)
-			{
-			}
-		}
-
-		auto& transformComponent = *m_scene.AddComponent<TransformComponent>(entity);
+		auto meshRendererComponent = m_scene.AddComponent<MeshRendererComponent>(entity);
+		auto meshFilterComponent = m_scene.AddComponent<MeshFilterComponent>(entity);
+		auto transformComponent = m_scene.AddComponent<TransformComponent>(entity);
 
 		float angle = 0.0f;
-		transformComponent.m_worldTransform = glm::rotate(mat4(1.0f), angle, vec3(0.0f, 0.0f, 1.0f));
-		transformComponent.m_localTransform = glm::inverse(transformComponent.m_worldTransform);
+		transformComponent->m_worldTransform = glm::rotate(mat4(1.0f), angle, vec3(0.0f, 0.0f, 1.0f));
+		transformComponent->m_localTransform = glm::inverse(transformComponent->m_worldTransform);
 
 		sptr<Mesh> mesh = Mesh::GenerateRectangle();
 		sptr<GpuMesh> gpuMesh = smake<GpuMesh>(GetRenderDevice());
 		gpuMesh->Update(mesh.get());
-		meshFilterComponent.m_mesh = mesh;
+		meshFilterComponent->m_mesh = mesh;
 
 		sptr<Material> material = Material::Create(GetRenderDevice(), "Shaders\\ColoredTriangle\\material.json");
 		material->Set("g_diffuseColor1", vec4(1.0f, 1.0f, 0.0f, 0.0f));
 		material->Set("g_albedo2", m_texture);
 		material->Set("g_albedo1", m_texture2);
 
-		meshRendererComponent.m_gpuMesh = gpuMesh;
-		meshRendererComponent.m_mesh = mesh;
-		meshRendererComponent.m_material = material;
+		meshRendererComponent->m_gpuMesh = gpuMesh;
+		meshRendererComponent->m_mesh = mesh;
+		meshRendererComponent->m_material = material;
 	}
 
 	Scene m_scene;

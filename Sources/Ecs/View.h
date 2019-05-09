@@ -32,7 +32,7 @@ public:
 	public:
 		using ValueType = std::tuple<Entity, ptr<TComponents>...>;
 
-		Iterator(ptr<ViewBase> viewBase, GroupsIterator groupsIterator, u32 index);
+		Iterator(ptr<ViewBase> viewBase, GroupsIterator groupsEndIterator, GroupsIterator groupsIterator, u32 index);
 		Iterator operator++();
 		bool operator!=(const Iterator& other) const;
 		bool operator==(const Iterator& other) const;
@@ -44,6 +44,7 @@ public:
 
 	private:
 		ptr<ViewBase> m_viewBase;
+		GroupsIterator m_groupsEndIterator;
 		GroupsIterator m_groupsIterator;
 		u32 m_index;
 	};
