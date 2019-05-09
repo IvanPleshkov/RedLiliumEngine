@@ -30,7 +30,7 @@ inline ptr<TComponent> Scene::AddComponent(Entity entity, Args && ...args)
 
 	newData->MoveComponents(oldData, TComponent(std::forward<Args>(args)...));
 	m_entityMetaClass[entity.m_index] = newData;
-	m_entityMetaIndex[entity.m_index] = newData->GetEntities().size() - 1;
+	m_entityMetaIndex[entity.m_index] = newData->GetEntitiesCount() - 1;
 	CheckEmptyEntityGroupData(oldData);
 
 	return GetComponent<TComponent>(entity);
@@ -112,9 +112,21 @@ inline std::tuple<ptr<const TComponents>...> Scene::GetComponents(Entity entity)
 }
 
 template<class ...TComponents>
-inline View<TComponents...>& Scene::View()
+inline View<TComponents...>& Scene::GetView()
 {
-	return View<TComponents...>();
+	ComponentsSet componentsSet = GetComponentTypesId<TComponents...>();
+	auto it = m_views.find(componentsSet);
+	if (it == m_views.end())
+	{
+		it = m_views.insert({ std::move(componentsSet), umake<View<TComponents...>>() }).first;
+
+		for (auto&[key, value] : m_entityGroupData)
+		{
+			it->second->OnAddGroup(key);
+		}
+	}
+
+	return static_cast<View<TComponents...>&>(*it->second.get());
 }
 
 template<class TComponent>
@@ -125,6 +137,12 @@ inline ptr<EntityGroupData> Scene::CreateEntityGroupDataByAddComponent(ptr<Entit
 	ptr<EntityGroupData> result = newMetaData.get();
 	m_metaClasses.insert({ newMetaData->GetComponentsSet(), result });
 	m_entityGroupData.insert({ result, std::move(newMetaData) });
+
+	for (auto& [key, value] : m_views)
+	{
+		value->OnAddGroup(result);
+	}
+
 	return result;
 }
 
@@ -136,6 +154,12 @@ inline ptr<EntityGroupData> Scene::CreateEntityGroupDataByRemoveComponent(ptr<En
 	ptr<EntityGroupData> result = newMetaData.get();
 	m_metaClasses.insert({ newMetaData->GetComponentsSet(), result });
 	m_entityGroupData.insert({ result, std::move(newMetaData) });
+
+	for (auto& [key, value] : m_views)
+	{
+		value->OnAddGroup(result);
+	}
+
 	return result;
 }
 

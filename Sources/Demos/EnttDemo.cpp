@@ -12,13 +12,15 @@
 #include <Core/InputEvent.h>
 #include <Core/Camera.h>
 
+#include <Ecs/Scene.h>
+
 REGISTER_COMMAND("EnttDemo", EnttDemo)
 
 using namespace RED_LILIUM_NAMESPACE;
 
 struct HierarchyComponent
 {
-	entt::entity m_parent;
+	Entity m_parent;
 };
 
 struct TransformComponent
@@ -60,10 +62,10 @@ struct IPipelineStage : public NonCopyable
 	{}
 
 	virtual void Init() {}
-	virtual bool HandleEvent(MouseEvent& mouseEvent, entt::registry& scenes) { return false; }
-	virtual void Tick(entt::registry& scenes) { }
+	virtual bool HandleEvent(MouseEvent& mouseEvent, Scene& scene) { return false; }
+	virtual void Tick(Scene& scene) { }
 	virtual void Draw(
-		entt::registry& scenes,
+		Scene& scene,
 		ptr<RenderContext> renderContext,
 		CameraComponent& cameraComponent) { }
 
@@ -98,7 +100,7 @@ public:
 		return nullptr;
 	}
 
-	bool HandleEvent(MouseEvent& mouseEvent, entt::registry& scene)
+	bool HandleEvent(MouseEvent& mouseEvent, Scene& scene)
 	{
 		for (auto& stage : m_stages)
 		{
@@ -111,7 +113,7 @@ public:
 		return false;
 	}
 
-	void Tick(entt::registry& scene)
+	void Tick(Scene& scene)
 	{
 		for (auto& stage : m_stages)
 		{
@@ -119,22 +121,21 @@ public:
 		}
 	}
 
-	void Draw(entt::registry& scene)
+	void Draw(Scene& scene)
 	{
 		uptr<RenderContext> renderContext = m_renderDevice->CreateRenderContext();
 
-		auto view = scene.view<CameraComponent>();
-		for (auto entity : view)
+		auto& view = scene.GetView<CameraComponent>();
+		for (auto[entity, cameraComponent] : view)
 		{
-			auto& cameraComponent = scene.get<CameraComponent>(entity);
-			Draw(scene, renderContext.get(), cameraComponent);
+			Draw(scene, renderContext.get(), *cameraComponent);
 		}
 	}
 
 	ptr<RenderDevice> GetRenderDevice() { return m_renderDevice; }
 
 private:
-	void Draw(entt::registry& scene, ptr<RenderContext> renderContext, CameraComponent& cameraComponent)
+	void Draw(Scene& scene, ptr<RenderContext> renderContext, CameraComponent& cameraComponent)
 	{
 		for (auto& stage : m_stages)
 		{
@@ -155,7 +156,7 @@ public:
 	{}
 
 	void Draw(
-		entt::registry& scene,
+		Scene& scene,
 		ptr<RenderContext> renderContext,
 		CameraComponent& cameraComponent) override
 	{
@@ -182,42 +183,40 @@ public:
 
 private:
 	void DrawScene(
-		entt::registry& scene,
+		Scene& scene,
 		ptr<RenderContext> renderContext,
 		CameraComponent& cameraComponent)
 	{
-		auto view = scene.view<MeshFilterComponent, MeshRendererComponent>();
-		for (auto entity : view)
+		auto& view = scene.GetView<MeshFilterComponent, MeshRendererComponent>();
+		for (auto [entity, filter, renderer] : view)
 		{
-			auto& filter = scene.get<MeshFilterComponent>(entity);
-			auto& renderer = scene.get<MeshRendererComponent>(entity);
-
-			if (!renderer.m_material)
+			if (!(*renderer).m_material)
 			{
 				continue;
 			}
 
-			if (filter.m_mesh == nullptr)
+			if ((*filter).m_mesh == nullptr)
 			{
-				renderer.m_mesh = nullptr;
-				renderer.m_gpuMesh = nullptr;
+				(*renderer).m_mesh = nullptr;
+				(*renderer).m_gpuMesh = nullptr;
 				continue;
 			}
 
-			if (filter.m_mesh != renderer.m_mesh)
+			if ((*filter).m_mesh != (*renderer).m_mesh)
 			{
-				renderer.m_mesh = filter.m_mesh;
-				renderer.m_gpuMesh = smake<GpuMesh>(renderContext->GetRenderDevice());
-				renderer.m_gpuMesh->Update(filter.m_mesh.get());
+				(*renderer).m_mesh = (*filter).m_mesh;
+				(*renderer).m_gpuMesh = smake<GpuMesh>(renderContext->GetRenderDevice());
+				(*renderer).m_gpuMesh->Update((*filter).m_mesh.get());
 			}
 
 			mat4 worldTransform(1.0f);
-			if (scene.has<TransformComponent>(entity))
+			auto transformComponent = scene.GetComponent<TransformComponent>(entity);
+			if (transformComponent)
 			{
-				worldTransform = scene.get<TransformComponent>(entity).m_worldTransform;
+				worldTransform = transformComponent->m_worldTransform;
 			}
 			renderContext->Set("g_model", worldTransform);
-			renderContext->Draw(renderer.m_gpuMesh, renderer.m_material);
+			renderContext->Draw((*renderer).m_gpuMesh, (*renderer).m_material);
 		}
 	}
 };
@@ -245,9 +244,9 @@ public:
 		ptr<ImDrawList> imguiDrawList = ImGui::GetWindowDrawList();
 		auto canvasPos = ImGui::GetCursorScreenPos();
 
-		m_scene.view<CameraComponent>().each([canvasPos, imguiDrawList](auto& cameraComponent)
+		for (auto[entity, cameraComponent] : m_scene.GetView<CameraComponent>())
 		{
-			GLuint id = cameraComponent.m_renderTarget->GetColor()->GetNative();
+			GLuint id = cameraComponent->m_renderTarget->GetColor()->GetNative();
 
 			imguiDrawList->AddRect(
 				ImVec2(canvasPos.x + 100, canvasPos.y + 100),
@@ -258,7 +257,7 @@ public:
 				(void*)(intptr_t)id,
 				ImVec2(canvasPos.x + 100, canvasPos.y + 100),
 				ImVec2(canvasPos.x + 612, canvasPos.y + 612));
-		});
+		}
 	}
 
 	void PollEvent(ptr<SDL_Event> event) override
@@ -283,8 +282,8 @@ private:
 		uptr<RenderOpaqueStage> renderOpaqueStage = umake<RenderOpaqueStage>(m_pipeline.get());
 		m_pipeline->AddStage(std::move(renderOpaqueStage));
 		
-		auto entity = m_scene.create();
-		auto& cameraComponent = m_scene.assign<CameraComponent>(entity);
+		auto entity = m_scene.Add();
+		auto& cameraComponent = *m_scene.AddComponent<CameraComponent>(entity);
 
 		Camera camera;
 		camera.LookAt({ 5.0f, 5.0f, 5.0f }, { 0, 0, 0 }, { 0, 0, 1 });
@@ -294,10 +293,18 @@ private:
 		cameraComponent.m_renderTarget = smake<RenderTarget>(GetRenderDevice());
 		cameraComponent.m_renderTarget->Create(u32(512), u32(512));
 
-		entity = m_scene.create();
-		auto& meshRendererComponent = m_scene.assign<MeshRendererComponent>(entity);
-		auto& meshFilterComponent = m_scene.assign<MeshFilterComponent>(entity);
-		auto& transformComponent = m_scene.assign<TransformComponent>(entity);
+		entity = m_scene.Add();
+		auto& meshRendererComponent = *m_scene.AddComponent<MeshRendererComponent>(entity);
+		auto& meshFilterComponent = *m_scene.AddComponent<MeshFilterComponent>(entity);
+
+		{
+			auto& view = m_scene.GetView<MeshFilterComponent, MeshRendererComponent>();
+			for (auto[entity, filter, renderer] : view)
+			{
+			}
+		}
+
+		auto& transformComponent = *m_scene.AddComponent<TransformComponent>(entity);
 
 		float angle = 0.0f;
 		transformComponent.m_worldTransform = glm::rotate(mat4(1.0f), angle, vec3(0.0f, 0.0f, 1.0f));
@@ -318,7 +325,7 @@ private:
 		meshRendererComponent.m_material = material;
 	}
 
-	entt::registry m_scene;
+	Scene m_scene;
 	uptr<Pipeline> m_pipeline;
 	sptr<GpuTexture> m_texture;
 	sptr<GpuTexture> m_texture2;

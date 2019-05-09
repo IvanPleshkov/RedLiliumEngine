@@ -111,3 +111,45 @@ TEST_CASE("Ecs.Test8")
 
 	REQUIRE(hierarchyComponent != nullptr);
 }
+
+TEST_CASE("Ecs.Test9")
+{
+	Scene scene;
+	Entity e1 = scene.Add();
+
+	scene.AddComponent<HierarchyComponent>(e1);
+	scene.AddComponent<TransformComponent>(e1);
+
+	const auto hierarchyComponent = scene.GetComponent<HierarchyComponent>(e1);
+	const auto transformComponent = scene.GetComponent<TransformComponent>(e1);
+
+	REQUIRE(hierarchyComponent != nullptr);
+	REQUIRE(transformComponent != nullptr);
+}
+
+TEST_CASE("Ecs.Test10")
+{
+	Scene scene;
+
+	scene.AddComponent<HierarchyComponent>(scene.Add());
+	scene.AddComponent<TransformComponent>(scene.Add());
+
+	Entity e1 = scene.Add();
+	scene.AddComponent<HierarchyComponent>(e1);
+	scene.AddComponent<TransformComponent>(e1);
+
+	Entity e2 = scene.Add();
+	scene.AddComponent<HierarchyComponent>(e2);
+	scene.AddComponent<TransformComponent>(e2);
+
+	scene.AddComponent<HierarchyComponent>(scene.Add());
+	scene.AddComponent<TransformComponent>(scene.Add());
+
+	u32 count = 0;
+	for (auto t : scene.GetView<HierarchyComponent, TransformComponent>())
+	{
+		count++;
+	}
+
+	REQUIRE(count == 2);
+}

@@ -7,7 +7,7 @@
 namespace RED_LILIUM_NAMESPACE
 {
 
-class ViewBase
+class ViewBase : public NonCopyable
 {
 public:
 	ViewBase();
@@ -32,56 +32,15 @@ public:
 	public:
 		using ValueType = std::tuple<Entity, ptr<TComponents>...>;
 
-	public:
-		Iterator(ptr<ViewBase> viewBase, GroupsIterator groupsIterator)
-			: m_viewBase(viewBase)
-			, m_groupsIterator(groupsIterator)
-			, m_index(0)
-		{}
-
-		Iterator operator++()
-		{
-			Iterator iterator(m_viewBase, m_groupsIterator);
-			iterator.m_index++;
-			if (iterator.m_index == iterator.m_groupsIterator->GetEntitiesCount())
-			{
-				iterator.m_groupsIterator++;
-				iterator.m_index = 0;
-			}
-			return iterator;
-		}
-
-		bool operator!=(const Iterator& other) const
-		{
-			return m_viewBase != other.m_viewBase ||
-				m_groupsIterator != other.m_groupsIterator ||
-				m_index != other.m_index;
-		}
-
-		bool operator==(const Iterator& other) const
-		{
-			return m_viewBase == other.m_viewBase && 
-				m_groupsIterator == other.m_groupsIterator &&
-				m_index == other.m_index;
-		}
-
-		ValueType operator*()
-		{
-			return Get();
-		}
-
-		ValueType operator->()
-		{
-			return Get();
-		}
+		Iterator(ptr<ViewBase> viewBase, GroupsIterator groupsIterator, u32 index);
+		Iterator operator++();
+		bool operator!=(const Iterator& other) const;
+		bool operator==(const Iterator& other) const;
+		ValueType operator*();
+		ValueType operator->();
 
 	private:
-		ValueType Get()
-		{
-			return std::tuple_cat(
-				m_groupsIterator->GetComponentsSet()[m_index],
-				m_groupsIterator->GetComponents(m_index));
-		}
+		ValueType Get();
 
 	private:
 		ptr<ViewBase> m_viewBase;

@@ -35,7 +35,7 @@ ptr<TComponent> EntityGroupData::GetComponent(u32 index)
 template<class ...TComponents>
 std::tuple<ptr<TComponents>...> EntityGroupData::GetComponents(u32 index)
 {
-	return std::tuple<TComponents&...>{ GetComponent<TComponents>(index)... };
+	return std::tuple<ptr<TComponents>...>{ GetComponent<TComponents>(index)... };
 }
 
 template<class TComponent>

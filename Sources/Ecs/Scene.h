@@ -53,7 +53,7 @@ public: // Component
 
 public: // Views
 	template<class ...TComponents>
-	View<TComponents...>& View();
+	View<TComponents...>& GetView();
 
 private:
 	void SwapEntitiesInsideGroup(Entity e1, Entity e2);

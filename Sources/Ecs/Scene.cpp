@@ -106,8 +106,15 @@ void Scene::SwapEntitiesInsideGroup(Entity entity1, Entity entity2)
 
 void Scene::CheckEmptyEntityGroupData(ptr<EntityGroupData> entityGroupData)
 {
+	return;
+
 	if (!entityGroupData->GetEntities().empty() || entityGroupData->GetComponentsSet().empty())
 	{
 		return;
+	}
+
+	for (auto&[key, value] : m_views)
+	{
+		value->OnRemoveGroup(entityGroupData);
 	}
 }
