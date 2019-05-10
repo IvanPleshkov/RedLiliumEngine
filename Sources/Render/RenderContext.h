@@ -27,7 +27,7 @@ public:
 	void Clear();
 	ptr<RenderDevice> GetRenderDevice() { return m_renderDevice; }
 
-/*internal*/ public:
+RED_LILIUM_INTERNAL:
 	ptr<const Uniform::ValueVariants> GetUniformValue(std::string_view name);
 
 private:

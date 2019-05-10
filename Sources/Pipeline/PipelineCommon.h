@@ -1,8 +1,6 @@
 #pragma once
 
 #include <Core/Common.h>
-#include <Scene/Scene.h>
-#include <Scene/Entity.h>
 #include <Render/RenderCommon.h>
 
 namespace RED_LILIUM_NAMESPACE
