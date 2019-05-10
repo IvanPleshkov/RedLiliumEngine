@@ -294,9 +294,13 @@ private:
 		cameraComponent.m_renderTarget->Create(u32(512), u32(512));
 
 		entity = m_scene.Add();
-		auto meshRendererComponent = m_scene.AddComponent<MeshRendererComponent>(entity);
-		auto meshFilterComponent = m_scene.AddComponent<MeshFilterComponent>(entity);
-		auto transformComponent = m_scene.AddComponent<TransformComponent>(entity);
+		m_scene.AddComponent<MeshRendererComponent>(entity);
+		m_scene.AddComponent<MeshFilterComponent>(entity);
+		m_scene.AddComponent<TransformComponent>(entity);
+
+		auto meshRendererComponent = m_scene.GetComponent<MeshRendererComponent>(entity);
+		auto meshFilterComponent = m_scene.GetComponent<MeshFilterComponent>(entity);
+		auto transformComponent = m_scene.GetComponent<TransformComponent>(entity);
 
 		float angle = 0.0f;
 		transformComponent->m_worldTransform = glm::rotate(mat4(1.0f), angle, vec3(0.0f, 0.0f, 1.0f));
