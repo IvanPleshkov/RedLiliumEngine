@@ -56,10 +56,6 @@ if (MSVC)
 	link_libraries(
 		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/SDL2.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/SDL2.lib
 		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/SDL2main.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/SDL2main.lib
-		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/gmockd.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/gmock.lib
-		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/gmock_maind.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/gmock_main.lib
-		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/gtestd.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/gtest.lib
-		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/gtest_maind.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/gtest_main.lib
 		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/glew32d.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/glew32.lib
 		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/GlU32.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/GlU32.lib
 		debug ${THIRD_PARTY_DEBUG_LIBS_DIR}/OpenGL32.lib optimized ${THIRD_PARTY_OPTIMIZED_LIBS_DIR}/OpenGL32.lib

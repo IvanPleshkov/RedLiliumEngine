@@ -334,3 +334,4 @@ int EnttDemo(ptr<ApplicationSettings> settings)
 	uptr<LoadSceneApplication> application = umake<LoadSceneApplication>();
 	return application->Start(settings);
 }
+ 

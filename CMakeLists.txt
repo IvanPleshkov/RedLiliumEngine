@@ -46,13 +46,9 @@ add_subdirectory("Sources/Ecs")
 add_subdirectory("Sources/Render")
 add_subdirectory("Sources/Geometrics")
 add_subdirectory("Sources/Pipeline")
-# add_subdirectory("Sources/Nodes")
 add_subdirectory("Sources/Editor")
-# add_subdirectory("Sources/NodesEditor")
-# add_subdirectory("Sources/NodesEditorImgui")
 add_subdirectory("Sources/Demos")
 add_subdirectory("Sources/Tests")
 
 # setup default startup project
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Demos)
-
