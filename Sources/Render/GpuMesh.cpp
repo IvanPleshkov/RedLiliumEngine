@@ -54,7 +54,7 @@ GpuMesh::GpuMesh(ptr<RenderDevice> renderDevice, std::string_view resourceName, 
 GpuMesh::~GpuMesh()
 {}
 
-void GpuMesh::Update(ptr<const Mesh> mesh)
+void GpuMesh::Update(ptr<const Mesh> mesh, IndicesBufferFormat indexBufferFormat)
 {
 	// TODO: check if changes type of data
 	m_arrayObjects.clear();
@@ -79,6 +79,11 @@ void GpuMesh::Update(ptr<const Mesh> mesh)
 	{
 		InitVertexBuffer(m_texCoords[i], mesh->m_texCoords[i], m_renderDevice, m_resourceName + "_texcoords", m_usage);
 	}
+}
+
+void GpuMesh::UpdateIndices(ptr<const Mesh> mesh, IndicesBufferFormat indexBufferFormat)
+{
+
 }
 
 u32 GpuMesh::GetIndicesSize() const
