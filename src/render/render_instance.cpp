@@ -58,8 +58,9 @@ void destroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 }
 
 RenderInstance::RenderInstance(SDL_Window *window, bool enableValidation)
+    : _sdlWindow(window)
 {
-    init(window, enableValidation);
+    init(enableValidation);
 }
 
 RenderInstance::~RenderInstance()
@@ -82,18 +83,22 @@ VkAllocationCallbacks* RenderInstance::allocator()
     return nullptr;
 }
 
-void RenderInstance::init(SDL_Window *window, bool enableValidation)
+SDL_Window* RenderInstance::getSdlWindow()
 {
-    initVkInstance(window, enableValidation);
-    setupDebugMessenger();
-    createSurface(window);
+    return _sdlWindow;
+}
+
+void RenderInstance::init(bool enableValidation)
+{
+    initVkInstance(enableValidation);
     if (enableValidation)
     {
         setupDebugMessenger();
     }
+    createSurface();
 }
 
-void RenderInstance::initVkInstance(SDL_Window *window, bool enableValidation)
+void RenderInstance::initVkInstance(bool enableValidation)
 {
     VkApplicationInfo appInfo{};
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -112,14 +117,14 @@ void RenderInstance::initVkInstance(SDL_Window *window, bool enableValidation)
     }
     
     unsigned int sdlExtensionsCount = 0;
-    if (!SDL_Vulkan_GetInstanceExtensions(window, &sdlExtensionsCount, nullptr))
+    if (!SDL_Vulkan_GetInstanceExtensions(_sdlWindow, &sdlExtensionsCount, nullptr))
     {
         throw std::runtime_error("Could not get required extensions from sdl");
     }
     
     size_t additionalExtensionsCount = extensions.size();
     extensions.resize(additionalExtensionsCount + sdlExtensionsCount);
-    if (!SDL_Vulkan_GetInstanceExtensions(window, &sdlExtensionsCount, extensions.data() + additionalExtensionsCount))
+    if (!SDL_Vulkan_GetInstanceExtensions(_sdlWindow, &sdlExtensionsCount, extensions.data() + additionalExtensionsCount))
     {
         throw std::runtime_error("Could not get required extensions from sdl");
     }
@@ -155,9 +160,9 @@ void RenderInstance::setupDebugMessenger()
     }
 }
 
-void RenderInstance::createSurface(SDL_Window *window)
+void RenderInstance::createSurface()
 {
-    if (!SDL_Vulkan_CreateSurface(window, _vkInstance, &_vkSurface))
+    if (!SDL_Vulkan_CreateSurface(_sdlWindow, _vkInstance, &_vkSurface))
     {
         throw std::runtime_error("Cannot create vulkan surface from sdl");
     }

@@ -16,18 +16,21 @@ public:
     
     VkAllocationCallbacks* allocator();
     
-private:
-    void init(SDL_Window *window, bool enableValidation);
+    SDL_Window* getSdlWindow();
     
-    void initVkInstance(SDL_Window *window, bool enableValidation);
+private:
+    void init(bool enableValidation);
+    
+    void initVkInstance(bool enableValidation);
     
     void setupDebugMessenger();
 
-    void createSurface(SDL_Window *window);
+    void createSurface();
     
     void destroy();
     
     VkInstance _vkInstance = VK_NULL_HANDLE;
     VkDebugUtilsMessengerEXT _vkDebugMessenger = VK_NULL_HANDLE;
     VkSurfaceKHR _vkSurface = VK_NULL_HANDLE;
+    SDL_Window* _sdlWindow = nullptr;
 };
