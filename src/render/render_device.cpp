@@ -24,7 +24,6 @@ RenderInstance& RenderDevice::getRenderInstance()
     return _renderInstance;
 }
 
-
 VkDevice RenderDevice::getVkDevice() const
 {
     return _vkDevice;

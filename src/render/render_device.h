@@ -7,7 +7,7 @@
 
 class RenderInstance;
 
-class RenderDevice
+class RenderDevice final
 {
 public:
     RenderDevice(RenderInstance& renderInstance);

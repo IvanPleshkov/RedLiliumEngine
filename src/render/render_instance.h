@@ -3,7 +3,7 @@
 #include <vulkan/vulkan.h>
 #include <SDL.h>
 
-class RenderInstance
+class RenderInstance final
 {
 public:
     RenderInstance(SDL_Window *window, bool enableValidation);
