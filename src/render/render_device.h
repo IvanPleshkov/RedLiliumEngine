@@ -61,12 +61,15 @@ private:
     void createLogicalDevice();
     
     void createSwapChain();
+    
+    void createImageViews();
 
     RenderInstance& _renderInstance;
     VkPhysicalDevice _vkPhysicalDevice;
     VkDevice _vkDevice;
     VkSwapchainKHR _vkSwapChain;
     std::vector<VkImage> _swapChainVkImages;
+    std::vector<VkImageView> _swapChainVkImageViews;
     VkFormat _swapChainVkImageFormat;
     VkExtent2D _swapChainVkExtent;
     VkQueue _vkGraphicsQueue;
