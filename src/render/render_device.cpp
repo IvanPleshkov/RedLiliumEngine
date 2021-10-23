@@ -19,6 +19,11 @@ RenderDevice::~RenderDevice()
     destroy();
 }
 
+VkAllocationCallbacks* RenderDevice::allocator()
+{
+    return _renderInstance.allocator();
+}
+
 RenderInstance& RenderDevice::getRenderInstance()
 {
     return _renderInstance;
@@ -37,6 +42,18 @@ VkQueue RenderDevice::getGraphicsVkQueue() const
 VkQueue RenderDevice::getPresentationVkQueue() const
 {
     return _vkPresentQueue;
+}
+
+VkFormat RenderDevice::getSwapChainVkImageFormat() const
+{
+    return _swapChainVkImageFormat;
+}
+
+glm::ivec2 RenderDevice::getSwapChainSize() const
+{
+    return {
+        static_cast<int>(_swapChainVkExtent.width),
+        static_cast<int>(_swapChainVkExtent.height)};
 }
 
 void RenderDevice::init()

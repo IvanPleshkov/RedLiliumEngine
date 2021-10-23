@@ -2,6 +2,7 @@
 
 #include <vulkan/vulkan.h>
 #include <SDL.h>
+#include <glm/vec2.hpp>
 #include <optional>
 #include <vector>
 
@@ -14,6 +15,8 @@ public:
     
     ~RenderDevice();
     
+    VkAllocationCallbacks* allocator();
+    
     RenderInstance& getRenderInstance();
     
     VkDevice getVkDevice() const;
@@ -21,6 +24,10 @@ public:
     VkQueue getGraphicsVkQueue() const;
     
     VkQueue getPresentationVkQueue() const;
+
+    VkFormat getSwapChainVkImageFormat() const;
+
+    glm::ivec2 getSwapChainSize() const;
 
 private:
     struct SwapChainSupportDetails {

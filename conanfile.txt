@@ -2,6 +2,10 @@
 glm/0.9.9.5
 sdl/2.0.16
 spdlog/1.9.2
+nlohmann_json/3.10.4
+#assimp/5.0.1
+#physx/4.1.1
+#entt/3.8.1
 
 [generators]
 cmake_multi
