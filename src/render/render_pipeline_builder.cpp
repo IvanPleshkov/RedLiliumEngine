@@ -2,13 +2,12 @@
 #include "render_pipeline.h"
 #include "render_device.h"
 #include "render_instance.h"
-#include "render_pass.h"
+#include "render_target.h"
 
-RenderPipelineBuilder::RenderPipelineBuilder(RenderDevice& renderDevice, const RenderPass& renderPass)
+RenderPipelineBuilder::RenderPipelineBuilder(const std::shared_ptr<RenderDevice>& renderDevice, const std::shared_ptr<RenderTarget>& renderTarget)
     : _renderDevice(renderDevice)
-    , _renderPass(renderPass)
+    , _renderTarget(renderTarget)
 {
-    
 }
 
 RenderPipelineBuilder& RenderPipelineBuilder::setVertexShader(std::string_view spirvShader)
@@ -23,7 +22,7 @@ RenderPipelineBuilder& RenderPipelineBuilder::setFragmentShader(std::string_view
     return *this;
 }
 
-RenderPipeline RenderPipelineBuilder::build()
+std::shared_ptr<RenderPipeline> RenderPipelineBuilder::build()
 {
     VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
     vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -57,15 +56,15 @@ RenderPipeline RenderPipelineBuilder::build()
     VkViewport viewport{};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
-    viewport.width = static_cast<float>(_renderPass.getSize().x);
-    viewport.height = static_cast<float>(_renderPass.getSize().y);
+    viewport.width = static_cast<float>(_renderTarget->getSize().x);
+    viewport.height = static_cast<float>(_renderTarget->getSize().y);
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
     
     VkRect2D scissor{};
     scissor.offset = {0, 0};
-    scissor.extent.width = static_cast<uint32_t>(_renderPass.getSize().x);
-    scissor.extent.height = static_cast<uint32_t>(_renderPass.getSize().y);
+    scissor.extent.width = static_cast<uint32_t>(_renderTarget->getSize().x);
+    scissor.extent.height = static_cast<uint32_t>(_renderTarget->getSize().y);
     
     VkPipelineViewportStateCreateInfo viewportState{};
     viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -147,15 +146,15 @@ RenderPipeline RenderPipelineBuilder::build()
     pipelineInfo.pColorBlendState = &colorBlending;
     pipelineInfo.pDynamicState = nullptr; // Optional
     pipelineInfo.layout = VK_NULL_HANDLE; // this parameter setup inside pipeline class after layout creation
-    pipelineInfo.renderPass = _renderPass.getVkRenderPass();
+    pipelineInfo.renderPass = _renderTarget->getVkRenderPass();
     pipelineInfo.subpass = 0;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
     pipelineInfo.basePipelineIndex = -1; // Optional
 
-    RenderPipeline pipeline(_renderDevice, pipelineLayoutInfo, pipelineInfo);
+    auto pipeline = std::make_shared<RenderPipeline>(_renderDevice, pipelineLayoutInfo, pipelineInfo);
     
-    vkDestroyShaderModule(_renderDevice.getVkDevice(), vertShaderStageInfo.module, nullptr);
-    vkDestroyShaderModule(_renderDevice.getVkDevice(), fragShaderStageInfo.module, nullptr);
+    vkDestroyShaderModule(_renderDevice->getVkDevice(), vertShaderStageInfo.module, nullptr);
+    vkDestroyShaderModule(_renderDevice->getVkDevice(), fragShaderStageInfo.module, nullptr);
     return pipeline;
 }
 
@@ -166,7 +165,7 @@ VkShaderModule RenderPipelineBuilder::createShaderModule(std::string_view spirvS
     createInfo.codeSize = spirvShader.size();
     createInfo.pCode = reinterpret_cast<const uint32_t*>(spirvShader.data());
     VkShaderModule shaderModule;
-    if (vkCreateShaderModule(_renderDevice.getVkDevice(), &createInfo, _renderDevice.allocator(), &shaderModule) != VK_SUCCESS) {
+    if (vkCreateShaderModule(_renderDevice->getVkDevice(), &createInfo, _renderDevice->allocator(), &shaderModule) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create shader module!");
     }
     return shaderModule;

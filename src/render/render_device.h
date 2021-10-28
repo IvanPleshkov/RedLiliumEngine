@@ -5,29 +5,39 @@
 #include <glm/vec2.hpp>
 #include <optional>
 #include <vector>
+#include <memory>
+#include <utility>
 
 class RenderInstance;
 
 class RenderDevice final
 {
 public:
-    RenderDevice(RenderInstance& renderInstance);
+    RenderDevice(const std::shared_ptr<RenderInstance>& renderInstance);
     
     ~RenderDevice();
     
+    void startFrame();
+    
+    void endFrame(VkSemaphore waitSemaphore);
+    
     VkAllocationCallbacks* allocator();
-    
-    RenderInstance& getRenderInstance();
-    
+
     VkDevice getVkDevice() const;
     
-    VkQueue getGraphicsVkQueue() const;
+    std::pair<VkQueue, uint32_t> getGraphicsVkQueue() const;
     
-    VkQueue getPresentationVkQueue() const;
+    std::pair<VkQueue, uint32_t> getPresentationVkQueue() const;
 
     VkFormat getSwapChainVkImageFormat() const;
 
     glm::ivec2 getSwapChainSize() const;
+    
+    const std::vector<VkImageView>& getSwapChainVkImageViews() const;
+    
+    VkSemaphore getSwapChainVkSemaphore() const;
+    
+    uint32_t getSwapChainCurrentImageIndex() const;
 
 private:
     struct SwapChainSupportDetails {
@@ -71,14 +81,18 @@ private:
     
     void createImageViews();
 
-    RenderInstance& _renderInstance;
-    VkPhysicalDevice _vkPhysicalDevice;
-    VkDevice _vkDevice;
-    VkSwapchainKHR _vkSwapChain;
+    void initSwapChainSemaphore();
+
+    std::shared_ptr<RenderInstance> _renderInstance;
+    VkPhysicalDevice _vkPhysicalDevice = VK_NULL_HANDLE;
+    VkDevice _vkDevice = VK_NULL_HANDLE;
+    VkSwapchainKHR _vkSwapChain = VK_NULL_HANDLE;
     std::vector<VkImage> _swapChainVkImages;
     std::vector<VkImageView> _swapChainVkImageViews;
+    uint32_t _swapChainCurrentImageIndex = 0;
     VkFormat _swapChainVkImageFormat;
-    VkExtent2D _swapChainVkExtent;
-    VkQueue _vkGraphicsQueue;
-    VkQueue _vkPresentQueue;
+    VkExtent2D _swapChainVkExtent = { 0, 0 };
+    VkSemaphore _swapChainVkSemaphore = VK_NULL_HANDLE;
+    std::pair<VkQueue, uint32_t> _vkGraphicsQueue;
+    std::pair<VkQueue, uint32_t> _vkPresentQueue;
 };

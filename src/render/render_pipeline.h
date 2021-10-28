@@ -2,6 +2,7 @@
 
 #include <vulkan/vulkan.h>
 #include <string>
+#include <memory>
 
 class RenderDevice;
 
@@ -9,11 +10,13 @@ class RenderPipeline
 {
 public:
     RenderPipeline(
-                   RenderDevice& renderDevice,
+                   const std::shared_ptr<RenderDevice>& renderDevice,
                    const VkPipelineLayoutCreateInfo& vkPipelineLayoutCreateInfo,
                    const VkGraphicsPipelineCreateInfo& vkGraphicsPipelineCreateInfo);
     
     ~RenderPipeline();
+
+    void bind(VkCommandBuffer vkCommandBuffer) const;
     
 private:
     void init(
@@ -22,7 +25,7 @@ private:
 
     void destroy();
 
-    RenderDevice& _renderDevice;
+    std::shared_ptr<RenderDevice> _renderDevice;
     VkPipelineLayout _vkPipelineLayout = VK_NULL_HANDLE;
     VkPipeline _vkPipeline = VK_NULL_HANDLE;
 };

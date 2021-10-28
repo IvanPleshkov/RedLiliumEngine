@@ -3,11 +3,15 @@
 
 #include "render/render_instance.h"
 #include "render/render_device.h"
-#include "render/render_pass.h"
+#include "render/render_target.h"
+#include "render/render_target_builder.h"
 #include "render/render_pipeline.h"
 #include "render/render_pipeline_builder.h"
+#include "render/render_step.h"
 
 #include "resources_manager.h"
+
+#include <memory>
 
 int main(int argc, char *args[])
 {
@@ -18,13 +22,17 @@ int main(int argc, char *args[])
 
     ResourcesManager resourcesManager;
 
-    RenderInstance renderInstance(window, true);
-    RenderDevice renderDevice(renderInstance);
-    RenderPass renderPass(renderDevice, renderDevice.getSwapChainVkImageFormat(), renderDevice.getSwapChainSize());
-    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderPass)
+    auto renderInstance = std::make_shared<RenderInstance>(window, true);
+    auto renderDevice = std::make_shared<RenderDevice>(renderInstance);
+    auto renderTarget = RenderTargetBuilder(renderDevice)
+        .setVkFormat(renderDevice->getSwapChainVkImageFormat())
+        .setSize(renderDevice->getSwapChainSize())
+        .build();
+    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget)
         .setVertexShader(resourcesManager.readResourceData("shaders/triangle.vert.spv"))
         .setFragmentShader(resourcesManager.readResourceData("shaders/triangle.frag.spv"))
         .build();
+    auto renderStep = std::make_shared<RenderStep>(renderDevice, renderTarget, renderPipeline);
 
     bool quit = false;
     SDL_Event e;
@@ -35,6 +43,11 @@ int main(int argc, char *args[])
                 case SDL_QUIT: quit = true; break;
             }
         }
+        
+        renderDevice->startFrame();
+        renderTarget->setFramebufferIndex(renderDevice->getSwapChainCurrentImageIndex());
+        renderStep->draw(renderDevice->getSwapChainVkSemaphore());
+        renderDevice->endFrame(renderTarget->getVkSemaphore());
     }
 
     SDL_DestroyWindow(window);

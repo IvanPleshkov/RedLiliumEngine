@@ -8,7 +8,7 @@
 #include <cstdint>
 #include <algorithm>
 
-RenderDevice::RenderDevice(RenderInstance& renderInstance)
+RenderDevice::RenderDevice(const std::shared_ptr<RenderInstance>& renderInstance)
     : _renderInstance(renderInstance)
 {
     init();
@@ -19,14 +19,29 @@ RenderDevice::~RenderDevice()
     destroy();
 }
 
-VkAllocationCallbacks* RenderDevice::allocator()
+void RenderDevice::startFrame()
 {
-    return _renderInstance.allocator();
+    vkAcquireNextImageKHR(_vkDevice, _vkSwapChain, UINT64_MAX, _swapChainVkSemaphore, VK_NULL_HANDLE, &_swapChainCurrentImageIndex);
 }
 
-RenderInstance& RenderDevice::getRenderInstance()
+void RenderDevice::endFrame(VkSemaphore waitSemaphore)
 {
-    return _renderInstance;
+    VkPresentInfoKHR presentInfo{};
+    presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    presentInfo.waitSemaphoreCount = 1;
+    presentInfo.pWaitSemaphores = &waitSemaphore;
+    presentInfo.swapchainCount = 1;
+    presentInfo.pSwapchains = &_vkSwapChain;
+    presentInfo.pImageIndices = &_swapChainCurrentImageIndex;
+    presentInfo.pResults = nullptr;
+    vkQueuePresentKHR(_vkPresentQueue.first, &presentInfo);
+    
+    vkDeviceWaitIdle(_vkDevice);
+}
+
+VkAllocationCallbacks* RenderDevice::allocator()
+{
+    return _renderInstance->allocator();
 }
 
 VkDevice RenderDevice::getVkDevice() const
@@ -34,12 +49,12 @@ VkDevice RenderDevice::getVkDevice() const
     return _vkDevice;
 }
 
-VkQueue RenderDevice::getGraphicsVkQueue() const
+std::pair<VkQueue, uint32_t> RenderDevice::getGraphicsVkQueue() const
 {
     return _vkGraphicsQueue;
 }
 
-VkQueue RenderDevice::getPresentationVkQueue() const
+std::pair<VkQueue, uint32_t> RenderDevice::getPresentationVkQueue() const
 {
     return _vkPresentQueue;
 }
@@ -56,45 +71,67 @@ glm::ivec2 RenderDevice::getSwapChainSize() const
         static_cast<int>(_swapChainVkExtent.height)};
 }
 
+const std::vector<VkImageView>& RenderDevice::getSwapChainVkImageViews() const
+{
+    return _swapChainVkImageViews;
+}
+
+VkSemaphore RenderDevice::getSwapChainVkSemaphore() const
+{
+    return _swapChainVkSemaphore;
+}
+
+uint32_t RenderDevice::getSwapChainCurrentImageIndex() const
+{
+    return _swapChainCurrentImageIndex;
+}
+
 void RenderDevice::init()
 {
     pickPhysicalDevice();
     createLogicalDevice();
     createSwapChain();
     createImageViews();
+    initSwapChainSemaphore();
 }
 
 void RenderDevice::destroy()
 {
+    if (_swapChainVkSemaphore != VK_NULL_HANDLE)
+    {
+        vkDestroySemaphore(_vkDevice, _swapChainVkSemaphore, allocator());
+        _swapChainVkSemaphore = VK_NULL_HANDLE;
+    }
     for (auto imageView : _swapChainVkImageViews)
     {
-        vkDestroyImageView(_vkDevice, imageView, _renderInstance.allocator());
+        vkDestroyImageView(_vkDevice, imageView, _renderInstance->allocator());
     }
 
     if (_vkSwapChain != VK_NULL_HANDLE)
     {
-        vkDestroySwapchainKHR(_vkDevice, _vkSwapChain, _renderInstance.allocator());
+        vkDestroySwapchainKHR(_vkDevice, _vkSwapChain, _renderInstance->allocator());
     }
 
     if (_vkDevice != VK_NULL_HANDLE)
     {
-        vkDestroyDevice(_vkDevice, _renderInstance.allocator());
+        vkDestroyDevice(_vkDevice, _renderInstance->allocator());
         _vkDevice = VK_NULL_HANDLE;
         _vkPhysicalDevice = VK_NULL_HANDLE;
-        _vkGraphicsQueue = VK_NULL_HANDLE;
+        _vkGraphicsQueue = { VK_NULL_HANDLE, 0 };
+        _vkPresentQueue = { VK_NULL_HANDLE, 0 };
     }
 }
 
 void RenderDevice::pickPhysicalDevice()
 {
     uint32_t deviceCount = 0;
-    vkEnumeratePhysicalDevices(_renderInstance.getVkInstance(), &deviceCount, nullptr);
+    vkEnumeratePhysicalDevices(_renderInstance->getVkInstance(), &deviceCount, nullptr);
     if (deviceCount == 0)
     {
         throw std::runtime_error("Failed to find GPUs with Vulkan support!");
     }
     std::vector<VkPhysicalDevice> devices(deviceCount);
-    vkEnumeratePhysicalDevices(_renderInstance.getVkInstance(), &deviceCount, devices.data());
+    vkEnumeratePhysicalDevices(_renderInstance->getVkInstance(), &deviceCount, devices.data());
     
     std::multimap<int, VkPhysicalDevice> candidates;
 
@@ -166,20 +203,20 @@ int RenderDevice::rateDeviceSuitability(VkPhysicalDevice vkPhysicalDevice)
 
 RenderDevice::SwapChainSupportDetails RenderDevice::querySwapChainSupport(VkPhysicalDevice vkPhysicalDevice) {
     SwapChainSupportDetails details;
-    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vkPhysicalDevice, _renderInstance.getVkSurface(), &details._capabilities);
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vkPhysicalDevice, _renderInstance->getVkSurface(), &details._capabilities);
     
     uint32_t formatCount;
-    vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice, _renderInstance.getVkSurface(), &formatCount, nullptr);
+    vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice, _renderInstance->getVkSurface(), &formatCount, nullptr);
     if (formatCount != 0) {
         details._formats.resize(formatCount);
-        vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice, _renderInstance.getVkSurface(), &formatCount, details._formats.data());
+        vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice, _renderInstance->getVkSurface(), &formatCount, details._formats.data());
     }
 
     uint32_t presentModeCount;
-    vkGetPhysicalDeviceSurfacePresentModesKHR(vkPhysicalDevice, _renderInstance.getVkSurface(), &presentModeCount, nullptr);
+    vkGetPhysicalDeviceSurfacePresentModesKHR(vkPhysicalDevice, _renderInstance->getVkSurface(), &presentModeCount, nullptr);
     if (presentModeCount != 0) {
         details._presentModes.resize(presentModeCount);
-        vkGetPhysicalDeviceSurfacePresentModesKHR(vkPhysicalDevice, _renderInstance.getVkSurface(), &presentModeCount, details._presentModes.data());
+        vkGetPhysicalDeviceSurfacePresentModesKHR(vkPhysicalDevice, _renderInstance->getVkSurface(), &presentModeCount, details._presentModes.data());
     }
     
     return details;
@@ -197,7 +234,7 @@ RenderDevice::QueueFamilyIndices RenderDevice::findQueueFamilies(VkPhysicalDevic
     int i = 0;
     for (const auto& queueFamily : queueFamilies) {
         VkBool32 presentSupport = false;
-        vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice, i, _renderInstance.getVkSurface(), &presentSupport);
+        vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice, i, _renderInstance->getVkSurface(), &presentSupport);
         if (presentSupport) {
             indices._presentFamily = i;
         }
@@ -242,7 +279,7 @@ VkExtent2D RenderDevice::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabi
     else
     {
         int width, height;
-        SDL_GetWindowSize(_renderInstance.getSdlWindow(), &width, &height);
+        SDL_GetWindowSize(_renderInstance->getSdlWindow(), &width, &height);
 
         VkExtent2D actualExtent =
         {
@@ -296,12 +333,14 @@ void RenderDevice::createLogicalDevice()
     createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
     createInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
-    if (vkCreateDevice(_vkPhysicalDevice, &createInfo, _renderInstance.allocator(), &_vkDevice) != VK_SUCCESS) {
+    if (vkCreateDevice(_vkPhysicalDevice, &createInfo, _renderInstance->allocator(), &_vkDevice) != VK_SUCCESS) {
         throw std::runtime_error("failed to create logical device!");
     }
     
-    vkGetDeviceQueue(_vkDevice, indices._graphicsFamily.value(), 0, &_vkGraphicsQueue);
-    vkGetDeviceQueue(_vkDevice, indices._presentFamily.value(), 0, &_vkPresentQueue);
+    vkGetDeviceQueue(_vkDevice, indices._graphicsFamily.value(), 0, &_vkGraphicsQueue.first);
+    _vkGraphicsQueue.second = indices._graphicsFamily.value();
+    vkGetDeviceQueue(_vkDevice, indices._presentFamily.value(), 0, &_vkPresentQueue.first);
+    _vkPresentQueue.second = indices._presentFamily.value();
 }
 
 void RenderDevice::createSwapChain() {
@@ -318,7 +357,7 @@ void RenderDevice::createSwapChain() {
 
     VkSwapchainCreateInfoKHR createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-    createInfo.surface = _renderInstance.getVkSurface();
+    createInfo.surface = _renderInstance->getVkSurface();
     createInfo.minImageCount = imageCount;
     createInfo.imageFormat = surfaceFormat.format;
     createInfo.imageColorSpace = surfaceFormat.colorSpace;
@@ -352,7 +391,7 @@ void RenderDevice::createSwapChain() {
     createInfo.clipped = VK_TRUE;
     createInfo.oldSwapchain = VK_NULL_HANDLE;
     
-    if (vkCreateSwapchainKHR(_vkDevice, &createInfo, _renderInstance.allocator(), &_vkSwapChain) != VK_SUCCESS)
+    if (vkCreateSwapchainKHR(_vkDevice, &createInfo, _renderInstance->allocator(), &_vkSwapChain) != VK_SUCCESS)
     {
         throw std::runtime_error("Failed to create swap chain!");
     }
@@ -387,9 +426,19 @@ void RenderDevice::createImageViews()
         createInfo.subresourceRange.baseArrayLayer = 0;
         createInfo.subresourceRange.layerCount = 1;
         
-        if (vkCreateImageView(_vkDevice, &createInfo, _renderInstance.allocator(), &_swapChainVkImageViews[i]) != VK_SUCCESS)
+        if (vkCreateImageView(_vkDevice, &createInfo, _renderInstance->allocator(), &_swapChainVkImageViews[i]) != VK_SUCCESS)
         {
             throw std::runtime_error("Failed to create image views!");
         }
+    }
+}
+
+void RenderDevice::initSwapChainSemaphore()
+{
+    VkSemaphoreCreateInfo semaphoreInfo{};
+    semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    if (vkCreateSemaphore(_vkDevice, &semaphoreInfo, allocator(), &_swapChainVkSemaphore) != VK_SUCCESS)
+    {
+        throw std::runtime_error("Failed to create semaphore!");
     }
 }
