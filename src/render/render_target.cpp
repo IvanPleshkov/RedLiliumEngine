@@ -2,8 +2,10 @@
 #include "render_device.h"
 #include "render_instance.h"
 
-RenderTarget::RenderTarget(const std::shared_ptr<RenderDevice>& renderDevice, VkFormat vkFormat, glm::ivec2 size)
+RenderTarget::RenderTarget(const std::shared_ptr<RenderDevice>& renderDevice, const std::vector<VkImageView>& vkImageViews, VkFormat vkFormat, glm::ivec2 size)
     : _renderDevice(renderDevice)
+    , _vkImageViews(vkImageViews)
+    , _vkFormat(vkFormat)
     , _size(size)
 {
     init(vkFormat);
@@ -104,10 +106,10 @@ void RenderTarget::init(VkFormat vkFormat)
 
 void RenderTarget::initFramebuffer()
 {
-    _vkFramebuffers.resize(_renderDevice->getSwapChainVkImageViews().size());
-    for (size_t i = 0; i < _vkFramebuffers.size(); i++) {
+    _vkFramebuffers.resize(_vkImageViews.size());
+    for (size_t i = 0; i < _vkImageViews.size(); i++) {
         VkImageView attachments[] = {
-            _renderDevice->getSwapChainVkImageViews()[i]
+            _vkImageViews[i]
         };
 
         VkFramebufferCreateInfo framebufferInfo{};

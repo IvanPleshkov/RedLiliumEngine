@@ -24,10 +24,14 @@ int main(int argc, char *args[])
 
     auto renderInstance = std::make_shared<RenderInstance>(window, true);
     auto renderDevice = std::make_shared<RenderDevice>(renderInstance);
-    auto renderTarget = RenderTargetBuilder(renderDevice)
+    auto renderTargetBuilder = RenderTargetBuilder(renderDevice)
         .setVkFormat(renderDevice->getSwapChainVkImageFormat())
-        .setSize(renderDevice->getSwapChainSize())
-        .build();
+        .setSize(renderDevice->getSwapChainSize());
+    for (auto& vkImageView : renderDevice->getSwapChainVkImageViews())
+    {
+        renderTargetBuilder.addImageView(vkImageView);
+    }
+    auto renderTarget = renderTargetBuilder.build();
     auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget)
         .setVertexShader(resourcesManager.readResourceData("shaders/triangle.vert.spv"))
         .setFragmentShader(resourcesManager.readResourceData("shaders/triangle.frag.spv"))

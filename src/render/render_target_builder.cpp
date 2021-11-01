@@ -18,7 +18,13 @@ RenderTargetBuilder& RenderTargetBuilder::setSize(glm::ivec2 size)
     return *this;
 }
 
+RenderTargetBuilder& RenderTargetBuilder::addImageView(VkImageView vkImageView)
+{
+    _vkImageViews.push_back(vkImageView);
+    return *this;
+}
+
 std::shared_ptr<RenderTarget> RenderTargetBuilder::build()
 {
-    return std::make_shared<RenderTarget>(_renderDevice, _vkFormat, _size);
+    return std::make_shared<RenderTarget>(_renderDevice, _vkImageViews, _vkFormat, _size);
 }
