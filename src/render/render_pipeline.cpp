@@ -1,6 +1,7 @@
 #include "render_pipeline.h"
 #include "render_device.h"
 #include "render_instance.h"
+#include <stdexcept>
 
 RenderPipeline::RenderPipeline(
                                const std::shared_ptr<RenderDevice>& renderDevice,

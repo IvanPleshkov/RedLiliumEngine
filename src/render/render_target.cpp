@@ -1,6 +1,7 @@
 #include "render_target.h"
 #include "render_device.h"
 #include "render_instance.h"
+#include <stdexcept>
 
 RenderTarget::RenderTarget(const std::shared_ptr<RenderDevice>& renderDevice, const std::vector<VkImageView>& vkImageViews, VkFormat vkFormat, glm::ivec2 size)
     : _renderDevice(renderDevice)

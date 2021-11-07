@@ -4,6 +4,7 @@
 #include <nlohmann/json.hpp>
 #include <filesystem>
 #include <fstream>
+#include <sstream>
 
 ResourcesManager::ResourcesManager()
 {
@@ -36,10 +37,18 @@ ResourcesManager::~ResourcesManager() { }
 
 std::string ResourcesManager::readResourceData(std::string_view resource)
 {
-    std::string fullPath = _path + std::filesystem::path::preferred_separator + std::string(resource);
-    std::ifstream fileStream(fullPath);
-    std::string fileData(
-        (std::istreambuf_iterator<char>(fileStream)),
-        std::istreambuf_iterator<char>());
-    return std::move(fileData);
+	std::stringstream ss;
+	ss << _path << "/" << resource;
+    std::ifstream fileStream(ss.str());
+	if (fileStream.is_open())
+	{
+		std::string fileData(
+			(std::istreambuf_iterator<char>(fileStream)),
+			std::istreambuf_iterator<char>());
+		return std::move(fileData);
+	}
+	else
+	{
+		return std::string();
+	}
 }

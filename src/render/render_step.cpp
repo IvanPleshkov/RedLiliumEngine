@@ -2,6 +2,7 @@
 #include "render_target.h"
 #include "render_pipeline.h"
 #include "render_device.h"
+#include <stdexcept>
 
 RenderStep::RenderStep(const std::shared_ptr<RenderDevice>& renderDevice,
            const std::shared_ptr<RenderTarget>& renderTarget,
