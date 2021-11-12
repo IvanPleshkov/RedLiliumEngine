@@ -2,6 +2,8 @@
 #include "render_target.h"
 #include "render_pipeline.h"
 #include "render_device.h"
+#include "gpu_mesh.h"
+#include "gpu_buffer.h"
 #include <stdexcept>
 
 RenderStep::RenderStep(const std::shared_ptr<RenderDevice>& renderDevice,
@@ -19,10 +21,10 @@ RenderStep::~RenderStep()
     destroy();
 }
 
-void RenderStep::draw(VkSemaphore waitVkSemaphore)
+void RenderStep::draw(const std::shared_ptr<GpuMesh>& gpuMesh, VkSemaphore waitVkSemaphore)
 {
     destroyCommandBuffer();
-    buildCommandBuffer();
+    buildCommandBuffer(gpuMesh);
     runCommandBuffer(waitVkSemaphore);
 }
 
@@ -50,7 +52,7 @@ void RenderStep::destroy()
     }
 }
 
-void RenderStep::buildCommandBuffer()
+void RenderStep::buildCommandBuffer(const std::shared_ptr<GpuMesh>& gpuMesh)
 {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -75,7 +77,19 @@ void RenderStep::buildCommandBuffer()
 
     _renderTarget->bind(_vkCommandBuffer);
     _renderPipeline->bind(_vkCommandBuffer);
-    vkCmdDraw(_vkCommandBuffer, 3, 1, 0, 0);
+
+    if (gpuMesh != nullptr)
+    {
+        VkBuffer vertexBuffers[] = { gpuMesh->getVertexBuffer()->getVkBuffer() };
+        VkDeviceSize offsets[] = { 0 };
+        vkCmdBindVertexBuffers(_vkCommandBuffer, 0, 1, vertexBuffers, offsets);
+        vkCmdDraw(_vkCommandBuffer, 3, 1, 0, 0);
+    }
+    else
+    {
+        vkCmdDraw(_vkCommandBuffer, 3, 1, 0, 0);
+    }
+
     _renderTarget->unbind(_vkCommandBuffer);
     if (vkEndCommandBuffer(_vkCommandBuffer) != VK_SUCCESS)
     {

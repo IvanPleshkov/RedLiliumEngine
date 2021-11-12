@@ -40,6 +40,8 @@ public:
     
     uint32_t getSwapChainCurrentImageIndex() const;
 
+    uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+
 private:
     struct SwapChainSupportDetails {
         VkSurfaceCapabilitiesKHR _capabilities;

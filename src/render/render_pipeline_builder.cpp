@@ -23,6 +23,31 @@ RenderPipelineBuilder& RenderPipelineBuilder::setFragmentShader(std::string_view
     return *this;
 }
 
+RenderPipelineBuilder& RenderPipelineBuilder::addVertexAttribute(uint32_t location, uint32_t offset, VkFormat format)
+{
+    VkVertexInputAttributeDescription vkVertexInputAttributeDescription{};
+    vkVertexInputAttributeDescription.binding = 0;
+    vkVertexInputAttributeDescription.location = location;
+    vkVertexInputAttributeDescription.format = format;
+    vkVertexInputAttributeDescription.offset = offset;
+    _vkVertexInputAttributeDescriptions.push_back(vkVertexInputAttributeDescription);
+    
+    uint32_t size = sizeof(float);
+    switch (format)
+    {
+        case VK_FORMAT_R32G32_SFLOAT:
+            size = 2 * sizeof(float);
+            break;
+        case VK_FORMAT_R32G32B32_SFLOAT:
+            size = 3 * sizeof(float);
+            break;
+        default:
+            throw std::runtime_error("add please format size");
+    }
+    _vertexInputBindingSize = std::max(_vertexInputBindingSize, offset + size);
+    return *this;
+}
+
 std::shared_ptr<RenderPipeline> RenderPipelineBuilder::build()
 {
     VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
@@ -42,12 +67,33 @@ std::shared_ptr<RenderPipeline> RenderPipelineBuilder::build()
         fragShaderStageInfo
     };
     
+    VkVertexInputBindingDescription vkVertexInputBindingDescription{};
+    vkVertexInputBindingDescription.binding = 0;
+    vkVertexInputBindingDescription.stride = _vertexInputBindingSize;
+    vkVertexInputBindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+    
     VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertexInputInfo.vertexBindingDescriptionCount = 0;
-    vertexInputInfo.pVertexBindingDescriptions = nullptr; // Optional
-    vertexInputInfo.vertexAttributeDescriptionCount = 0;
-    vertexInputInfo.pVertexAttributeDescriptions = nullptr; // Optional
+    if (_vertexInputBindingSize > 0)
+    {
+        vertexInputInfo.vertexBindingDescriptionCount = 1;
+        vertexInputInfo.pVertexBindingDescriptions = &vkVertexInputBindingDescription;
+    }
+    else
+    {
+        vertexInputInfo.vertexBindingDescriptionCount = 0;
+        vertexInputInfo.pVertexBindingDescriptions = nullptr;
+    }
+    if (!_vkVertexInputAttributeDescriptions.empty())
+    {
+        vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(_vkVertexInputAttributeDescriptions.size());
+        vertexInputInfo.pVertexAttributeDescriptions = _vkVertexInputAttributeDescriptions.data();
+    }
+    else
+    {
+        vertexInputInfo.vertexAttributeDescriptionCount = 0;
+        vertexInputInfo.pVertexAttributeDescriptions = nullptr;
+    }
     
     VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
     inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;

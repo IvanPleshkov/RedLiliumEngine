@@ -18,9 +18,9 @@ public:
 
     ~GpuBuffer();
 
-    void updateImmediate();
-
-    void update();
+    void update(const char* data, size_t size);
+    
+    VkBuffer getVkBuffer() const;
 
 private:
     void init();
@@ -29,4 +29,6 @@ private:
 
     std::shared_ptr<RenderDevice> _renderDevice;
     BufferType _bufferType;
+    VkBuffer _vkVertexBuffer = VK_NULL_HANDLE;
+    VkDeviceMemory _vkVertexBufferMemory = VK_NULL_HANDLE;
 };

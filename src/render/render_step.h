@@ -6,6 +6,7 @@
 class RenderDevice;
 class RenderTarget;
 class RenderPipeline;
+class GpuMesh;
 
 class RenderStep
 {
@@ -16,14 +17,14 @@ public:
 
     ~RenderStep();
 
-    void draw(VkSemaphore waitVkSemaphore);
+    void draw(const std::shared_ptr<GpuMesh>& gpuMesh, VkSemaphore waitVkSemaphore);
     
 public:
     void init();
 
     void destroy();
     
-    void buildCommandBuffer();
+    void buildCommandBuffer(const std::shared_ptr<GpuMesh>& gpuMesh);
 
     void destroyCommandBuffer();
     
