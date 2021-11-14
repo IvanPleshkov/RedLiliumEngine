@@ -18,11 +18,13 @@ void GpuMesh::update(const Mesh& mesh)
     if (!mesh._indices.empty())
     {
         _indexBuffer = std::make_shared<GpuBuffer>(_renderDevice, GpuBuffer::Index);
+        _indexBuffer->update(reinterpret_cast<const char*>(mesh._indices.data()), sizeof(uint16_t) * mesh._indices.size());
     }
     else
     {
         _indexBuffer = nullptr;
     }
+    _indicesCount = mesh._indices.size();
 }
 
 const std::shared_ptr<GpuBuffer> GpuMesh::getVertexBuffer() const
@@ -33,4 +35,9 @@ const std::shared_ptr<GpuBuffer> GpuMesh::getVertexBuffer() const
 const std::shared_ptr<GpuBuffer> GpuMesh::getIndexBuffer() const
 {
     return _indexBuffer;
+}
+
+size_t GpuMesh::getIndicesCount() const
+{
+    return _indicesCount;
 }

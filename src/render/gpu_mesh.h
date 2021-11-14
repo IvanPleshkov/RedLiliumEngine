@@ -19,8 +19,11 @@ public:
     
     const std::shared_ptr<GpuBuffer> getIndexBuffer() const;
     
+    size_t getIndicesCount() const;
+    
 private:
     std::shared_ptr<RenderDevice> _renderDevice;
     std::shared_ptr<GpuBuffer> _vertexBuffer;
     std::shared_ptr<GpuBuffer> _indexBuffer;
+    size_t _indicesCount;
 };

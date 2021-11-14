@@ -27,8 +27,14 @@ private:
 
     void destroy();
 
+    void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+
+    void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+
     std::shared_ptr<RenderDevice> _renderDevice;
     BufferType _bufferType;
-    VkBuffer _vkVertexBuffer = VK_NULL_HANDLE;
-    VkDeviceMemory _vkVertexBufferMemory = VK_NULL_HANDLE;
+    VkBuffer _vkBuffer = VK_NULL_HANDLE;
+    VkDeviceMemory _vkBufferMemory = VK_NULL_HANDLE;
+    VkBuffer _vkStagingBuffer = VK_NULL_HANDLE;
+    VkDeviceMemory _vkStagingBufferMemory = VK_NULL_HANDLE;
 };

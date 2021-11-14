@@ -67,8 +67,8 @@ void RenderStep::buildCommandBuffer(const std::shared_ptr<GpuMesh>& gpuMesh)
 
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    beginInfo.flags = 0; // Optional
-    beginInfo.pInheritanceInfo = nullptr; // Optional
+    beginInfo.flags = 0;
+    beginInfo.pInheritanceInfo = nullptr;
 
     if (vkBeginCommandBuffer(_vkCommandBuffer, &beginInfo) != VK_SUCCESS)
     {
@@ -83,7 +83,17 @@ void RenderStep::buildCommandBuffer(const std::shared_ptr<GpuMesh>& gpuMesh)
         VkBuffer vertexBuffers[] = { gpuMesh->getVertexBuffer()->getVkBuffer() };
         VkDeviceSize offsets[] = { 0 };
         vkCmdBindVertexBuffers(_vkCommandBuffer, 0, 1, vertexBuffers, offsets);
-        vkCmdDraw(_vkCommandBuffer, 3, 1, 0, 0);
+
+        if (gpuMesh->getIndexBuffer() != nullptr)
+        {
+            auto vkIndexBuffer = gpuMesh->getIndexBuffer()->getVkBuffer();
+            vkCmdBindIndexBuffer(_vkCommandBuffer, vkIndexBuffer, 0, VK_INDEX_TYPE_UINT16);
+            vkCmdDrawIndexed(_vkCommandBuffer, static_cast<uint32_t>(gpuMesh->getIndicesCount()), 1, 0, 0, 0);
+        }
+        else
+        {
+            vkCmdDraw(_vkCommandBuffer, 3, 1, 0, 0);
+        }
     }
     else
     {
