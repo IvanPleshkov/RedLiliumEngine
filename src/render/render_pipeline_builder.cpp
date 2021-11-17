@@ -48,8 +48,34 @@ RenderPipelineBuilder& RenderPipelineBuilder::addVertexAttribute(uint32_t locati
     return *this;
 }
 
+RenderPipelineBuilder& RenderPipelineBuilder::addUniformBuffer(VkShaderStageFlags vkStage, uint32_t binding)
+{
+    VkDescriptorSetLayoutBinding uboLayoutBinding{};
+    uboLayoutBinding.binding = 0;
+    uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    uboLayoutBinding.descriptorCount = 1;
+    uboLayoutBinding.stageFlags = vkStage;
+    uboLayoutBinding.pImmutableSamplers = nullptr;
+    _vkDescriptorSetLayoutBindings.push_back(uboLayoutBinding);
+    return *this;
+}
+
 std::shared_ptr<RenderPipeline> RenderPipelineBuilder::build()
 {
+    VkDescriptorSetLayout vkDescriptorSetLayout = VK_NULL_HANDLE;
+    if (!_vkDescriptorSetLayoutBindings.empty())
+    {
+        VkDescriptorSetLayoutCreateInfo layoutInfo{};
+        layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        layoutInfo.bindingCount = static_cast<uint32_t>(_vkDescriptorSetLayoutBindings.size());
+        layoutInfo.pBindings = _vkDescriptorSetLayoutBindings.data();
+
+        if (vkCreateDescriptorSetLayout(_renderDevice->getVkDevice(), &layoutInfo, _renderDevice->allocator(), &vkDescriptorSetLayout) != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to create descriptor set layout!");
+        }
+    }
+
     VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
     vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
@@ -175,10 +201,24 @@ std::shared_ptr<RenderPipeline> RenderPipelineBuilder::build()
     
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount = 0; // Optional
-    pipelineLayoutInfo.pSetLayouts = nullptr; // Optional
+    if (vkDescriptorSetLayout != VK_NULL_HANDLE)
+    {
+        pipelineLayoutInfo.setLayoutCount = 1;
+        pipelineLayoutInfo.pSetLayouts = &vkDescriptorSetLayout;
+    }
+    else
+    {
+        pipelineLayoutInfo.setLayoutCount = 0;
+        pipelineLayoutInfo.pSetLayouts = nullptr;
+    }
     pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
     pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
+
+    VkPipelineLayout vkPipelineLayout;
+    if (vkCreatePipelineLayout(_renderDevice->getVkDevice(), &pipelineLayoutInfo, _renderDevice->allocator(), &vkPipelineLayout) != VK_SUCCESS)
+    {
+        throw std::runtime_error("Failed to create pipeline layout!");
+    }
 
     VkGraphicsPipelineCreateInfo pipelineInfo{};
     pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -192,13 +232,19 @@ std::shared_ptr<RenderPipeline> RenderPipelineBuilder::build()
     pipelineInfo.pDepthStencilState = nullptr; // Optional
     pipelineInfo.pColorBlendState = &colorBlending;
     pipelineInfo.pDynamicState = nullptr; // Optional
-    pipelineInfo.layout = VK_NULL_HANDLE; // this parameter setup inside pipeline class after layout creation
+    pipelineInfo.layout = vkPipelineLayout;
     pipelineInfo.renderPass = _renderTarget->getVkRenderPass();
     pipelineInfo.subpass = 0;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
     pipelineInfo.basePipelineIndex = -1; // Optional
 
-    auto pipeline = std::make_shared<RenderPipeline>(_renderDevice, pipelineLayoutInfo, pipelineInfo);
+    VkPipeline vkPipeline;
+    if (vkCreateGraphicsPipelines(_renderDevice->getVkDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, _renderDevice->allocator(), &vkPipeline) != VK_SUCCESS)
+    {
+        throw std::runtime_error("Failed to create graphics pipeline!");
+    }
+    
+    auto pipeline = std::make_shared<RenderPipeline>(_renderDevice, vkDescriptorSetLayout, vkPipelineLayout, vkPipeline);
     
     vkDestroyShaderModule(_renderDevice->getVkDevice(), vertShaderStageInfo.module, nullptr);
     vkDestroyShaderModule(_renderDevice->getVkDevice(), fragShaderStageInfo.module, nullptr);

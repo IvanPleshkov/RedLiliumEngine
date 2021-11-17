@@ -5,11 +5,14 @@
 
 RenderPipeline::RenderPipeline(
                                const std::shared_ptr<RenderDevice>& renderDevice,
-                               const VkPipelineLayoutCreateInfo& vkPipelineLayoutCreateInfo,
-                               const VkGraphicsPipelineCreateInfo& vkGraphicsPipelineCreateInfo)
+                               VkDescriptorSetLayout vkDescriptorSetLayout,
+                               VkPipelineLayout vkPipelineLayout,
+                               VkPipeline vkPipeline)
     : _renderDevice(renderDevice)
+    , _vkDescriptorSetLayout(vkDescriptorSetLayout)
+    , _vkPipelineLayout(vkPipelineLayout)
+    , _vkPipeline(vkPipeline)
 {
-    init(vkPipelineLayoutCreateInfo, vkGraphicsPipelineCreateInfo);
 }
 
 RenderPipeline::~RenderPipeline()
@@ -20,23 +23,6 @@ RenderPipeline::~RenderPipeline()
 void RenderPipeline::bind(VkCommandBuffer vkCommandBuffer) const
 {
     vkCmdBindPipeline(vkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _vkPipeline);
-}
-
-void RenderPipeline::init(
-                          const VkPipelineLayoutCreateInfo& vkPipelineLayoutCreateInfo,
-                          const VkGraphicsPipelineCreateInfo& vkGraphicsPipelineCreateInfo)
-{
-    if (vkCreatePipelineLayout(_renderDevice->getVkDevice(), &vkPipelineLayoutCreateInfo, _renderDevice->allocator(), &_vkPipelineLayout) != VK_SUCCESS)
-    {
-        throw std::runtime_error("Failed to create pipeline layout!");
-    }
-
-    VkGraphicsPipelineCreateInfo pipelineCreateInfo = vkGraphicsPipelineCreateInfo;
-    pipelineCreateInfo.layout = _vkPipelineLayout;
-    if (vkCreateGraphicsPipelines(_renderDevice->getVkDevice(), VK_NULL_HANDLE, 1, &pipelineCreateInfo, _renderDevice->allocator(), &_vkPipeline) != VK_SUCCESS)
-    {
-        throw std::runtime_error("Failed to create graphics pipeline!");
-    }
 }
 
 void RenderPipeline::destroy()
@@ -50,5 +36,10 @@ void RenderPipeline::destroy()
     {
         vkDestroyPipelineLayout(_renderDevice->getVkDevice(), _vkPipelineLayout, _renderDevice->allocator());
         _vkPipelineLayout = VK_NULL_HANDLE;
+    }
+    if (_vkDescriptorSetLayout != VK_NULL_HANDLE)
+    {
+        vkDestroyDescriptorSetLayout(_renderDevice->getVkDevice(), _vkDescriptorSetLayout, _renderDevice->allocator());
+        _vkDescriptorSetLayout = VK_NULL_HANDLE;
     }
 }

@@ -11,10 +11,11 @@ public:
     enum BufferType
     {
         Vertex,
-        Index
+        Index,
+        Uniform
     };
 
-    GpuBuffer(const std::shared_ptr<RenderDevice>& renderDevice, BufferType bufferType);
+    GpuBuffer(const std::shared_ptr<RenderDevice>& renderDevice, BufferType bufferType, bool useStagingBuffers = true);
 
     ~GpuBuffer();
 
@@ -33,6 +34,7 @@ private:
 
     std::shared_ptr<RenderDevice> _renderDevice;
     BufferType _bufferType;
+    bool _useStagingBuffers = true;
     VkBuffer _vkBuffer = VK_NULL_HANDLE;
     VkDeviceMemory _vkBufferMemory = VK_NULL_HANDLE;
     VkBuffer _vkStagingBuffer = VK_NULL_HANDLE;
