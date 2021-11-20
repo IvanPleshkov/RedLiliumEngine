@@ -3,6 +3,7 @@
 #include "render_device.h"
 #include "render_instance.h"
 #include "render_target.h"
+#include "render_descriptor.h"
 #include <stdexcept>
 
 RenderPipelineBuilder::RenderPipelineBuilder(const std::shared_ptr<RenderDevice>& renderDevice, const std::shared_ptr<RenderTarget>& renderTarget)
@@ -48,34 +49,14 @@ RenderPipelineBuilder& RenderPipelineBuilder::addVertexAttribute(uint32_t locati
     return *this;
 }
 
-RenderPipelineBuilder& RenderPipelineBuilder::addUniformBuffer(VkShaderStageFlags vkStage, uint32_t binding)
+RenderPipelineBuilder& RenderPipelineBuilder::addUniformBuffer(VkShaderStageFlags vkStage, uint32_t binding, uint32_t size)
 {
-    VkDescriptorSetLayoutBinding uboLayoutBinding{};
-    uboLayoutBinding.binding = 0;
-    uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    uboLayoutBinding.descriptorCount = 1;
-    uboLayoutBinding.stageFlags = vkStage;
-    uboLayoutBinding.pImmutableSamplers = nullptr;
-    _vkDescriptorSetLayoutBindings.push_back(uboLayoutBinding);
+    _renderDescriptors.push_back(std::make_shared<RenderDescriptor>(_renderDevice, vkStage, binding, size));
     return *this;
 }
 
 std::shared_ptr<RenderPipeline> RenderPipelineBuilder::build()
 {
-    VkDescriptorSetLayout vkDescriptorSetLayout = VK_NULL_HANDLE;
-    if (!_vkDescriptorSetLayoutBindings.empty())
-    {
-        VkDescriptorSetLayoutCreateInfo layoutInfo{};
-        layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        layoutInfo.bindingCount = static_cast<uint32_t>(_vkDescriptorSetLayoutBindings.size());
-        layoutInfo.pBindings = _vkDescriptorSetLayoutBindings.data();
-
-        if (vkCreateDescriptorSetLayout(_renderDevice->getVkDevice(), &layoutInfo, _renderDevice->allocator(), &vkDescriptorSetLayout) != VK_SUCCESS)
-        {
-            throw std::runtime_error("failed to create descriptor set layout!");
-        }
-    }
-
     VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
     vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
@@ -152,8 +133,10 @@ std::shared_ptr<RenderPipeline> RenderPipelineBuilder::build()
     rasterizer.rasterizerDiscardEnable = VK_FALSE;
     rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
     rasterizer.lineWidth = 1.0f;
+    // rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+    // rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
     rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-    rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+    rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
     rasterizer.depthBiasEnable = VK_FALSE;
     rasterizer.depthBiasConstantFactor = 0.0f; // Optional
     rasterizer.depthBiasClamp = 0.0f; // Optional
@@ -184,11 +167,11 @@ std::shared_ptr<RenderPipeline> RenderPipelineBuilder::build()
     colorBlending.logicOp = VK_LOGIC_OP_COPY; // Optional
     colorBlending.attachmentCount = 1;
     colorBlending.pAttachments = &colorBlendAttachment;
-    colorBlending.blendConstants[0] = 0.0f; // Optional
-    colorBlending.blendConstants[1] = 0.0f; // Optional
-    colorBlending.blendConstants[2] = 0.0f; // Optional
-    colorBlending.blendConstants[3] = 0.0f; // Optional
-    
+    colorBlending.blendConstants[0] = 0.0f;
+    colorBlending.blendConstants[1] = 0.0f;
+    colorBlending.blendConstants[2] = 0.0f;
+    colorBlending.blendConstants[3] = 0.0f;
+
     VkDynamicState dynamicStates[] = {
         VK_DYNAMIC_STATE_VIEWPORT,
         VK_DYNAMIC_STATE_LINE_WIDTH
@@ -201,10 +184,15 @@ std::shared_ptr<RenderPipeline> RenderPipelineBuilder::build()
     
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    if (vkDescriptorSetLayout != VK_NULL_HANDLE)
+    std::vector<VkDescriptorSetLayout> vkDescriptorSetLayouts;
+    if (!_renderDescriptors.empty())
     {
-        pipelineLayoutInfo.setLayoutCount = 1;
-        pipelineLayoutInfo.pSetLayouts = &vkDescriptorSetLayout;
+        for (auto& renderDescriptor : _renderDescriptors)
+        {
+            vkDescriptorSetLayouts.push_back(renderDescriptor->getVkDescriptorSetLayout());
+        }
+        pipelineLayoutInfo.setLayoutCount = static_cast<uint32_t>(vkDescriptorSetLayouts.size());
+        pipelineLayoutInfo.pSetLayouts = vkDescriptorSetLayouts.data();
     }
     else
     {
@@ -244,8 +232,8 @@ std::shared_ptr<RenderPipeline> RenderPipelineBuilder::build()
         throw std::runtime_error("Failed to create graphics pipeline!");
     }
     
-    auto pipeline = std::make_shared<RenderPipeline>(_renderDevice, vkDescriptorSetLayout, vkPipelineLayout, vkPipeline);
-    
+    auto pipeline = std::make_shared<RenderPipeline>(_renderDevice, std::move(_renderDescriptors), vkPipelineLayout, vkPipeline);
+
     vkDestroyShaderModule(_renderDevice->getVkDevice(), vertShaderStageInfo.module, nullptr);
     vkDestroyShaderModule(_renderDevice->getVkDevice(), fragShaderStageInfo.module, nullptr);
     return pipeline;

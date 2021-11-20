@@ -4,6 +4,7 @@
 #include "render_device.h"
 #include "gpu_mesh.h"
 #include "gpu_buffer.h"
+#include "render_descriptor.h"
 #include <stdexcept>
 
 RenderStep::RenderStep(const std::shared_ptr<RenderDevice>& renderDevice,

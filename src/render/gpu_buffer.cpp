@@ -17,42 +17,49 @@ GpuBuffer::~GpuBuffer()
 
 void GpuBuffer::update(const char* data, size_t size)
 {
-    destroy();
-
-    VkBufferUsageFlags usageFlags{};
-    switch (_bufferType)
+    const VkDeviceSize vkSize = static_cast<VkDeviceSize>(size);
+    if (_size != size)
     {
-        case Index:
+        destroy();
+        _size = size;
+
+        VkBufferUsageFlags usageFlags{};
+        switch (_bufferType)
+        {
+            case Index:
             usageFlags = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
             break;
-        case Vertex:
-            usageFlags = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-            break;
-        case Uniform:
-            usageFlags = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
-            break;
-        default:
-            throw std::runtime_error("not supported buffer type");
-    }
+            case Vertex:
+                usageFlags = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+                break;
+            case Uniform:
+                usageFlags = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+                break;
+            default:
+                throw std::runtime_error("not supported buffer type");
+        }
 
-    VkDeviceSize vkSize = static_cast<VkDeviceSize>(size);
+        if (_useStagingBuffers)
+        {
+            createBuffer(vkSize, usageFlags | VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, _vkStagingBuffer, _vkStagingBufferMemory);
+            createBuffer(vkSize, usageFlags | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _vkBuffer, _vkBufferMemory);
+        }
+        else
+        {
+            createBuffer(vkSize, usageFlags | VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, _vkBuffer, _vkBufferMemory);
+        }
+    }
     
     if (_useStagingBuffers)
     {
-        createBuffer(vkSize, usageFlags | VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, _vkStagingBuffer, _vkStagingBufferMemory);
-
         void* gpuData;
         vkMapMemory(_renderDevice->getVkDevice(), _vkStagingBufferMemory, 0, vkSize, 0, &gpuData);
         memcpy(gpuData, data, size);
         vkUnmapMemory(_renderDevice->getVkDevice(), _vkStagingBufferMemory);
-
-        createBuffer(vkSize, usageFlags | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _vkBuffer, _vkBufferMemory);
         copyBuffer(_vkStagingBuffer, _vkBuffer, vkSize);
     }
     else
     {
-        createBuffer(vkSize, usageFlags | VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, _vkBuffer, _vkBufferMemory);
-
         void* gpuData;
         vkMapMemory(_renderDevice->getVkDevice(), _vkBufferMemory, 0, vkSize, 0, &gpuData);
         memcpy(gpuData, data, size);
@@ -67,6 +74,7 @@ VkBuffer GpuBuffer::getVkBuffer() const
 
 void GpuBuffer::destroy()
 {
+    _size = 0;
     if (_vkStagingBuffer != VK_NULL_HANDLE)
     {
         vkDestroyBuffer(_renderDevice->getVkDevice(), _vkStagingBuffer, _renderDevice->allocator());

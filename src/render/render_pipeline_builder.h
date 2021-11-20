@@ -8,6 +8,7 @@
 
 class RenderDevice;
 class RenderTarget;
+class RenderDescriptor;
 
 class RenderPipelineBuilder final
 {
@@ -20,7 +21,7 @@ public:
 
     RenderPipelineBuilder& addVertexAttribute(uint32_t location, uint32_t offset, VkFormat format);
 
-    RenderPipelineBuilder& addUniformBuffer(VkShaderStageFlags vkStage, uint32_t binding);
+    RenderPipelineBuilder& addUniformBuffer(VkShaderStageFlags vkStage, uint32_t binding, uint32_t size);
 
     std::shared_ptr<RenderPipeline> build();
 
@@ -31,7 +32,7 @@ private:
     std::shared_ptr<RenderTarget> _renderTarget;
     std::vector<VkVertexInputAttributeDescription> _vkVertexInputAttributeDescriptions;
     uint32_t _vertexInputBindingSize = 0;
-    std::vector<VkDescriptorSetLayoutBinding> _vkDescriptorSetLayoutBindings;
+    std::vector<std::shared_ptr<RenderDescriptor>> _renderDescriptors;
     std::string_view _vertexShader;
     std::string_view _fragmentShader;
 };

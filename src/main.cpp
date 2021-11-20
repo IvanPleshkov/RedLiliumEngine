@@ -14,6 +14,7 @@
 #include "render/render_step.h"
 #include "render/gpu_buffer.h"
 #include "render/gpu_mesh.h"
+#include "render/render_descriptor.h"
 
 #include "mesh.h"
 #include "resources_manager.h"
@@ -179,14 +180,13 @@ void uniformBufferSample(SDL_Window* window)
         renderTargetBuilder.addImageView(vkImageView);
     }
     auto renderTarget = renderTargetBuilder.build();
-    auto uniformBuffer = std::make_shared<GpuBuffer>(renderDevice, GpuBuffer::Uniform, false);
-    
+
     auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget)
         .setVertexShader(resourcesManager.readResourceData("shaders/uniform_buffer.vert.spv"))
         .setFragmentShader(resourcesManager.readResourceData("shaders/uniform_buffer.frag.spv"))
         .addVertexAttribute(0, offsetof(Vertex, pos), VK_FORMAT_R32G32_SFLOAT)
         .addVertexAttribute(1, offsetof(Vertex, color), VK_FORMAT_R32G32B32_SFLOAT)
-        .addUniformBuffer(VK_SHADER_STAGE_VERTEX_BIT, 0)
+        .addUniformBuffer(VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(UniformBufferObject))
         .build();
 
     Mesh mesh;
@@ -212,7 +212,7 @@ void uniformBufferSample(SDL_Window* window)
                 case SDL_QUIT: quit = true; break;
             }
         }
-        
+
         auto currentTime = std::chrono::high_resolution_clock::now();
         float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
         ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -221,8 +221,8 @@ void uniformBufferSample(SDL_Window* window)
         float aspectRatio = static_cast<float>(screenSize.y) / static_cast<float>(screenSize.x);
         ubo.proj = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 10.0f);
         ubo.proj[1][1] *= -1;
-        uniformBuffer->update((const char*)&ubo, sizeof(UniformBufferObject));
-        
+        renderPipeline->getRenderDescriptors()[0]->update(reinterpret_cast<const char*>(&ubo));
+
         renderDevice->startFrame();
         renderTarget->setFramebufferIndex(renderDevice->getSwapChainCurrentImageIndex());
         renderStep->draw(gpuMesh, renderDevice->getSwapChainVkSemaphore());
@@ -237,8 +237,8 @@ int main(int argc, char *args[])
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
     SDL_Window* window = SDL_CreateWindow("vulkan demo", -1, -1, 640, 480, SDL_WINDOW_VULKAN | SDL_WINDOW_ALLOW_HIGHDPI);
 
-    // uniformBufferSample(window);
-    indexedMeshSample(window);
+    uniformBufferSample(window);
+    //indexedMeshSample(window);
 
     SDL_DestroyWindow(window);
     SDL_Quit();

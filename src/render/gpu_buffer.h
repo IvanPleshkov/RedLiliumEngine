@@ -33,6 +33,7 @@ private:
     void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 
     std::shared_ptr<RenderDevice> _renderDevice;
+    size_t _size = 0;
     BufferType _bufferType;
     bool _useStagingBuffers = true;
     VkBuffer _vkBuffer = VK_NULL_HANDLE;

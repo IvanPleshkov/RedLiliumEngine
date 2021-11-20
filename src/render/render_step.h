@@ -2,10 +2,12 @@
 
 #include <vulkan/vulkan.h>
 #include <memory>
+#include <vector>
 
 class RenderDevice;
 class RenderTarget;
 class RenderPipeline;
+class RenderDescriptor;
 class GpuMesh;
 
 class RenderStep
