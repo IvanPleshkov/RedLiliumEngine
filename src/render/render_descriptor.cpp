@@ -32,9 +32,9 @@ void RenderDescriptor::bind(VkCommandBuffer vkCommandBuffer, VkPipelineLayout vk
     vkCmdBindDescriptorSets(vkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, vkPipelineLayout, 0, 1, &_vkDescriptorSet, 0, nullptr);
 }
 
-VkDescriptorSetLayout RenderDescriptor::getVkDescriptorSetLayout() const
+const VkDescriptorSetLayout* RenderDescriptor::getVkDescriptorSetLayout() const
 {
-    return _vkDescriptorSetLayout;
+    return &_vkDescriptorSetLayout;
 }
 
 void RenderDescriptor::init()
@@ -62,7 +62,8 @@ void RenderDescriptor::initDescriptorSetLayout()
     layoutInfo.bindingCount = 1;
     layoutInfo.pBindings = &uboLayoutBinding;
 
-    if (vkCreateDescriptorSetLayout(_renderDevice->getVkDevice(), &layoutInfo, _renderDevice->allocator(), &_vkDescriptorSetLayout) != VK_SUCCESS) {
+    if (vkCreateDescriptorSetLayout(_renderDevice->getVkDevice(), &layoutInfo, _renderDevice->allocator(), &_vkDescriptorSetLayout) != VK_SUCCESS)
+    {
         throw std::runtime_error("failed to create descriptor set layout!");
     }
 }
@@ -93,7 +94,8 @@ void RenderDescriptor::initDescriptorSets()
     allocInfo.descriptorSetCount = 1;
     allocInfo.pSetLayouts = &_vkDescriptorSetLayout;
     
-    if (vkAllocateDescriptorSets(_renderDevice->getVkDevice(), &allocInfo, &_vkDescriptorSet) != VK_SUCCESS) {
+    if (vkAllocateDescriptorSets(_renderDevice->getVkDevice(), &allocInfo, &_vkDescriptorSet) != VK_SUCCESS)
+    {
         throw std::runtime_error("failed to allocate descriptor sets!");
     }
     

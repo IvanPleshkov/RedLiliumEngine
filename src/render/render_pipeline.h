@@ -7,15 +7,15 @@
 
 class RenderDevice;
 class RenderDescriptor;
+class RenderPipelineBuilder;
 
 class RenderPipeline
 {
 public:
     RenderPipeline(
                    const std::shared_ptr<RenderDevice>& renderDevice,
-                   std::vector<std::shared_ptr<RenderDescriptor>> renderDescriptors,
-                   VkPipelineLayout vkPipelineLayout,
-                   VkPipeline vkPipeline);
+                   const std::shared_ptr<RenderDescriptor>& renderDescriptor,
+                   const RenderPipelineBuilder& renderPipelineBuilder);
 
     ~RenderPipeline();
 
@@ -25,13 +25,13 @@ public:
 
     VkPipeline getVkPipeline() const;
 
-    const std::vector<std::shared_ptr<RenderDescriptor>>& getRenderDescriptors() const;
-
 private:
+    void init(const RenderPipelineBuilder& renderPipelineBuilder);
+
     void destroy();
 
     std::shared_ptr<RenderDevice> _renderDevice;
-    std::vector<std::shared_ptr<RenderDescriptor>> _renderDescriptors;
+    std::shared_ptr<RenderDescriptor> _renderDescriptor;
     VkPipelineLayout _vkPipelineLayout = VK_NULL_HANDLE;
     VkPipeline _vkPipeline = VK_NULL_HANDLE;
 };

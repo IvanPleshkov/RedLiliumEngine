@@ -37,7 +37,8 @@ void triangleSample(SDL_Window* window)
         renderTargetBuilder.addImageView(vkImageView);
     }
     auto renderTarget = renderTargetBuilder.build();
-    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget)
+    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget, nullptr)
+        .setFrontFace(VK_FRONT_FACE_CLOCKWISE)
         .setVertexShader(resourcesManager.readResourceData("shaders/triangle.vert.spv"))
         .setFragmentShader(resourcesManager.readResourceData("shaders/triangle.frag.spv"))
         .build();
@@ -74,7 +75,8 @@ void meshSample(SDL_Window* window)
         renderTargetBuilder.addImageView(vkImageView);
     }
     auto renderTarget = renderTargetBuilder.build();
-    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget)
+    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget, nullptr)
+        .setFrontFace(VK_FRONT_FACE_CLOCKWISE)
         .setVertexShader(resourcesManager.readResourceData("shaders/colored_mesh.vert.spv"))
         .setFragmentShader(resourcesManager.readResourceData("shaders/colored_mesh.frag.spv"))
         .addVertexAttribute(0, 0, VK_FORMAT_R32G32_SFLOAT)
@@ -122,7 +124,8 @@ void indexedMeshSample(SDL_Window* window)
         renderTargetBuilder.addImageView(vkImageView);
     }
     auto renderTarget = renderTargetBuilder.build();
-    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget)
+    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget, nullptr)
+        .setFrontFace(VK_FRONT_FACE_CLOCKWISE)
         .setVertexShader(resourcesManager.readResourceData("shaders/colored_mesh.vert.spv"))
         .setFragmentShader(resourcesManager.readResourceData("shaders/colored_mesh.frag.spv"))
         .addVertexAttribute(0, 0, VK_FORMAT_R32G32_SFLOAT)
@@ -182,12 +185,12 @@ void uniformBufferSample(SDL_Window* window)
     }
     auto renderTarget = renderTargetBuilder.build();
 
-    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget)
+    auto renderDescriptor = std::make_shared<RenderDescriptor>(renderDevice, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(UniformBufferObject));
+    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget, renderDescriptor)
         .setVertexShader(resourcesManager.readResourceData("shaders/uniform_buffer.vert.spv"))
         .setFragmentShader(resourcesManager.readResourceData("shaders/uniform_buffer.frag.spv"))
         .addVertexAttribute(0, 0, VK_FORMAT_R32G32_SFLOAT)
         .addVertexAttribute(1, 2 * sizeof(float), VK_FORMAT_R32G32B32_SFLOAT)
-        .addUniformBuffer(VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(UniformBufferObject))
         .build();
 
     Mesh mesh;
@@ -222,7 +225,7 @@ void uniformBufferSample(SDL_Window* window)
         float aspectRatio = static_cast<float>(screenSize.y) / static_cast<float>(screenSize.x);
         ubo.proj = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 10.0f);
         ubo.proj[1][1] *= -1;
-        renderPipeline->getRenderDescriptors()[0]->update(reinterpret_cast<const char*>(&ubo));
+        renderDescriptor->update(reinterpret_cast<const char*>(&ubo));
 
         renderDevice->startFrame();
         renderTarget->setFramebufferIndex(renderDevice->getSwapChainCurrentImageIndex());
@@ -253,13 +256,13 @@ void textureSample(SDL_Window* window)
     }
     auto renderTarget = renderTargetBuilder.build();
 
-    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget)
+    auto renderDescriptor = std::make_shared<RenderDescriptor>(renderDevice, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(UniformBufferObject));
+    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget, renderDescriptor)
         .setVertexShader(resourcesManager.readResourceData("shaders/texture.vert.spv"))
         .setFragmentShader(resourcesManager.readResourceData("shaders/texture.frag.spv"))
         .addVertexAttribute(0, 0, VK_FORMAT_R32G32_SFLOAT)
         .addVertexAttribute(1, 2 * sizeof(float), VK_FORMAT_R32G32B32_SFLOAT)
         .addVertexAttribute(2, 5 * sizeof(float), VK_FORMAT_R32G32_SFLOAT)
-        .addUniformBuffer(VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(UniformBufferObject))
         .build();
 
     auto gpuTexture = std::make_shared<GpuTexture>(renderDevice);
@@ -297,7 +300,7 @@ void textureSample(SDL_Window* window)
         float aspectRatio = static_cast<float>(screenSize.y) / static_cast<float>(screenSize.x);
         ubo.proj = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 10.0f);
         ubo.proj[1][1] *= -1;
-        renderPipeline->getRenderDescriptors()[0]->update(reinterpret_cast<const char*>(&ubo));
+        renderDescriptor->update(reinterpret_cast<const char*>(&ubo));
 
         renderDevice->startFrame();
         renderTarget->setFramebufferIndex(renderDevice->getSwapChainCurrentImageIndex());
@@ -305,7 +308,6 @@ void textureSample(SDL_Window* window)
         renderDevice->endFrame(renderTarget->getVkSemaphore());
     }
 }
-
 
 int main(int argc, char *args[])
 {

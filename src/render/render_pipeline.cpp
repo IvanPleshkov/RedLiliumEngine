@@ -2,18 +2,17 @@
 #include "render_device.h"
 #include "render_instance.h"
 #include "render_descriptor.h"
+#include "render_pipeline_builder.h"
 #include <stdexcept>
 
 RenderPipeline::RenderPipeline(
                                const std::shared_ptr<RenderDevice>& renderDevice,
-                               std::vector<std::shared_ptr<RenderDescriptor>> renderDescriptors,
-                               VkPipelineLayout vkPipelineLayout,
-                               VkPipeline vkPipeline)
+                               const std::shared_ptr<RenderDescriptor>& renderDescriptor,
+                               const RenderPipelineBuilder& renderPipelineBuilder)
     : _renderDevice(renderDevice)
-    , _renderDescriptors(std::move(renderDescriptors))
-    , _vkPipelineLayout(vkPipelineLayout)
-    , _vkPipeline(vkPipeline)
+    , _renderDescriptor(renderDescriptor)
 {
+    init(renderPipelineBuilder);
 }
 
 RenderPipeline::~RenderPipeline()
@@ -24,9 +23,9 @@ RenderPipeline::~RenderPipeline()
 void RenderPipeline::bind(VkCommandBuffer vkCommandBuffer) const
 {
     vkCmdBindPipeline(vkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _vkPipeline);
-    for (auto& renderDescriptor : _renderDescriptors)
+    if (_renderDescriptor != nullptr)
     {
-        renderDescriptor->bind(vkCommandBuffer, _vkPipelineLayout);
+        _renderDescriptor->bind(vkCommandBuffer, _vkPipelineLayout);
     }
 }
 
@@ -40,9 +39,19 @@ VkPipeline RenderPipeline::getVkPipeline() const
     return _vkPipeline;
 }
 
-const std::vector<std::shared_ptr<RenderDescriptor>>& RenderPipeline::getRenderDescriptors() const
+void RenderPipeline::init(const RenderPipelineBuilder& renderPipelineBuilder)
 {
-    return _renderDescriptors;
+    if (vkCreatePipelineLayout(_renderDevice->getVkDevice(), &renderPipelineBuilder._vkPipelineLayoutCreateInfo, _renderDevice->allocator(), &_vkPipelineLayout) != VK_SUCCESS)
+    {
+        throw std::runtime_error("Failed to create pipeline layout!");
+    }
+
+    auto vkGraphicsPipelineCreateInfo = renderPipelineBuilder._vkGraphicsPipelineCreateInfo;
+    vkGraphicsPipelineCreateInfo.layout = _vkPipelineLayout;
+    if (vkCreateGraphicsPipelines(_renderDevice->getVkDevice(), VK_NULL_HANDLE, 1, &vkGraphicsPipelineCreateInfo, _renderDevice->allocator(), &_vkPipeline) != VK_SUCCESS)
+    {
+        throw std::runtime_error("Failed to create graphics pipeline!");
+    }
 }
 
 void RenderPipeline::destroy()
@@ -57,5 +66,5 @@ void RenderPipeline::destroy()
         vkDestroyPipelineLayout(_renderDevice->getVkDevice(), _vkPipelineLayout, _renderDevice->allocator());
         _vkPipelineLayout = VK_NULL_HANDLE;
     }
-    _renderDescriptors.clear();
+    _renderDescriptor = nullptr;
 }

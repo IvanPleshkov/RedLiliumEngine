@@ -13,14 +13,14 @@ public:
     RenderDescriptor(const std::shared_ptr<RenderDevice>& renderDevice, VkShaderStageFlags vkStage, uint32_t binding, size_t size);
 
     ~RenderDescriptor();
-    
+
     void update(const char* data);
-    
+
     uint32_t binding() const;
 
     void bind(VkCommandBuffer vkCommandBuffer, VkPipelineLayout vkPipelineLayout) const;
-    
-    VkDescriptorSetLayout getVkDescriptorSetLayout() const;
+
+    const VkDescriptorSetLayout* getVkDescriptorSetLayout() const;
 
 private:
     void init();
