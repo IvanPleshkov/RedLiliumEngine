@@ -14,7 +14,7 @@ GpuMesh::~GpuMesh() {}
 void GpuMesh::update(const Mesh& mesh)
 {
     _vertexBuffer = std::make_shared<GpuBuffer>(_renderDevice, GpuBuffer::Vertex);
-    _vertexBuffer->update(reinterpret_cast<const char*>(mesh._vertices.data()), sizeof(Vertex) * mesh._vertices.size());
+    _vertexBuffer->update(reinterpret_cast<const char*>(mesh._vertices.data()), sizeof(float) * mesh._vertices.size());
     if (!mesh._indices.empty())
     {
         _indexBuffer = std::make_shared<GpuBuffer>(_renderDevice, GpuBuffer::Index);

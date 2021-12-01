@@ -77,15 +77,15 @@ void meshSample(SDL_Window* window)
     auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget)
         .setVertexShader(resourcesManager.readResourceData("shaders/colored_mesh.vert.spv"))
         .setFragmentShader(resourcesManager.readResourceData("shaders/colored_mesh.frag.spv"))
-        .addVertexAttribute(0, offsetof(Vertex, pos), VK_FORMAT_R32G32_SFLOAT)
-        .addVertexAttribute(1, offsetof(Vertex, color), VK_FORMAT_R32G32B32_SFLOAT)
+        .addVertexAttribute(0, 0, VK_FORMAT_R32G32_SFLOAT)
+        .addVertexAttribute(1, 2 * sizeof(float), VK_FORMAT_R32G32B32_SFLOAT)
         .build();
     
     Mesh mesh;
     mesh._vertices = {
-        {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-        {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-        {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+        0.0f, -0.5f, 1.0f, 0.0f, 0.0f,
+        0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
+        -0.5f, 0.5f, 0.0f, 0.0f, 1.0f
     };
     auto gpuMesh = std::make_shared<GpuMesh>(renderDevice);
     gpuMesh->update(mesh);
@@ -125,16 +125,16 @@ void indexedMeshSample(SDL_Window* window)
     auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget)
         .setVertexShader(resourcesManager.readResourceData("shaders/colored_mesh.vert.spv"))
         .setFragmentShader(resourcesManager.readResourceData("shaders/colored_mesh.frag.spv"))
-        .addVertexAttribute(0, offsetof(Vertex, pos), VK_FORMAT_R32G32_SFLOAT)
-        .addVertexAttribute(1, offsetof(Vertex, color), VK_FORMAT_R32G32B32_SFLOAT)
+        .addVertexAttribute(0, 0, VK_FORMAT_R32G32_SFLOAT)
+        .addVertexAttribute(1, 2 * sizeof(float), VK_FORMAT_R32G32B32_SFLOAT)
         .build();
 
     Mesh mesh;
     mesh._vertices = {
-        {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-        {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-        {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-        {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+        -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+        0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+        -0.5f, 0.5f, 1.0f, 1.0f, 1.0f
     };
     mesh._indices = {
         0, 1, 2, 2, 3, 0
@@ -185,17 +185,17 @@ void uniformBufferSample(SDL_Window* window)
     auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget)
         .setVertexShader(resourcesManager.readResourceData("shaders/uniform_buffer.vert.spv"))
         .setFragmentShader(resourcesManager.readResourceData("shaders/uniform_buffer.frag.spv"))
-        .addVertexAttribute(0, offsetof(Vertex, pos), VK_FORMAT_R32G32_SFLOAT)
-        .addVertexAttribute(1, offsetof(Vertex, color), VK_FORMAT_R32G32B32_SFLOAT)
+        .addVertexAttribute(0, 0, VK_FORMAT_R32G32_SFLOAT)
+        .addVertexAttribute(1, 2 * sizeof(float), VK_FORMAT_R32G32B32_SFLOAT)
         .addUniformBuffer(VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(UniformBufferObject))
         .build();
 
     Mesh mesh;
     mesh._vertices = {
-        {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-        {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-        {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-        {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+        -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+        0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+        -0.5f, 0.5f, 1.0f, 1.0f, 1.0f
     };
     mesh._indices = {
         0, 1, 2, 2, 3, 0
@@ -254,22 +254,23 @@ void textureSample(SDL_Window* window)
     auto renderTarget = renderTargetBuilder.build();
 
     auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget)
-        .setVertexShader(resourcesManager.readResourceData("shaders/uniform_buffer.vert.spv"))
-        .setFragmentShader(resourcesManager.readResourceData("shaders/uniform_buffer.frag.spv"))
-        .addVertexAttribute(0, offsetof(Vertex, pos), VK_FORMAT_R32G32_SFLOAT)
-        .addVertexAttribute(1, offsetof(Vertex, color), VK_FORMAT_R32G32B32_SFLOAT)
+        .setVertexShader(resourcesManager.readResourceData("shaders/texture.vert.spv"))
+        .setFragmentShader(resourcesManager.readResourceData("shaders/texture.frag.spv"))
+        .addVertexAttribute(0, 0, VK_FORMAT_R32G32_SFLOAT)
+        .addVertexAttribute(1, 2 * sizeof(float), VK_FORMAT_R32G32B32_SFLOAT)
+        .addVertexAttribute(2, 5 * sizeof(float), VK_FORMAT_R32G32_SFLOAT)
         .addUniformBuffer(VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(UniformBufferObject))
         .build();
-    
+
     auto gpuTexture = std::make_shared<GpuTexture>(renderDevice);
     gpuTexture->upload(resourcesManager.readResourceData("textures/texture.jpeg"));
 
     Mesh mesh;
     mesh._vertices = {
-        {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-        {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-        {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-        {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+        -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+        0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+        -0.5f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
     };
     mesh._indices = {
         0, 1, 2, 2, 3, 0
