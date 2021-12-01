@@ -67,12 +67,33 @@ void GpuTexture::upload(std::string_view textureData)
     copyBufferToImage(stagingBuffer->getVkBuffer(), static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
 
     transitionImageLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    
+    createImageView();
+    createSampler();
 }
 
 void GpuTexture::destroy()
 {
-    vkDestroyImage(_renderDevice->getVkDevice(), _vkImage, _renderDevice->allocator());
-    vkFreeMemory(_renderDevice->getVkDevice(), _vkImageMemory, _renderDevice->allocator());
+    if (_vkSampler != VK_NULL_HANDLE)
+    {
+        vkDestroySampler(_renderDevice->getVkDevice(), _vkSampler, _renderDevice->allocator());
+        _vkSampler = VK_NULL_HANDLE;
+    }
+    if (_vkImageView != VK_NULL_HANDLE)
+    {
+        vkDestroyImageView(_renderDevice->getVkDevice(), _vkImageView, _renderDevice->allocator());
+        _vkImageView = VK_NULL_HANDLE;
+    }
+    if (_vkImage != VK_NULL_HANDLE)
+    {
+        vkDestroyImage(_renderDevice->getVkDevice(), _vkImage, _renderDevice->allocator());
+        _vkImage = VK_NULL_HANDLE;
+    }
+    if (_vkImageMemory != VK_NULL_HANDLE)
+    {
+        vkFreeMemory(_renderDevice->getVkDevice(), _vkImageMemory, _renderDevice->allocator());
+        _vkImageMemory = VK_NULL_HANDLE;
+    }
 }
 
 void GpuTexture::transitionImageLayout(VkImageLayout oldLayout, VkImageLayout newLayout)
@@ -232,4 +253,41 @@ void GpuTexture::copyBufferToImage(VkBuffer buffer, uint32_t width, uint32_t hei
     
     vkFreeCommandBuffers(_renderDevice->getVkDevice(), vkCommandPool, 1, &vkCommandBuffer);
     vkDestroyCommandPool(_renderDevice->getVkDevice(), vkCommandPool, _renderDevice->allocator());
+}
+
+void GpuTexture::createImageView()
+{
+    VkImageViewCreateInfo viewInfo{};
+    viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    viewInfo.image = _vkImage;
+    viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    viewInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
+    viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    viewInfo.subresourceRange.baseMipLevel = 0;
+    viewInfo.subresourceRange.levelCount = 1;
+    viewInfo.subresourceRange.baseArrayLayer = 0;
+    viewInfo.subresourceRange.layerCount = 1;
+    if (vkCreateImageView(_renderDevice->getVkDevice(), &viewInfo, _renderDevice->allocator(), &_vkImageView) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create texture image view!");
+    }
+}
+
+void GpuTexture::createSampler()
+{
+    VkSamplerCreateInfo samplerInfo{};
+    samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    samplerInfo.magFilter = VK_FILTER_LINEAR;
+    samplerInfo.minFilter = VK_FILTER_LINEAR;
+    samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    samplerInfo.anisotropyEnable = VK_TRUE;
+    samplerInfo.maxAnisotropy = _renderDevice->getMaxAnisotropy();
+    samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+    samplerInfo.unnormalizedCoordinates = VK_FALSE;
+    if (vkCreateSampler(_renderDevice->getVkDevice(), &samplerInfo, _renderDevice->allocator(), &_vkSampler) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create texture sampler!");
+    }
 }

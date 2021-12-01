@@ -41,6 +41,8 @@ public:
     uint32_t getSwapChainCurrentImageIndex() const;
 
     uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+    
+    float getMaxAnisotropy() const;
 
 private:
     struct SwapChainSupportDetails {
@@ -98,4 +100,5 @@ private:
     VkSemaphore _swapChainVkSemaphore = VK_NULL_HANDLE;
     std::pair<VkQueue, uint32_t> _vkGraphicsQueue;
     std::pair<VkQueue, uint32_t> _vkPresentQueue;
+    float _maxAnisotropy = 1.0f;
 };

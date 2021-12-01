@@ -100,6 +100,11 @@ uint32_t RenderDevice::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags
     throw std::runtime_error("failed to find suitable memory type!");
 }
 
+float RenderDevice::getMaxAnisotropy() const
+{
+    return _maxAnisotropy;
+}
+
 void RenderDevice::init()
 {
     pickPhysicalDevice();
@@ -206,6 +211,11 @@ int RenderDevice::rateDeviceSuitability(VkPhysicalDevice vkPhysicalDevice)
     VkPhysicalDeviceFeatures deviceFeatures;
     vkGetPhysicalDeviceProperties(vkPhysicalDevice, &deviceProperties);
     vkGetPhysicalDeviceFeatures(vkPhysicalDevice, &deviceFeatures);
+    
+    if (!deviceFeatures.samplerAnisotropy)
+    {
+        return 0;
+    }
     
     int score = 1;
     if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
@@ -327,9 +337,16 @@ void RenderDevice::createLogicalDevice()
         queueCreateInfo.pQueuePriorities = &queuePriority;
         queueCreateInfos.push_back(queueCreateInfo);
     }
+
+    VkPhysicalDeviceProperties physicalDeviceProperties;
+    vkGetPhysicalDeviceProperties(_vkPhysicalDevice, &physicalDeviceProperties);
+    // VkPhysicalDeviceFeatures physicalDeviceFeatures;
+    // vkGetPhysicalDeviceFeatures(vkPhysicalDevice, &physicalDeviceFeatures);
+    _maxAnisotropy = physicalDeviceProperties.limits.maxSamplerAnisotropy;
     
     VkPhysicalDeviceFeatures deviceFeatures{};
-    
+    deviceFeatures.samplerAnisotropy = VK_TRUE;
+
     VkDeviceCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     createInfo.pQueueCreateInfos = queueCreateInfos.data();

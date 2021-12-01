@@ -22,8 +22,14 @@ private:
     void transitionImageLayout(VkImageLayout oldLayout, VkImageLayout newLayout);
     
     void copyBufferToImage(VkBuffer buffer, uint32_t width, uint32_t height);
+    
+    void createImageView();
+    
+    void createSampler();
 
     std::shared_ptr<RenderDevice> _renderDevice;
-    VkImage _vkImage;
-    VkDeviceMemory _vkImageMemory;
+    VkImage _vkImage = VK_NULL_HANDLE;
+    VkDeviceMemory _vkImageMemory = VK_NULL_HANDLE;
+    VkImageView _vkImageView = VK_NULL_HANDLE;
+    VkSampler _vkSampler = VK_NULL_HANDLE;
 };
