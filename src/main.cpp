@@ -15,6 +15,7 @@
 #include "render/gpu_buffer.h"
 #include "render/gpu_mesh.h"
 #include "render/render_descriptor.h"
+#include "render/render_descriptor_builder.h"
 #include "render/gpu_texture.h"
 
 #include "mesh.h"
@@ -185,7 +186,12 @@ void uniformBufferSample(SDL_Window* window)
     }
     auto renderTarget = renderTargetBuilder.build();
 
-    auto renderDescriptor = std::make_shared<RenderDescriptor>(renderDevice, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(UniformBufferObject));
+    auto uniformBuffer = std::make_shared<GpuBuffer>(renderDevice, GpuBuffer::Uniform, false);
+    std::vector<char> bufferData(sizeof(UniformBufferObject), 0);
+    uniformBuffer->update(bufferData.data(), sizeof(UniformBufferObject));
+    auto renderDescriptor = RenderDescriptorBuilder(renderDevice)
+        .addUniformBuffer(uniformBuffer, VK_SHADER_STAGE_VERTEX_BIT, 0)
+        .build();
     auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget, renderDescriptor)
         .setVertexShader(resourcesManager.readResourceData("shaders/uniform_buffer.vert.spv"))
         .setFragmentShader(resourcesManager.readResourceData("shaders/uniform_buffer.frag.spv"))
@@ -225,7 +231,7 @@ void uniformBufferSample(SDL_Window* window)
         float aspectRatio = static_cast<float>(screenSize.y) / static_cast<float>(screenSize.x);
         ubo.proj = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 10.0f);
         ubo.proj[1][1] *= -1;
-        renderDescriptor->update(reinterpret_cast<const char*>(&ubo));
+        uniformBuffer->update(reinterpret_cast<const char*>(&ubo), sizeof(UniformBufferObject));
 
         renderDevice->startFrame();
         renderTarget->setFramebufferIndex(renderDevice->getSwapChainCurrentImageIndex());
@@ -256,7 +262,16 @@ void textureSample(SDL_Window* window)
     }
     auto renderTarget = renderTargetBuilder.build();
 
-    auto renderDescriptor = std::make_shared<RenderDescriptor>(renderDevice, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(UniformBufferObject));
+    auto gpuTexture = std::make_shared<GpuTexture>(renderDevice);
+    gpuTexture->upload(resourcesManager.readResourceData("textures/texture.jpeg"));
+
+    auto uniformBuffer = std::make_shared<GpuBuffer>(renderDevice, GpuBuffer::Uniform, false);
+    std::vector<char> bufferData(sizeof(UniformBufferObject), 0);
+    uniformBuffer->update(bufferData.data(), sizeof(UniformBufferObject));
+    auto renderDescriptor = RenderDescriptorBuilder(renderDevice)
+        .addUniformBuffer(uniformBuffer, VK_SHADER_STAGE_VERTEX_BIT, 0)
+        .addCombinedImageSampler(gpuTexture, VK_SHADER_STAGE_FRAGMENT_BIT, 1)
+        .build();
     auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget, renderDescriptor)
         .setVertexShader(resourcesManager.readResourceData("shaders/texture.vert.spv"))
         .setFragmentShader(resourcesManager.readResourceData("shaders/texture.frag.spv"))
@@ -264,9 +279,6 @@ void textureSample(SDL_Window* window)
         .addVertexAttribute(1, 2 * sizeof(float), VK_FORMAT_R32G32B32_SFLOAT)
         .addVertexAttribute(2, 5 * sizeof(float), VK_FORMAT_R32G32_SFLOAT)
         .build();
-
-    auto gpuTexture = std::make_shared<GpuTexture>(renderDevice);
-    gpuTexture->upload(resourcesManager.readResourceData("textures/texture.jpeg"));
 
     Mesh mesh;
     mesh._vertices = {
@@ -300,7 +312,7 @@ void textureSample(SDL_Window* window)
         float aspectRatio = static_cast<float>(screenSize.y) / static_cast<float>(screenSize.x);
         ubo.proj = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 10.0f);
         ubo.proj[1][1] *= -1;
-        renderDescriptor->update(reinterpret_cast<const char*>(&ubo));
+        uniformBuffer->update(reinterpret_cast<const char*>(&ubo), sizeof(UniformBufferObject));
 
         renderDevice->startFrame();
         renderTarget->setFramebufferIndex(renderDevice->getSwapChainCurrentImageIndex());

@@ -15,6 +15,10 @@ public:
     ~GpuTexture();
 
     void upload(std::string_view textureData);
+    
+    VkImageView getVkImageView() const;
+
+    VkSampler getVkSampler() const;
 
 private:
     void destroy();

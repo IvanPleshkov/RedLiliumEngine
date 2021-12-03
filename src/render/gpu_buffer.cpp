@@ -72,6 +72,11 @@ VkBuffer GpuBuffer::getVkBuffer() const
     return _vkBuffer;
 }
 
+size_t GpuBuffer::getSize() const
+{
+    return _size;
+}
+
 void GpuBuffer::destroy()
 {
     _size = 0;

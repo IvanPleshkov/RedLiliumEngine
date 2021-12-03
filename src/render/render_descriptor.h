@@ -2,43 +2,38 @@
 
 #include <vulkan/vulkan.h>
 #include <memory>
+#include <vector>
 
 class RenderDevice;
 class GpuBuffer;
 class RenderPipeline;
+class RenderDescriptorBuilder;
 
 class RenderDescriptor
 {
 public:
-    RenderDescriptor(const std::shared_ptr<RenderDevice>& renderDevice, VkShaderStageFlags vkStage, uint32_t binding, size_t size);
+    RenderDescriptor(const std::shared_ptr<RenderDevice>& renderDevice, const RenderDescriptorBuilder& renderDescriptorBuilder);
 
     ~RenderDescriptor();
 
-    void update(const char* data);
-
-    uint32_t binding() const;
-
-    void bind(VkCommandBuffer vkCommandBuffer, VkPipelineLayout vkPipelineLayout) const;
-
-    const VkDescriptorSetLayout* getVkDescriptorSetLayout() const;
+    void bind(VkCommandBuffer vkCommandBuffer) const;
+    
+    VkPipelineLayout getVkPipelineLayout() const;
 
 private:
-    void init();
+    void init(const RenderDescriptorBuilder& renderDescriptorBuilder);
     
-    void initDescriptorSetLayout();
+    void initDescriptorSetLayout(const RenderDescriptorBuilder& renderDescriptorBuilder);
     
-    void initDescriptorPool();
+    void initDescriptorPool(const RenderDescriptorBuilder& renderDescriptorBuilder);
     
-    void initDescriptorSets();
+    void initDescriptorSets(const RenderDescriptorBuilder& renderDescriptorBuilder);
 
     void destroy();
 
     std::shared_ptr<RenderDevice> _renderDevice;
-    std::shared_ptr<GpuBuffer> _gpuBuffer;
-    VkShaderStageFlags _vkStage;
-    uint32_t _binding;
-    size_t _size;
     VkDescriptorPool _vkDescriptorPool = VK_NULL_HANDLE;
-    VkDescriptorSetLayout _vkDescriptorSetLayout = VK_NULL_HANDLE;
+    std::vector<VkDescriptorSetLayout> _vkDescriptorSetLayouts;
     VkDescriptorSet _vkDescriptorSet = VK_NULL_HANDLE;
+    VkPipelineLayout _vkPipelineLayout = VK_NULL_HANDLE;
 };

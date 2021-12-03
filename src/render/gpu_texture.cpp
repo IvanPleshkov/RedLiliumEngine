@@ -14,6 +14,16 @@ GpuTexture::~GpuTexture()
     destroy();
 }
 
+VkImageView GpuTexture::getVkImageView() const
+{
+    return _vkImageView;
+}
+
+VkSampler GpuTexture::getVkSampler() const
+{
+    return _vkSampler;
+}
+
 void GpuTexture::upload(std::string_view textureData)
 {
     int texWidth, texHeight, texChannels;

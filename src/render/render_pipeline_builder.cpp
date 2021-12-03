@@ -4,6 +4,7 @@
 #include "render_instance.h"
 #include "render_target.h"
 #include "render_descriptor.h"
+#include "render_descriptor_builder.h"
 #include <stdexcept>
 
 namespace
@@ -16,7 +17,6 @@ RenderPipelineBuilder::RenderPipelineBuilder(const std::shared_ptr<RenderDevice>
     , _renderTarget(renderTarget)
     , _renderDescriptor(renderDescriptor)
     , _vkGraphicsPipelineCreateInfo{}
-    , _vkPipelineLayoutCreateInfo{}
     , _vkPipelineColorBlendStateCreateInfo{}
     , _vkPipelineMultisampleStateCreateInfo{}
     , _vkPipelineRasterizationStateCreateInfo{}
@@ -26,6 +26,11 @@ RenderPipelineBuilder::RenderPipelineBuilder(const std::shared_ptr<RenderDevice>
     , _vkPipelineInputAssemblyStateCreateInfo{}
     , _vkPipelineVertexInputStateCreateInfo{}
 {
+    if (_renderDescriptor == nullptr)
+    {
+        _renderDescriptor = RenderDescriptorBuilder(_renderDevice).build();
+    }
+
     _vkPipelineVertexInputStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
     _vkPipelineVertexInputStateCreateInfo.vertexBindingDescriptionCount = 0;
     _vkPipelineVertexInputStateCreateInfo.pVertexBindingDescriptions = nullptr;
@@ -111,25 +116,11 @@ RenderPipelineBuilder::RenderPipelineBuilder(const std::shared_ptr<RenderDevice>
     _vkGraphicsPipelineCreateInfo.pDepthStencilState = nullptr; // Optional
     _vkGraphicsPipelineCreateInfo.pColorBlendState = &_vkPipelineColorBlendStateCreateInfo;
     _vkGraphicsPipelineCreateInfo.pDynamicState = nullptr; // Optional
-    _vkGraphicsPipelineCreateInfo.layout = VK_NULL_HANDLE; // setup later
+    _vkGraphicsPipelineCreateInfo.layout = _renderDescriptor->getVkPipelineLayout();
     _vkGraphicsPipelineCreateInfo.renderPass = _renderTarget->getVkRenderPass();
     _vkGraphicsPipelineCreateInfo.subpass = 0;
     _vkGraphicsPipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
     _vkGraphicsPipelineCreateInfo.basePipelineIndex = -1; // Optional
-
-    _vkPipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    if (_renderDescriptor != nullptr)
-    {
-        _vkPipelineLayoutCreateInfo.setLayoutCount = 1;
-        _vkPipelineLayoutCreateInfo.pSetLayouts = _renderDescriptor->getVkDescriptorSetLayout();
-    }
-    else
-    {
-        _vkPipelineLayoutCreateInfo.setLayoutCount = 0;
-        _vkPipelineLayoutCreateInfo.pSetLayouts = nullptr;
-    }
-    _vkPipelineLayoutCreateInfo.pushConstantRangeCount = 0; // Optional
-    _vkPipelineLayoutCreateInfo.pPushConstantRanges = nullptr; // Optional
 }
 
 RenderPipelineBuilder::~RenderPipelineBuilder()

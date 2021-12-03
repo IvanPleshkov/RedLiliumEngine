@@ -22,6 +22,8 @@ public:
     void update(const char* data, size_t size);
     
     VkBuffer getVkBuffer() const;
+    
+    size_t getSize() const;
 
 private:
     void init();

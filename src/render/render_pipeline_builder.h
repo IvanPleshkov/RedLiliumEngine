@@ -1,6 +1,5 @@
 #pragma once
 
-#include "render_pipeline.h"
 #include <vulkan/vulkan.h>
 #include <string_view>
 #include <memory>
@@ -8,6 +7,7 @@
 
 class RenderDevice;
 class RenderTarget;
+class RenderPipeline;
 class RenderDescriptor;
 
 class RenderPipelineBuilder final
@@ -28,8 +28,6 @@ public:
     std::shared_ptr<RenderPipeline> build();
 
 public:
-    VkPipelineLayoutCreateInfo _vkPipelineLayoutCreateInfo;
-
     std::vector<VkVertexInputAttributeDescription> _vkVertexInputAttributeDescriptions;
     std::vector<VkPipelineShaderStageCreateInfo> _vkPipelineShaderStageCreateInfos;
     std::vector<VkVertexInputBindingDescription> _vkVertexInputBindingDescriptions;

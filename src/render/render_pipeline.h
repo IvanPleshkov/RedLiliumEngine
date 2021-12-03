@@ -21,8 +21,6 @@ public:
 
     void bind(VkCommandBuffer vkCommandBuffer) const;
 
-    VkPipelineLayout getVkPipelineLayout() const;
-
     VkPipeline getVkPipeline() const;
 
 private:
@@ -32,6 +30,5 @@ private:
 
     std::shared_ptr<RenderDevice> _renderDevice;
     std::shared_ptr<RenderDescriptor> _renderDescriptor;
-    VkPipelineLayout _vkPipelineLayout = VK_NULL_HANDLE;
     VkPipeline _vkPipeline = VK_NULL_HANDLE;
 };
