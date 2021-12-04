@@ -20,6 +20,7 @@ RenderPipelineBuilder::RenderPipelineBuilder(const std::shared_ptr<RenderDevice>
     , _vkPipelineColorBlendStateCreateInfo{}
     , _vkPipelineMultisampleStateCreateInfo{}
     , _vkPipelineRasterizationStateCreateInfo{}
+    , _vkPipelineDepthStencilStateCreateInfo{}
     , _vkPipelineViewportStateCreateInfo{}
     , _vkScissor{}
     , _vkViewport{}
@@ -121,6 +122,21 @@ RenderPipelineBuilder::RenderPipelineBuilder(const std::shared_ptr<RenderDevice>
     _vkGraphicsPipelineCreateInfo.subpass = 0;
     _vkGraphicsPipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
     _vkGraphicsPipelineCreateInfo.basePipelineIndex = -1; // Optional
+
+    if (_renderTarget->hasDepth())
+    {
+        _vkPipelineDepthStencilStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+        _vkPipelineDepthStencilStateCreateInfo.depthTestEnable = VK_TRUE;
+        _vkPipelineDepthStencilStateCreateInfo.depthWriteEnable = VK_TRUE;
+        _vkPipelineDepthStencilStateCreateInfo.depthCompareOp = VK_COMPARE_OP_LESS;
+        _vkPipelineDepthStencilStateCreateInfo.depthBoundsTestEnable = VK_FALSE;
+        _vkPipelineDepthStencilStateCreateInfo.minDepthBounds = 0.0f;
+        _vkPipelineDepthStencilStateCreateInfo.maxDepthBounds = 1.0f;
+        _vkPipelineDepthStencilStateCreateInfo.stencilTestEnable = VK_FALSE;
+        _vkPipelineDepthStencilStateCreateInfo.front = {};
+        _vkPipelineDepthStencilStateCreateInfo.back = {};
+        _vkGraphicsPipelineCreateInfo.pDepthStencilState = &_vkPipelineDepthStencilStateCreateInfo;
+    }
 }
 
 RenderPipelineBuilder::~RenderPipelineBuilder()

@@ -108,14 +108,19 @@ void GpuTexture::destroy()
 
 void GpuTexture::transitionImageLayout(VkImageLayout oldLayout, VkImageLayout newLayout)
 {
-    auto graphicsQueue = _renderDevice->getGraphicsVkQueue();
+    transitionImageLayout(_renderDevice, _vkImage, VK_FORMAT_R8G8B8A8_SRGB, oldLayout, newLayout);
+}
+
+void GpuTexture::transitionImageLayout(const std::shared_ptr<RenderDevice>& renderDevice, VkImage vkImage, VkFormat vkFormat, VkImageLayout oldVkImageLayout, VkImageLayout newVkImageLayout)
+{
+    auto graphicsQueue = renderDevice->getGraphicsVkQueue();
     VkCommandPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     poolInfo.queueFamilyIndex = graphicsQueue.second;
     poolInfo.flags = 0;
 
     VkCommandPool vkCommandPool;
-    if (vkCreateCommandPool(_renderDevice->getVkDevice(), &poolInfo, _renderDevice->allocator(), &vkCommandPool) != VK_SUCCESS)
+    if (vkCreateCommandPool(renderDevice->getVkDevice(), &poolInfo, renderDevice->allocator(), &vkCommandPool) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create command pool!");
     }
@@ -127,7 +132,7 @@ void GpuTexture::transitionImageLayout(VkImageLayout oldLayout, VkImageLayout ne
     allocInfo.commandBufferCount = 1;
 
     VkCommandBuffer vkCommandBuffer;
-    vkAllocateCommandBuffers(_renderDevice->getVkDevice(), &allocInfo, &vkCommandBuffer);
+    vkAllocateCommandBuffers(renderDevice->getVkDevice(), &allocInfo, &vkCommandBuffer);
 
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -137,21 +142,29 @@ void GpuTexture::transitionImageLayout(VkImageLayout oldLayout, VkImageLayout ne
 
     VkImageMemoryBarrier barrier{};
     barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    barrier.oldLayout = oldLayout;
-    barrier.newLayout = newLayout;
+    barrier.oldLayout = oldVkImageLayout;
+    barrier.newLayout = newVkImageLayout;
     barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
     barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    barrier.image = _vkImage;
-    barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    barrier.image = vkImage;
     barrier.subresourceRange.baseMipLevel = 0;
     barrier.subresourceRange.levelCount = 1;
     barrier.subresourceRange.baseArrayLayer = 0;
     barrier.subresourceRange.layerCount = 1;
 
+    if (newVkImageLayout == VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL)
+    {
+        barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+    }
+    else
+    {
+        barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    }
+
     VkPipelineStageFlags sourceStage;
     VkPipelineStageFlags destinationStage;
 
-    if (oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && newLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
+    if (oldVkImageLayout == VK_IMAGE_LAYOUT_UNDEFINED && newVkImageLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
     {
         barrier.srcAccessMask = 0;
         barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
@@ -159,13 +172,21 @@ void GpuTexture::transitionImageLayout(VkImageLayout oldLayout, VkImageLayout ne
         sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
         destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
     }
-    else if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+    else if (oldVkImageLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && newVkImageLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
     {
         barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
         barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 
         sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
         destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+    }
+    else if (oldVkImageLayout == VK_IMAGE_LAYOUT_UNDEFINED && newVkImageLayout == VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL)
+    {
+        barrier.srcAccessMask = 0;
+        barrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+        sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+        destinationStage = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
     }
     else
     {
@@ -181,7 +202,7 @@ void GpuTexture::transitionImageLayout(VkImageLayout oldLayout, VkImageLayout ne
         0, nullptr,
         1, &barrier
     );
-    
+
     vkEndCommandBuffer(vkCommandBuffer);
 
     VkSubmitInfo submitInfo{};
@@ -189,11 +210,11 @@ void GpuTexture::transitionImageLayout(VkImageLayout oldLayout, VkImageLayout ne
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &vkCommandBuffer;
 
-    vkQueueSubmit(_renderDevice->getGraphicsVkQueue().first, 1, &submitInfo, VK_NULL_HANDLE);
-    vkQueueWaitIdle(_renderDevice->getGraphicsVkQueue().first);
-    
-    vkFreeCommandBuffers(_renderDevice->getVkDevice(), vkCommandPool, 1, &vkCommandBuffer);
-    vkDestroyCommandPool(_renderDevice->getVkDevice(), vkCommandPool, _renderDevice->allocator());
+    vkQueueSubmit(renderDevice->getGraphicsVkQueue().first, 1, &submitInfo, VK_NULL_HANDLE);
+    vkQueueWaitIdle(renderDevice->getGraphicsVkQueue().first);
+
+    vkFreeCommandBuffers(renderDevice->getVkDevice(), vkCommandPool, 1, &vkCommandBuffer);
+    vkDestroyCommandPool(renderDevice->getVkDevice(), vkCommandPool, renderDevice->allocator());
 }
 
 void GpuTexture::copyBufferToImage(VkBuffer buffer, uint32_t width, uint32_t height)

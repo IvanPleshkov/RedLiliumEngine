@@ -21,6 +21,8 @@ public:
     
     RenderTargetBuilder& addImageView(VkImageView vkImageView);
     
+    RenderTargetBuilder& enableDepth(bool enable);
+
     std::shared_ptr<RenderTarget> build();
 
 private:
@@ -28,4 +30,5 @@ private:
     std::vector<VkImageView> _vkImageViews;
     VkFormat _vkFormat;
     glm::ivec2 _size;
+    bool _enableDepth = false;
 };

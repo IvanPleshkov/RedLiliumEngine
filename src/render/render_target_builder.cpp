@@ -24,7 +24,13 @@ RenderTargetBuilder& RenderTargetBuilder::addImageView(VkImageView vkImageView)
     return *this;
 }
 
+RenderTargetBuilder& RenderTargetBuilder::enableDepth(bool enable)
+{
+    _enableDepth = enable;
+    return *this;
+}
+
 std::shared_ptr<RenderTarget> RenderTargetBuilder::build()
 {
-    return std::make_shared<RenderTarget>(_renderDevice, _vkImageViews, _vkFormat, _size);
+    return std::make_shared<RenderTarget>(_renderDevice, _vkImageViews, _vkFormat, _size, _enableDepth);
 }

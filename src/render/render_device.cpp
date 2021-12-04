@@ -218,14 +218,16 @@ int RenderDevice::rateDeviceSuitability(VkPhysicalDevice vkPhysicalDevice)
     }
     
     int score = 1;
-    if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
+    if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+    {
         score += 1000;
     }
     
     return score;
 }
 
-RenderDevice::SwapChainSupportDetails RenderDevice::querySwapChainSupport(VkPhysicalDevice vkPhysicalDevice) {
+RenderDevice::SwapChainSupportDetails RenderDevice::querySwapChainSupport(VkPhysicalDevice vkPhysicalDevice)
+{
     SwapChainSupportDetails details;
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vkPhysicalDevice, _renderInstance->getVkSurface(), &details._capabilities);
     

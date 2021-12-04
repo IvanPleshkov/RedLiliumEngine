@@ -20,6 +20,8 @@ public:
 
     VkSampler getVkSampler() const;
 
+    static void transitionImageLayout(const std::shared_ptr<RenderDevice>& renderDevice, VkImage vkImage, VkFormat vkFormat, VkImageLayout oldVkImageLayout, VkImageLayout newVkImageLayout);
+    
 private:
     void destroy();
     

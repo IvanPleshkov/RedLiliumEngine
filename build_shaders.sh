@@ -6,3 +6,5 @@
 ~/VulkanSDK/1.2.189.0/macOS/bin/glslc resources/shaders/uniform_buffer.frag -o resources/shaders/uniform_buffer.frag.spv
 ~/VulkanSDK/1.2.189.0/macOS/bin/glslc resources/shaders/texture.vert -o resources/shaders/texture.vert.spv
 ~/VulkanSDK/1.2.189.0/macOS/bin/glslc resources/shaders/texture.frag -o resources/shaders/texture.frag.spv
+~/VulkanSDK/1.2.189.0/macOS/bin/glslc resources/shaders/depth_buffer.vert -o resources/shaders/depth_buffer.vert.spv
+~/VulkanSDK/1.2.189.0/macOS/bin/glslc resources/shaders/depth_buffer.frag -o resources/shaders/depth_buffer.frag.spv

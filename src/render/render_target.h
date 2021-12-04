@@ -10,7 +10,7 @@ class RenderDevice;
 class RenderTarget
 {
 public:
-    RenderTarget(const std::shared_ptr<RenderDevice>& renderDevice, const std::vector<VkImageView>& vkImageViews, VkFormat vkFormat, glm::ivec2 size);
+    RenderTarget(const std::shared_ptr<RenderDevice>& renderDevice, const std::vector<VkImageView>& vkImageViews, VkFormat vkFormat, glm::ivec2 size, bool hasDepth);
 
     ~RenderTarget();
     
@@ -25,6 +25,8 @@ public:
     VkSemaphore getVkSemaphore() const;
 
     glm::ivec2 getSize() const;
+    
+    bool hasDepth() const;
 
 private:
     void init(VkFormat vkFormat);
@@ -32,12 +34,19 @@ private:
     void initFramebuffer();
     
     void initSemaphore();
+    
+    void initDepthResources();
 
     void destroy();
 
     std::shared_ptr<RenderDevice> _renderDevice;
     std::vector<VkFramebuffer> _vkFramebuffers;
     std::vector<VkImageView> _vkImageViews;
+    
+    VkImage _depthVkImage = VK_NULL_HANDLE;
+    VkDeviceMemory _depthVkDeviceMemory = VK_NULL_HANDLE;
+    VkImageView _depthVkImageView = VK_NULL_HANDLE;
+
     uint32_t _framebufferIndex = 0;
     VkRenderPass _vkRenderPass = VK_NULL_HANDLE;
     VkSemaphore _vkSemaphore = VK_NULL_HANDLE;

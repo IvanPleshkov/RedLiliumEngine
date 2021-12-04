@@ -18,7 +18,10 @@ RenderDescriptor::~RenderDescriptor()
 
 void RenderDescriptor::bind(VkCommandBuffer vkCommandBuffer) const
 {
-    vkCmdBindDescriptorSets(vkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _vkPipelineLayout, 0, 1, &_vkDescriptorSet, 0, nullptr);
+    if (_vkDescriptorSet != VK_NULL_HANDLE)
+    {
+        vkCmdBindDescriptorSets(vkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _vkPipelineLayout, 0, 1, &_vkDescriptorSet, 0, nullptr);
+    }
 }
 
 VkPipelineLayout RenderDescriptor::getVkPipelineLayout() const

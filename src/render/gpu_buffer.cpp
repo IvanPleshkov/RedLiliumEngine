@@ -1,6 +1,10 @@
 #include "gpu_buffer.h"
 #include "render_device.h"
+
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
+
 #include <vector>
 
 GpuBuffer::GpuBuffer(const std::shared_ptr<RenderDevice>& renderDevice, BufferType bufferType, bool useStagingBuffers)

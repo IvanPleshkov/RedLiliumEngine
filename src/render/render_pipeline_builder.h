@@ -36,6 +36,7 @@ public:
     VkViewport _vkViewport{};
     VkRect2D _vkScissor{};
     VkPipelineViewportStateCreateInfo _vkPipelineViewportStateCreateInfo{};
+    VkPipelineDepthStencilStateCreateInfo _vkPipelineDepthStencilStateCreateInfo{};
     VkPipelineRasterizationStateCreateInfo _vkPipelineRasterizationStateCreateInfo{};
     VkPipelineMultisampleStateCreateInfo _vkPipelineMultisampleStateCreateInfo{};
     std::vector<VkPipelineColorBlendAttachmentState> _vkPipelineColorBlendAttachmentStates;
