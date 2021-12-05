@@ -10,7 +10,7 @@ class GpuBuffer;
 class GpuTexture
 {
 public:
-    GpuTexture(const std::shared_ptr<RenderDevice>& renderDevice);
+    GpuTexture(const std::shared_ptr<RenderDevice>& renderDevice, bool generateMips = false);
 
     ~GpuTexture();
 
@@ -20,7 +20,7 @@ public:
 
     VkSampler getVkSampler() const;
 
-    static void transitionImageLayout(const std::shared_ptr<RenderDevice>& renderDevice, VkImage vkImage, VkFormat vkFormat, VkImageLayout oldVkImageLayout, VkImageLayout newVkImageLayout);
+    static void transitionImageLayout(const std::shared_ptr<RenderDevice>& renderDevice, VkImage vkImage, VkFormat vkFormat, VkImageLayout oldVkImageLayout, VkImageLayout newVkImageLayout, uint32_t mipsLevel = 1);
     
 private:
     void destroy();
@@ -32,10 +32,14 @@ private:
     void createImageView();
     
     void createSampler();
+    
+    void generateMipmaps(int32_t texWidth, int32_t texHeight);
 
     std::shared_ptr<RenderDevice> _renderDevice;
     VkImage _vkImage = VK_NULL_HANDLE;
     VkDeviceMemory _vkImageMemory = VK_NULL_HANDLE;
     VkImageView _vkImageView = VK_NULL_HANDLE;
     VkSampler _vkSampler = VK_NULL_HANDLE;
+    bool _generateMips = false;
+    uint32_t _mipLevels = 1;
 };
