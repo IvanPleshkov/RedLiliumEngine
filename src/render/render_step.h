@@ -26,12 +26,14 @@ public:
 
     void copyBufferToImage(const std::shared_ptr<GpuBuffer>& gpuBuffer, const std::shared_ptr<GpuTexture>& gpuTexture, uint32_t mipLevel = 0);
 
+    void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+
     void transitionImageLayout(const std::shared_ptr<GpuTexture>& gpuTexture, VkImageLayout oldVkImageLayout, VkImageLayout newVkImageLayout, uint32_t mipsLevel = 1);
 
     void generateMipmaps(const std::shared_ptr<GpuTexture>& gpuTexture);
 
     void run(VkSemaphore waitVkSemaphore, VkSemaphore signalVkSemaphore);
-    
+
 public:
     void init();
     

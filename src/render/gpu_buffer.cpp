@@ -1,5 +1,6 @@
 #include "gpu_buffer.h"
 #include "render_device.h"
+#include "render_step.h"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -60,7 +61,10 @@ void GpuBuffer::update(const char* data, size_t size)
         vkMapMemory(_renderDevice->getVkDevice(), _vkStagingBufferMemory, 0, vkSize, 0, &gpuData);
         memcpy(gpuData, data, size);
         vkUnmapMemory(_renderDevice->getVkDevice(), _vkStagingBufferMemory);
-        copyBuffer(_vkStagingBuffer, _vkBuffer, vkSize);
+
+        auto renderStep = std::make_shared<RenderStep>(_renderDevice, _renderDevice->getGraphicsVkQueue().first, _renderDevice->getGraphicsVkQueue().second);
+        renderStep->copyBuffer(_vkStagingBuffer, _vkBuffer, vkSize);
+        renderStep->run(VK_NULL_HANDLE, VK_NULL_HANDLE);
     }
     else
     {
@@ -131,53 +135,4 @@ void GpuBuffer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemo
         throw std::runtime_error("failed to allocate gpu buffer memory!");
     }
     vkBindBufferMemory(_renderDevice->getVkDevice(), vkBuffer, vkBufferMemory, 0);
-}
-
-void GpuBuffer::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
-{
-    auto graphicsQueue = _renderDevice->getGraphicsVkQueue();
-    VkCommandPoolCreateInfo poolInfo{};
-    poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-    poolInfo.queueFamilyIndex = graphicsQueue.second;
-    poolInfo.flags = 0;
-
-    VkCommandPool vkCommandPool;
-    if (vkCreateCommandPool(_renderDevice->getVkDevice(), &poolInfo, _renderDevice->allocator(), &vkCommandPool) != VK_SUCCESS)
-    {
-        throw std::runtime_error("failed to create command pool!");
-    }
-
-    VkCommandBufferAllocateInfo allocInfo{};
-    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandPool = vkCommandPool;
-    allocInfo.commandBufferCount = 1;
-
-    VkCommandBuffer vkCommandBuffer;
-    vkAllocateCommandBuffers(_renderDevice->getVkDevice(), &allocInfo, &vkCommandBuffer);
-
-    VkCommandBufferBeginInfo beginInfo{};
-    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-    vkBeginCommandBuffer(vkCommandBuffer, &beginInfo);
-
-    VkBufferCopy copyRegion{};
-    copyRegion.srcOffset = 0;
-    copyRegion.dstOffset = 0;
-    copyRegion.size = size;
-    vkCmdCopyBuffer(vkCommandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
-    
-    vkEndCommandBuffer(vkCommandBuffer);
-
-    VkSubmitInfo submitInfo{};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &vkCommandBuffer;
-
-    vkQueueSubmit(_renderDevice->getGraphicsVkQueue().first, 1, &submitInfo, VK_NULL_HANDLE);
-    vkQueueWaitIdle(_renderDevice->getGraphicsVkQueue().first);
-    
-    vkFreeCommandBuffers(_renderDevice->getVkDevice(), vkCommandPool, 1, &vkCommandBuffer);
-    vkDestroyCommandPool(_renderDevice->getVkDevice(), vkCommandPool, _renderDevice->allocator());
 }

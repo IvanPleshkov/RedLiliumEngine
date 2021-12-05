@@ -87,6 +87,15 @@ void RenderStep::copyBufferToImage(const std::shared_ptr<GpuBuffer>& gpuBuffer, 
     );
 }
 
+void RenderStep::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
+{
+    VkBufferCopy copyRegion{};
+    copyRegion.srcOffset = 0;
+    copyRegion.dstOffset = 0;
+    copyRegion.size = size;
+    vkCmdCopyBuffer(_vkCommandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
+}
+
 void RenderStep::transitionImageLayout(const std::shared_ptr<GpuTexture>& gpuTexture, VkImageLayout oldVkImageLayout, VkImageLayout newVkImageLayout, uint32_t mipsLevel)
 {
     VkImageMemoryBarrier barrier{};

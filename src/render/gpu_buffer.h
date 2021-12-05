@@ -5,7 +5,7 @@
 
 class RenderDevice;
 
-class GpuBuffer
+class GpuBuffer : public std::enable_shared_from_this<GpuBuffer>
 {
 public:
     enum BufferType
@@ -31,8 +31,6 @@ private:
     void destroy();
 
     void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
-
-    void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 
     std::shared_ptr<RenderDevice> _renderDevice;
     size_t _size = 0;
