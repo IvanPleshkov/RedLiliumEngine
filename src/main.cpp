@@ -443,7 +443,7 @@ void objMeshSample(SDL_Window* window)
     auto gpuTexture = std::make_shared<GpuTexture>(renderDevice, true);
     gpuTexture->upload(resourcesManager.readResourceData("textures/viking_room.png"));
 
-    auto uniformBuffer = std::make_shared<GpuBuffer>(renderDevice, GpuBuffer::Uniform, false);
+    auto uniformBuffer = std::make_shared<GpuBuffer>(renderDevice, GpuBuffer::Uniform);
     std::vector<char> bufferData(sizeof(UniformBufferObject), 0);
     uniformBuffer->update(bufferData.data(), sizeof(UniformBufferObject));
     auto renderDescriptor = RenderDescriptorBuilder(renderDevice)
@@ -480,7 +480,7 @@ void objMeshSample(SDL_Window* window)
         float aspectRatio = static_cast<float>(screenSize.y) / static_cast<float>(screenSize.x);
         ubo.proj = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 10.0f);
         ubo.proj[1][1] *= -1;
-        uniformBuffer->update(reinterpret_cast<const char*>(&ubo), sizeof(UniformBufferObject));
+        uniformBuffer->update(renderStep, reinterpret_cast<const char*>(&ubo), sizeof(UniformBufferObject));
 
         renderDevice->startFrame();
         renderTarget->setFramebufferIndex(renderDevice->getSwapChainCurrentImageIndex());

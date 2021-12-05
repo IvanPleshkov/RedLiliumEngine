@@ -60,6 +60,11 @@ void RenderStep::draw(
 
 void RenderStep::copyBufferToImage(const std::shared_ptr<GpuBuffer>& gpuBuffer, const std::shared_ptr<GpuTexture>& gpuTexture, uint32_t mipLevel)
 {
+    if (_vkCommandBuffer == VK_NULL_HANDLE)
+    {
+        initCommandBuffer();
+    }
+
     VkBufferImageCopy region{};
     region.bufferOffset = 0;
     region.bufferRowLength = 0;
@@ -89,6 +94,11 @@ void RenderStep::copyBufferToImage(const std::shared_ptr<GpuBuffer>& gpuBuffer, 
 
 void RenderStep::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
 {
+    if (_vkCommandBuffer == VK_NULL_HANDLE)
+    {
+        initCommandBuffer();
+    }
+
     VkBufferCopy copyRegion{};
     copyRegion.srcOffset = 0;
     copyRegion.dstOffset = 0;
@@ -98,6 +108,11 @@ void RenderStep::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize
 
 void RenderStep::transitionImageLayout(const std::shared_ptr<GpuTexture>& gpuTexture, VkImageLayout oldVkImageLayout, VkImageLayout newVkImageLayout, uint32_t mipsLevel)
 {
+    if (_vkCommandBuffer == VK_NULL_HANDLE)
+    {
+        initCommandBuffer();
+    }
+
     VkImageMemoryBarrier barrier{};
     barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
     barrier.oldLayout = oldVkImageLayout;
@@ -164,6 +179,11 @@ void RenderStep::transitionImageLayout(const std::shared_ptr<GpuTexture>& gpuTex
 
 void RenderStep::generateMipmaps(const std::shared_ptr<GpuTexture>& gpuTexture)
 {
+    if (_vkCommandBuffer == VK_NULL_HANDLE)
+    {
+        initCommandBuffer();
+    }
+
     VkImageMemoryBarrier barrier{};
     barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
     barrier.image = gpuTexture->getVkImage();

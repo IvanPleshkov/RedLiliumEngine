@@ -4,6 +4,7 @@
 #include <memory>
 
 class RenderDevice;
+class RenderStep;
 
 class GpuBuffer : public std::enable_shared_from_this<GpuBuffer>
 {
@@ -20,7 +21,9 @@ public:
     ~GpuBuffer();
 
     void update(const char* data, size_t size);
-    
+
+    void update(const std::shared_ptr<RenderStep>& renderStep, const char* data, size_t size);
+
     VkBuffer getVkBuffer() const;
     
     size_t getSize() const;
