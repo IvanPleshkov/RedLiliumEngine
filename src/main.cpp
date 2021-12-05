@@ -426,6 +426,7 @@ void objMeshSample(SDL_Window* window)
     auto renderTargetBuilder = RenderTargetBuilder(renderDevice)
         .setVkFormat(renderDevice->getSwapChainVkImageFormat())
         .setSize(renderDevice->getSwapChainSize())
+        .addMultisampling(renderDevice->getMaxSampleCount())
         .enableDepth(true);
     for (auto& vkImageView : renderDevice->getSwapChainVkImageViews())
     {

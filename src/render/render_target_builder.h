@@ -22,6 +22,8 @@ public:
     RenderTargetBuilder& addImageView(VkImageView vkImageView);
     
     RenderTargetBuilder& enableDepth(bool enable);
+    
+    RenderTargetBuilder& addMultisampling(VkSampleCountFlagBits vkSampleCountFlagBits);
 
     std::shared_ptr<RenderTarget> build();
 
@@ -31,4 +33,5 @@ private:
     VkFormat _vkFormat;
     glm::ivec2 _size;
     bool _enableDepth = false;
+    VkSampleCountFlagBits _vkSampleCountFlagBits = VK_SAMPLE_COUNT_1_BIT;
 };

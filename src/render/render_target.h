@@ -10,7 +10,7 @@ class RenderDevice;
 class RenderTarget
 {
 public:
-    RenderTarget(const std::shared_ptr<RenderDevice>& renderDevice, const std::vector<VkImageView>& vkImageViews, VkFormat vkFormat, glm::ivec2 size, bool hasDepth);
+    RenderTarget(const std::shared_ptr<RenderDevice>& renderDevice, const std::vector<VkImageView>& vkImageViews, VkFormat vkFormat, glm::ivec2 size, VkSampleCountFlagBits vkSampleCountFlagBits, bool hasDepth);
 
     ~RenderTarget();
     
@@ -27,6 +27,8 @@ public:
     glm::ivec2 getSize() const;
     
     bool hasDepth() const;
+    
+    VkSampleCountFlagBits getVkSampleCount() const;
 
 private:
     void init(VkFormat vkFormat);
@@ -34,6 +36,8 @@ private:
     void initFramebuffer();
     
     void initSemaphore();
+    
+    void initMultisamplingResources();
     
     void initDepthResources();
 
@@ -47,9 +51,14 @@ private:
     VkDeviceMemory _depthVkDeviceMemory = VK_NULL_HANDLE;
     VkImageView _depthVkImageView = VK_NULL_HANDLE;
 
+    VkImage _msaaVkImage = VK_NULL_HANDLE;
+    VkDeviceMemory _msaaVkDeviceMemory = VK_NULL_HANDLE;
+    VkImageView _msaaVkImageView = VK_NULL_HANDLE;
+    
     uint32_t _framebufferIndex = 0;
     VkRenderPass _vkRenderPass = VK_NULL_HANDLE;
     VkSemaphore _vkSemaphore = VK_NULL_HANDLE;
     VkFormat _vkFormat;
     glm::ivec2 _size = { 0, 0 };
+    VkSampleCountFlagBits _vkSampleCountFlagBits = VK_SAMPLE_COUNT_1_BIT;
 };

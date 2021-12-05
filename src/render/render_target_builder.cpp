@@ -30,7 +30,13 @@ RenderTargetBuilder& RenderTargetBuilder::enableDepth(bool enable)
     return *this;
 }
 
+RenderTargetBuilder& RenderTargetBuilder::addMultisampling(VkSampleCountFlagBits vkSampleCountFlagBits)
+{
+    _vkSampleCountFlagBits = vkSampleCountFlagBits;
+    return *this;
+}
+
 std::shared_ptr<RenderTarget> RenderTargetBuilder::build()
 {
-    return std::make_shared<RenderTarget>(_renderDevice, _vkImageViews, _vkFormat, _size, _enableDepth);
+    return std::make_shared<RenderTarget>(_renderDevice, _vkImageViews, _vkFormat, _size, _vkSampleCountFlagBits, _enableDepth);
 }

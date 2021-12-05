@@ -5,15 +5,20 @@
 #include <array>
 #include <stdexcept>
 
-RenderTarget::RenderTarget(const std::shared_ptr<RenderDevice>& renderDevice, const std::vector<VkImageView>& vkImageViews, VkFormat vkFormat, glm::ivec2 size, bool hasDepth)
+RenderTarget::RenderTarget(const std::shared_ptr<RenderDevice>& renderDevice, const std::vector<VkImageView>& vkImageViews, VkFormat vkFormat, glm::ivec2 size, VkSampleCountFlagBits vkSampleCountFlagBits, bool hasDepth)
     : _renderDevice(renderDevice)
     , _vkImageViews(vkImageViews)
     , _vkFormat(vkFormat)
     , _size(size)
+    , _vkSampleCountFlagBits(vkSampleCountFlagBits)
 {
     if (hasDepth)
     {
         initDepthResources();
+    }
+    if (_vkSampleCountFlagBits != VK_SAMPLE_COUNT_1_BIT)
+    {
+        initMultisamplingResources();
     }
     init(vkFormat);
 }
@@ -77,28 +82,47 @@ bool RenderTarget::hasDepth() const
     return _depthVkImage != VK_NULL_HANDLE;
 }
 
+VkSampleCountFlagBits RenderTarget::getVkSampleCount() const
+{
+    return _vkSampleCountFlagBits;
+}
+
 void RenderTarget::init(VkFormat vkFormat)
 {
     std::vector<VkAttachmentDescription> vkAttachmentDescriptions;
     
+    VkAttachmentReference colorAttachmentRef{};
+    colorAttachmentRef.attachment = 0;
+    colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
     {
         VkAttachmentDescription colorAttachment{};
         colorAttachment.format = vkFormat;
-        colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+        colorAttachment.samples = _vkSampleCountFlagBits;
         colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
         colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
         colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
         colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        if (_vkSampleCountFlagBits != VK_SAMPLE_COUNT_1_BIT)
+        {
+            colorAttachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        }
+        else
+        {
+            colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        }
         vkAttachmentDescriptions.push_back(colorAttachment);
+        colorAttachmentRef.attachment = static_cast<uint32_t>(vkAttachmentDescriptions.size() - 1);
     }
     
+    VkAttachmentReference depthAttachmentRef{};
+    depthAttachmentRef.attachment = 0;
+    depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
     if (_depthVkImage != VK_NULL_HANDLE)
     {
         VkAttachmentDescription depthAttachment{};
         depthAttachment.format = VK_FORMAT_D32_SFLOAT;
-        depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+        depthAttachment.samples = _vkSampleCountFlagBits;
         depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
         depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
@@ -106,16 +130,27 @@ void RenderTarget::init(VkFormat vkFormat)
         depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
         depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
         vkAttachmentDescriptions.push_back(depthAttachment);
+        depthAttachmentRef.attachment = static_cast<uint32_t>(vkAttachmentDescriptions.size() - 1);
+    }
+    
+    VkAttachmentReference colorAttachmentResolveRef{};
+    colorAttachmentResolveRef.attachment = 0;
+    colorAttachmentResolveRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    if (_vkSampleCountFlagBits != VK_SAMPLE_COUNT_1_BIT)
+    {
+        VkAttachmentDescription colorAttachmentResolve{};
+        colorAttachmentResolve.format = vkFormat;
+        colorAttachmentResolve.samples = VK_SAMPLE_COUNT_1_BIT;
+        colorAttachmentResolve.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        colorAttachmentResolve.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+        colorAttachmentResolve.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        colorAttachmentResolve.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        colorAttachmentResolve.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        colorAttachmentResolve.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        vkAttachmentDescriptions.push_back(colorAttachmentResolve);
+        colorAttachmentResolveRef.attachment = static_cast<uint32_t>(vkAttachmentDescriptions.size() - 1);
     }
 
-    VkAttachmentReference colorAttachmentRef{};
-    colorAttachmentRef.attachment = 0;
-    colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-    
-    VkAttachmentReference depthAttachmentRef{};
-    depthAttachmentRef.attachment = 1;
-    depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-    
     VkSubpassDescription subpass{};
     subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
     subpass.colorAttachmentCount = 1;
@@ -123,6 +158,10 @@ void RenderTarget::init(VkFormat vkFormat)
     if (_depthVkImage != VK_NULL_HANDLE)
     {
         subpass.pDepthStencilAttachment = &depthAttachmentRef;
+    }
+    if (_vkSampleCountFlagBits != VK_SAMPLE_COUNT_1_BIT)
+    {
+        subpass.pResolveAttachments = &colorAttachmentResolveRef;
     }
     
     VkSubpassDependency dependency{};
@@ -162,10 +201,21 @@ void RenderTarget::initFramebuffer()
     _vkFramebuffers.resize(_vkImageViews.size());
     for (size_t i = 0; i < _vkImageViews.size(); i++) {
         std::vector<VkImageView> attachments;
-        attachments.push_back(_vkImageViews[i]);
+        if (_vkSampleCountFlagBits != VK_SAMPLE_COUNT_1_BIT)
+        {
+            attachments.push_back(_msaaVkImageView);
+        }
+        else
+        {
+            attachments.push_back(_vkImageViews[i]);
+        }
         if (_depthVkImageView != VK_NULL_HANDLE)
         {
             attachments.push_back(_depthVkImageView);
+        }
+        if (_vkSampleCountFlagBits != VK_SAMPLE_COUNT_1_BIT)
+        {
+            attachments.push_back(_vkImageViews[i]);
         }
 
         VkFramebufferCreateInfo framebufferInfo{};
@@ -194,6 +244,59 @@ void RenderTarget::initSemaphore()
     }
 }
 
+void RenderTarget::initMultisamplingResources()
+{
+    VkImageCreateInfo vkImageCreateInfo{};
+    vkImageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    vkImageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
+    vkImageCreateInfo.format = _vkFormat;
+    vkImageCreateInfo.extent.width = _size.x;
+    vkImageCreateInfo.extent.height = _size.y;
+    vkImageCreateInfo.extent.depth = 1;
+    vkImageCreateInfo.mipLevels = 1;
+    vkImageCreateInfo.arrayLayers = 1;
+    vkImageCreateInfo.samples = _vkSampleCountFlagBits;
+    vkImageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+    vkImageCreateInfo.usage = VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+    vkImageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    vkImageCreateInfo.queueFamilyIndexCount = 0;
+    vkImageCreateInfo.pQueueFamilyIndices = nullptr;
+    vkImageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    if (vkCreateImage(_renderDevice->getVkDevice(), &vkImageCreateInfo, _renderDevice->allocator(), &_msaaVkImage) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create image!");
+    }
+
+    VkMemoryRequirements vkMemoryRequirements;
+    vkGetImageMemoryRequirements(_renderDevice->getVkDevice(), _msaaVkImage, &vkMemoryRequirements);
+
+    VkMemoryAllocateInfo vkMemoryAllocateInfo{};
+    vkMemoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    vkMemoryAllocateInfo.allocationSize = vkMemoryRequirements.size;
+    vkMemoryAllocateInfo.memoryTypeIndex = _renderDevice->findMemoryType(vkMemoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+    if (vkAllocateMemory(_renderDevice->getVkDevice(), &vkMemoryAllocateInfo, _renderDevice->allocator(), &_msaaVkDeviceMemory) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to allocate image memory!");
+    }
+    vkBindImageMemory(_renderDevice->getVkDevice(), _msaaVkImage, _msaaVkDeviceMemory, 0);
+
+    VkImageViewCreateInfo vkImageViewCreateInfo{};
+    vkImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    vkImageViewCreateInfo.image = _msaaVkImage;
+    vkImageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    vkImageViewCreateInfo.format = vkImageCreateInfo.format;
+    vkImageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    vkImageViewCreateInfo.subresourceRange.baseMipLevel = 0;
+    vkImageViewCreateInfo.subresourceRange.levelCount = 1;
+    vkImageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
+    vkImageViewCreateInfo.subresourceRange.layerCount = 1;
+    if (vkCreateImageView(_renderDevice->getVkDevice(), &vkImageViewCreateInfo, _renderDevice->allocator(), &_msaaVkImageView) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create texture image view!");
+    }
+}
+
 void RenderTarget::initDepthResources()
 {
     VkImageCreateInfo vkImageCreateInfo{};
@@ -205,7 +308,7 @@ void RenderTarget::initDepthResources()
     vkImageCreateInfo.extent.depth = 1;
     vkImageCreateInfo.mipLevels = 1;
     vkImageCreateInfo.arrayLayers = 1;
-    vkImageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+    vkImageCreateInfo.samples = _vkSampleCountFlagBits;
     vkImageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
     vkImageCreateInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
     vkImageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
@@ -253,6 +356,23 @@ void RenderTarget::destroy()
     {
         vkDestroySemaphore(_renderDevice->getVkDevice(), _vkSemaphore, _renderDevice->allocator());
     }
+    
+    if (_msaaVkImageView != VK_NULL_HANDLE)
+    {
+        vkDestroyImageView(_renderDevice->getVkDevice(), _msaaVkImageView, _renderDevice->allocator());
+        _msaaVkImageView = VK_NULL_HANDLE;
+    }
+    if (_msaaVkImage != VK_NULL_HANDLE)
+    {
+        vkDestroyImage(_renderDevice->getVkDevice(), _msaaVkImage, _renderDevice->allocator());
+        _msaaVkImage = VK_NULL_HANDLE;
+    }
+    if (_msaaVkDeviceMemory != VK_NULL_HANDLE)
+    {
+        vkFreeMemory(_renderDevice->getVkDevice(), _msaaVkDeviceMemory, _renderDevice->allocator());
+        _msaaVkDeviceMemory = VK_NULL_HANDLE;
+    }
+
     if (_depthVkImageView != VK_NULL_HANDLE)
     {
         vkDestroyImageView(_renderDevice->getVkDevice(), _depthVkImageView, _renderDevice->allocator());

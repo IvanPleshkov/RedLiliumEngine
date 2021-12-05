@@ -73,7 +73,7 @@ RenderPipelineBuilder::RenderPipelineBuilder(const std::shared_ptr<RenderDevice>
 
     _vkPipelineMultisampleStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
     _vkPipelineMultisampleStateCreateInfo.sampleShadingEnable = VK_FALSE;
-    _vkPipelineMultisampleStateCreateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+    _vkPipelineMultisampleStateCreateInfo.rasterizationSamples = _renderTarget->getVkSampleCount();
     _vkPipelineMultisampleStateCreateInfo.minSampleShading = 1.0f; // Optional
     _vkPipelineMultisampleStateCreateInfo.pSampleMask = nullptr; // Optional
     _vkPipelineMultisampleStateCreateInfo.alphaToCoverageEnable = VK_FALSE; // Optional
