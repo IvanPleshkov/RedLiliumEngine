@@ -44,7 +44,7 @@ void triangleSample(SDL_Window* window)
         .setVertexShader(resourcesManager.readResourceData("shaders/triangle.vert.spv"))
         .setFragmentShader(resourcesManager.readResourceData("shaders/triangle.frag.spv"))
         .build();
-    auto renderStep = std::make_shared<RenderStep>(renderDevice, renderTarget, renderPipeline);
+    auto renderStep = std::make_shared<RenderStep>(renderDevice, renderDevice->getGraphicsVkQueue().first, renderDevice->getGraphicsVkQueue().second);
 
     bool quit = false;
     SDL_Event e;
@@ -58,7 +58,8 @@ void triangleSample(SDL_Window* window)
         
         renderDevice->startFrame();
         renderTarget->setFramebufferIndex(renderDevice->getSwapChainCurrentImageIndex());
-        renderStep->draw(nullptr, renderDevice->getSwapChainVkSemaphore());
+        renderStep->draw(renderTarget, renderPipeline, nullptr);
+        renderStep->run(renderDevice->getSwapChainVkSemaphore(), renderTarget->getVkSemaphore());
         renderDevice->endFrame(renderTarget->getVkSemaphore());
     }
 }
@@ -93,7 +94,7 @@ void meshSample(SDL_Window* window)
     };
     auto gpuMesh = std::make_shared<GpuMesh>(renderDevice);
     gpuMesh->update(mesh);
-    auto renderStep = std::make_shared<RenderStep>(renderDevice, renderTarget, renderPipeline);
+    auto renderStep = std::make_shared<RenderStep>(renderDevice, renderDevice->getGraphicsVkQueue().first, renderDevice->getGraphicsVkQueue().second);
 
     bool quit = false;
     SDL_Event e;
@@ -107,7 +108,8 @@ void meshSample(SDL_Window* window)
         
         renderDevice->startFrame();
         renderTarget->setFramebufferIndex(renderDevice->getSwapChainCurrentImageIndex());
-        renderStep->draw(gpuMesh, renderDevice->getSwapChainVkSemaphore());
+        renderStep->draw(renderTarget, renderPipeline, gpuMesh);
+        renderStep->run(renderDevice->getSwapChainVkSemaphore(), renderTarget->getVkSemaphore());
         renderDevice->endFrame(renderTarget->getVkSemaphore());
     }
 }
@@ -146,7 +148,7 @@ void indexedMeshSample(SDL_Window* window)
     };
     auto gpuMesh = std::make_shared<GpuMesh>(renderDevice);
     gpuMesh->update(mesh);
-    auto renderStep = std::make_shared<RenderStep>(renderDevice, renderTarget, renderPipeline);
+    auto renderStep = std::make_shared<RenderStep>(renderDevice, renderDevice->getGraphicsVkQueue().first, renderDevice->getGraphicsVkQueue().second);
 
     bool quit = false;
     SDL_Event e;
@@ -160,7 +162,8 @@ void indexedMeshSample(SDL_Window* window)
         
         renderDevice->startFrame();
         renderTarget->setFramebufferIndex(renderDevice->getSwapChainCurrentImageIndex());
-        renderStep->draw(gpuMesh, renderDevice->getSwapChainVkSemaphore());
+        renderStep->draw(renderTarget, renderPipeline, gpuMesh);
+        renderStep->run(renderDevice->getSwapChainVkSemaphore(), renderTarget->getVkSemaphore());
         renderDevice->endFrame(renderTarget->getVkSemaphore());
     }
 }
@@ -212,7 +215,7 @@ void uniformBufferSample(SDL_Window* window)
     };
     auto gpuMesh = std::make_shared<GpuMesh>(renderDevice);
     gpuMesh->update(mesh);
-    auto renderStep = std::make_shared<RenderStep>(renderDevice, renderTarget, renderPipeline);
+    auto renderStep = std::make_shared<RenderStep>(renderDevice, renderDevice->getGraphicsVkQueue().first, renderDevice->getGraphicsVkQueue().second);
 
     bool quit = false;
     SDL_Event e;
@@ -236,7 +239,8 @@ void uniformBufferSample(SDL_Window* window)
 
         renderDevice->startFrame();
         renderTarget->setFramebufferIndex(renderDevice->getSwapChainCurrentImageIndex());
-        renderStep->draw(gpuMesh, renderDevice->getSwapChainVkSemaphore());
+        renderStep->draw(renderTarget, renderPipeline, gpuMesh);
+        renderStep->run(renderDevice->getSwapChainVkSemaphore(), renderTarget->getVkSemaphore());
         renderDevice->endFrame(renderTarget->getVkSemaphore());
     }
 }
@@ -293,7 +297,7 @@ void textureSample(SDL_Window* window)
     };
     auto gpuMesh = std::make_shared<GpuMesh>(renderDevice);
     gpuMesh->update(mesh);
-    auto renderStep = std::make_shared<RenderStep>(renderDevice, renderTarget, renderPipeline);
+    auto renderStep = std::make_shared<RenderStep>(renderDevice, renderDevice->getGraphicsVkQueue().first, renderDevice->getGraphicsVkQueue().second);
 
     bool quit = false;
     SDL_Event e;
@@ -317,7 +321,8 @@ void textureSample(SDL_Window* window)
 
         renderDevice->startFrame();
         renderTarget->setFramebufferIndex(renderDevice->getSwapChainCurrentImageIndex());
-        renderStep->draw(gpuMesh, renderDevice->getSwapChainVkSemaphore());
+        renderStep->draw(renderTarget, renderPipeline, gpuMesh);
+        renderStep->run(renderDevice->getSwapChainVkSemaphore(), renderTarget->getVkSemaphore());
         renderDevice->endFrame(renderTarget->getVkSemaphore());
     }
 }
@@ -381,7 +386,7 @@ void depthBufferSample(SDL_Window* window)
     };
     auto gpuMesh = std::make_shared<GpuMesh>(renderDevice);
     gpuMesh->update(mesh);
-    auto renderStep = std::make_shared<RenderStep>(renderDevice, renderTarget, renderPipeline);
+    auto renderStep = std::make_shared<RenderStep>(renderDevice, renderDevice->getGraphicsVkQueue().first, renderDevice->getGraphicsVkQueue().second);
 
     bool quit = false;
     SDL_Event e;
@@ -405,7 +410,8 @@ void depthBufferSample(SDL_Window* window)
 
         renderDevice->startFrame();
         renderTarget->setFramebufferIndex(renderDevice->getSwapChainCurrentImageIndex());
-        renderStep->draw(gpuMesh, renderDevice->getSwapChainVkSemaphore());
+        renderStep->draw(renderTarget, renderPipeline, gpuMesh);
+        renderStep->run(renderDevice->getSwapChainVkSemaphore(), renderTarget->getVkSemaphore());
         renderDevice->endFrame(renderTarget->getVkSemaphore());
     }
 }
@@ -454,7 +460,7 @@ void objMeshSample(SDL_Window* window)
     auto mesh = resourcesManager.loadObj("models/viking_room.obj");
     auto gpuMesh = std::make_shared<GpuMesh>(renderDevice);
     gpuMesh->update(*mesh);
-    auto renderStep = std::make_shared<RenderStep>(renderDevice, renderTarget, renderPipeline);
+    auto renderStep = std::make_shared<RenderStep>(renderDevice, renderDevice->getGraphicsVkQueue().first, renderDevice->getGraphicsVkQueue().second);
 
     bool quit = false;
     SDL_Event e;
@@ -478,7 +484,8 @@ void objMeshSample(SDL_Window* window)
 
         renderDevice->startFrame();
         renderTarget->setFramebufferIndex(renderDevice->getSwapChainCurrentImageIndex());
-        renderStep->draw(gpuMesh, renderDevice->getSwapChainVkSemaphore());
+        renderStep->draw(renderTarget, renderPipeline, gpuMesh);
+        renderStep->run(renderDevice->getSwapChainVkSemaphore(), renderTarget->getVkSemaphore());
         renderDevice->endFrame(renderTarget->getVkSemaphore());
     }
 }

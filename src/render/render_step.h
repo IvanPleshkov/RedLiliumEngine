@@ -9,32 +9,41 @@ class RenderTarget;
 class RenderPipeline;
 class RenderDescriptor;
 class GpuMesh;
+class GpuBuffer;
+class GpuTexture;
 
 class RenderStep
 {
 public:
-    RenderStep(const std::shared_ptr<RenderDevice>& renderDevice,
-               const std::shared_ptr<RenderTarget>& renderTarget,
-               const std::shared_ptr<RenderPipeline>& renderPipeline);
+    RenderStep(const std::shared_ptr<RenderDevice>& renderDevice, VkQueue vkQueue, uint32_t vkFamilyIndex);
 
     ~RenderStep();
 
-    void draw(const std::shared_ptr<GpuMesh>& gpuMesh, VkSemaphore waitVkSemaphore);
+    void draw(
+              const std::shared_ptr<RenderTarget>& renderTarget,
+              const std::shared_ptr<RenderPipeline>& renderPipeline,
+              const std::shared_ptr<GpuMesh>& gpuMesh);
+
+    void copyBufferToImage(const std::shared_ptr<GpuBuffer>& gpuBuffer, const std::shared_ptr<GpuTexture>& gpuTexture);
+
+    void transitionImageLayout(const std::shared_ptr<GpuTexture>& gpuTexture, VkImageLayout oldVkImageLayout, VkImageLayout newVkImageLayout, uint32_t mipsLevel = 1);
+
+    void generateMipmaps(const std::shared_ptr<GpuTexture>& gpuTexture);
+
+    void run(VkSemaphore waitVkSemaphore, VkSemaphore signalVkSemaphore);
     
 public:
     void init();
+    
+    void initCommandBuffer();
 
     void destroy();
     
-    void buildCommandBuffer(const std::shared_ptr<GpuMesh>& gpuMesh);
-
     void destroyCommandBuffer();
-    
-    void runCommandBuffer(VkSemaphore waitVkSemaphore);
 
     std::shared_ptr<RenderDevice> _renderDevice;
-    std::shared_ptr<RenderTarget> _renderTarget;
-    std::shared_ptr<RenderPipeline> _renderPipeline;
+    VkQueue _vkQueue = VK_NULL_HANDLE;
+    uint32_t _vkFamilyIndex = 0;
     VkCommandPool _vkCommandPool = VK_NULL_HANDLE;
     VkCommandBuffer _vkCommandBuffer = VK_NULL_HANDLE;
 };

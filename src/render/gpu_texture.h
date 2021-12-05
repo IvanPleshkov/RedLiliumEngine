@@ -1,5 +1,9 @@
 #pragma once
 
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <glm/glm.hpp>
+
 #include <vulkan/vulkan.h>
 #include <memory>
 #include <string_view>
@@ -7,7 +11,7 @@
 class RenderDevice;
 class GpuBuffer;
 
-class GpuTexture
+class GpuTexture : public std::enable_shared_from_this<GpuTexture>
 {
 public:
     GpuTexture(const std::shared_ptr<RenderDevice>& renderDevice, bool generateMips = false);
@@ -16,18 +20,22 @@ public:
 
     void upload(std::string_view textureData);
     
+    glm::ivec2 getSize() const;
+    
+    uint32_t getMipsCount() const;
+    
+    VkImage getVkImage() const;
+    
     VkImageView getVkImageView() const;
 
     VkSampler getVkSampler() const;
 
-    static void transitionImageLayout(const std::shared_ptr<RenderDevice>& renderDevice, VkImage vkImage, VkFormat vkFormat, VkImageLayout oldVkImageLayout, VkImageLayout newVkImageLayout, uint32_t mipsLevel = 1);
-    
 private:
     void destroy();
     
     void transitionImageLayout(VkImageLayout oldLayout, VkImageLayout newLayout);
     
-    void copyBufferToImage(VkBuffer buffer, uint32_t width, uint32_t height);
+    void copyBufferToImage(const std::shared_ptr<GpuBuffer>& gpuBuffer);
     
     void createImageView();
     
@@ -42,4 +50,5 @@ private:
     VkSampler _vkSampler = VK_NULL_HANDLE;
     bool _generateMips = false;
     uint32_t _mipLevels = 1;
+    glm::ivec2 _size = { 0, 0 };
 };
