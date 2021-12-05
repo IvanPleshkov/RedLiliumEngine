@@ -105,18 +105,23 @@ void GpuTexture::upload(std::string_view textureData)
     }
 
     vkBindImageMemory(_renderDevice->getVkDevice(), _vkImage, _vkImageMemory, 0);
+    
+    auto renderStep = std::make_shared<RenderStep>(_renderDevice, _renderDevice->getGraphicsVkQueue().first, _renderDevice->getGraphicsVkQueue().second);
 
-    transitionImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-    copyBufferToImage(stagingBuffer);
+    renderStep->transitionImageLayout(shared_from_this(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, _mipLevels);
+    renderStep->copyBufferToImage(stagingBuffer, shared_from_this(), 0);
 
     if (_generateMips)
     {
-        generateMipmaps(texWidth, texHeight);
+        renderStep->generateMipmaps(shared_from_this());
     }
     else
     {
-        transitionImageLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        renderStep->transitionImageLayout(shared_from_this(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, _mipLevels);
     }
+    
+    renderStep->run(VK_NULL_HANDLE, VK_NULL_HANDLE);
+    renderStep = nullptr;
     
     createImageView();
     createSampler();
@@ -144,21 +149,6 @@ void GpuTexture::destroy()
         vkFreeMemory(_renderDevice->getVkDevice(), _vkImageMemory, _renderDevice->allocator());
         _vkImageMemory = VK_NULL_HANDLE;
     }
-}
-
-void GpuTexture::transitionImageLayout(VkImageLayout oldLayout, VkImageLayout newLayout)
-{
-    RenderStep renderStep(_renderDevice, _renderDevice->getGraphicsVkQueue().first, _renderDevice->getGraphicsVkQueue().second);
-    renderStep.transitionImageLayout(shared_from_this(), oldLayout, newLayout, _mipLevels);
-    renderStep.run(VK_NULL_HANDLE, VK_NULL_HANDLE);
-}
-
-void GpuTexture::copyBufferToImage(const std::shared_ptr<GpuBuffer>& gpuBuffer)
-{
-    RenderStep renderStep(_renderDevice, _renderDevice->getGraphicsVkQueue().first, _renderDevice->getGraphicsVkQueue().second);
-
-    renderStep.copyBufferToImage(gpuBuffer, shared_from_this());
-    renderStep.run(VK_NULL_HANDLE, VK_NULL_HANDLE);
 }
 
 void GpuTexture::createImageView()
@@ -205,11 +195,4 @@ void GpuTexture::createSampler()
     {
         throw std::runtime_error("failed to create texture sampler!");
     }
-}
-
-void GpuTexture::generateMipmaps(int32_t texWidth, int32_t texHeight)
-{
-    RenderStep renderStep(_renderDevice, _renderDevice->getGraphicsVkQueue().first, _renderDevice->getGraphicsVkQueue().second);
-    renderStep.generateMipmaps(shared_from_this());
-    renderStep.run(VK_NULL_HANDLE, VK_NULL_HANDLE);
 }

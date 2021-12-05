@@ -32,16 +32,10 @@ public:
 
 private:
     void destroy();
-    
-    void transitionImageLayout(VkImageLayout oldLayout, VkImageLayout newLayout);
-    
-    void copyBufferToImage(const std::shared_ptr<GpuBuffer>& gpuBuffer);
-    
+
     void createImageView();
     
     void createSampler();
-    
-    void generateMipmaps(int32_t texWidth, int32_t texHeight);
 
     std::shared_ptr<RenderDevice> _renderDevice;
     VkImage _vkImage = VK_NULL_HANDLE;

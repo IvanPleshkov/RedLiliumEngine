@@ -58,7 +58,7 @@ void RenderStep::draw(
     renderTarget->unbind(_vkCommandBuffer);
 }
 
-void RenderStep::copyBufferToImage(const std::shared_ptr<GpuBuffer>& gpuBuffer, const std::shared_ptr<GpuTexture>& gpuTexture)
+void RenderStep::copyBufferToImage(const std::shared_ptr<GpuBuffer>& gpuBuffer, const std::shared_ptr<GpuTexture>& gpuTexture, uint32_t mipLevel)
 {
     VkBufferImageCopy region{};
     region.bufferOffset = 0;
@@ -66,7 +66,7 @@ void RenderStep::copyBufferToImage(const std::shared_ptr<GpuBuffer>& gpuBuffer, 
     region.bufferImageHeight = 0;
 
     region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    region.imageSubresource.mipLevel = 0;
+    region.imageSubresource.mipLevel = mipLevel;
     region.imageSubresource.baseArrayLayer = 0;
     region.imageSubresource.layerCount = 1;
 

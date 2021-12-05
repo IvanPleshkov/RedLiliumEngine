@@ -24,7 +24,7 @@ public:
               const std::shared_ptr<RenderPipeline>& renderPipeline,
               const std::shared_ptr<GpuMesh>& gpuMesh);
 
-    void copyBufferToImage(const std::shared_ptr<GpuBuffer>& gpuBuffer, const std::shared_ptr<GpuTexture>& gpuTexture);
+    void copyBufferToImage(const std::shared_ptr<GpuBuffer>& gpuBuffer, const std::shared_ptr<GpuTexture>& gpuTexture, uint32_t mipLevel = 0);
 
     void transitionImageLayout(const std::shared_ptr<GpuTexture>& gpuTexture, VkImageLayout oldVkImageLayout, VkImageLayout newVkImageLayout, uint32_t mipsLevel = 1);
 
