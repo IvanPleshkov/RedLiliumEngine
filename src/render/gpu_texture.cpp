@@ -13,6 +13,63 @@ GpuTexture::GpuTexture(const std::shared_ptr<RenderDevice>& renderDevice, bool g
     , _generateMips(generateMips)
 { }
 
+GpuTexture::GpuTexture(const std::shared_ptr<RenderDevice>& renderDevice, VkFormat vkFormat, VkSampleCountFlagBits samples, VkImageUsageFlags usage, VkImageAspectFlags aspect, glm::ivec2 size)
+    : _renderDevice(renderDevice)
+    , _generateMips(false)
+    , _mipLevels(1)
+    , _size(size)
+{
+    VkImageCreateInfo vkImageCreateInfo{};
+    vkImageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    vkImageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
+    vkImageCreateInfo.format = vkFormat;
+    vkImageCreateInfo.extent.width = _size.x;
+    vkImageCreateInfo.extent.height = _size.y;
+    vkImageCreateInfo.extent.depth = 1;
+    vkImageCreateInfo.mipLevels = 1;
+    vkImageCreateInfo.arrayLayers = 1;
+    vkImageCreateInfo.samples = samples;
+    vkImageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+    vkImageCreateInfo.usage = usage;
+    vkImageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    vkImageCreateInfo.queueFamilyIndexCount = 0;
+    vkImageCreateInfo.pQueueFamilyIndices = nullptr;
+    vkImageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    if (vkCreateImage(_renderDevice->getVkDevice(), &vkImageCreateInfo, _renderDevice->allocator(), &_vkImage) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create image!");
+    }
+
+    VkMemoryRequirements vkMemoryRequirements;
+    vkGetImageMemoryRequirements(_renderDevice->getVkDevice(), _vkImage, &vkMemoryRequirements);
+
+    VkMemoryAllocateInfo vkMemoryAllocateInfo{};
+    vkMemoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    vkMemoryAllocateInfo.allocationSize = vkMemoryRequirements.size;
+    vkMemoryAllocateInfo.memoryTypeIndex = _renderDevice->findMemoryType(vkMemoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+    if (vkAllocateMemory(_renderDevice->getVkDevice(), &vkMemoryAllocateInfo, _renderDevice->allocator(), &_vkImageMemory) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to allocate image memory!");
+    }
+    vkBindImageMemory(_renderDevice->getVkDevice(), _vkImage, _vkImageMemory, 0);
+
+    VkImageViewCreateInfo vkImageViewCreateInfo{};
+    vkImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    vkImageViewCreateInfo.image = _vkImage;
+    vkImageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    vkImageViewCreateInfo.format = vkImageCreateInfo.format;
+    vkImageViewCreateInfo.subresourceRange.aspectMask = aspect;
+    vkImageViewCreateInfo.subresourceRange.baseMipLevel = 0;
+    vkImageViewCreateInfo.subresourceRange.levelCount = 1;
+    vkImageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
+    vkImageViewCreateInfo.subresourceRange.layerCount = 1;
+    if (vkCreateImageView(_renderDevice->getVkDevice(), &vkImageViewCreateInfo, _renderDevice->allocator(), &_vkImageView) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create texture image view!");
+    }
+}
+
 GpuTexture::~GpuTexture()
 {
     destroy();

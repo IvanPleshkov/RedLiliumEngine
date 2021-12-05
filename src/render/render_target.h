@@ -6,6 +6,7 @@
 #include <vector>
 
 class RenderDevice;
+class GpuTexture;
 
 class RenderTarget
 {
@@ -38,23 +39,14 @@ private:
     void initSemaphore();
     
     void initMultisamplingResources();
-    
-    void initDepthResources();
 
     void destroy();
 
     std::shared_ptr<RenderDevice> _renderDevice;
     std::vector<VkFramebuffer> _vkFramebuffers;
     std::vector<VkImageView> _vkImageViews;
-    
-    VkImage _depthVkImage = VK_NULL_HANDLE;
-    VkDeviceMemory _depthVkDeviceMemory = VK_NULL_HANDLE;
-    VkImageView _depthVkImageView = VK_NULL_HANDLE;
-
-    VkImage _msaaVkImage = VK_NULL_HANDLE;
-    VkDeviceMemory _msaaVkDeviceMemory = VK_NULL_HANDLE;
-    VkImageView _msaaVkImageView = VK_NULL_HANDLE;
-    
+    std::shared_ptr<GpuTexture> _depthTexture;
+    std::shared_ptr<GpuTexture> _msaaTexture;
     uint32_t _framebufferIndex = 0;
     VkRenderPass _vkRenderPass = VK_NULL_HANDLE;
     VkSemaphore _vkSemaphore = VK_NULL_HANDLE;

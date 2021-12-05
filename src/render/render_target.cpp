@@ -14,11 +14,11 @@ RenderTarget::RenderTarget(const std::shared_ptr<RenderDevice>& renderDevice, co
 {
     if (hasDepth)
     {
-        initDepthResources();
+        _depthTexture = std::make_shared<GpuTexture>(_renderDevice, VK_FORMAT_D32_SFLOAT, _vkSampleCountFlagBits, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_IMAGE_ASPECT_DEPTH_BIT, _size);
     }
     if (_vkSampleCountFlagBits != VK_SAMPLE_COUNT_1_BIT)
     {
-        initMultisamplingResources();
+        _msaaTexture = std::make_shared<GpuTexture>(_renderDevice, _vkFormat, _vkSampleCountFlagBits, VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_IMAGE_ASPECT_COLOR_BIT, _size);
     }
     init(vkFormat);
 }
@@ -42,7 +42,7 @@ void RenderTarget::bind(VkCommandBuffer vkCommandBuffer) const
     std::array<VkClearValue, 2> clearValues{};
     clearValues[0].color = {{0.0f, 0.0f, 0.0f, 1.0f}};
     clearValues[1].depthStencil = {1.0f, 0};
-    if (_depthVkImage != VK_NULL_HANDLE)
+    if (_depthTexture != nullptr)
     {
         clearValueCount = 2;
     }
@@ -79,7 +79,7 @@ glm::ivec2 RenderTarget::getSize() const
 
 bool RenderTarget::hasDepth() const
 {
-    return _depthVkImage != VK_NULL_HANDLE;
+    return _depthTexture != nullptr;
 }
 
 VkSampleCountFlagBits RenderTarget::getVkSampleCount() const
@@ -90,7 +90,7 @@ VkSampleCountFlagBits RenderTarget::getVkSampleCount() const
 void RenderTarget::init(VkFormat vkFormat)
 {
     std::vector<VkAttachmentDescription> vkAttachmentDescriptions;
-    
+
     VkAttachmentReference colorAttachmentRef{};
     colorAttachmentRef.attachment = 0;
     colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
@@ -118,7 +118,7 @@ void RenderTarget::init(VkFormat vkFormat)
     VkAttachmentReference depthAttachmentRef{};
     depthAttachmentRef.attachment = 0;
     depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-    if (_depthVkImage != VK_NULL_HANDLE)
+    if (_depthTexture != nullptr)
     {
         VkAttachmentDescription depthAttachment{};
         depthAttachment.format = VK_FORMAT_D32_SFLOAT;
@@ -155,7 +155,7 @@ void RenderTarget::init(VkFormat vkFormat)
     subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
     subpass.colorAttachmentCount = 1;
     subpass.pColorAttachments = &colorAttachmentRef;
-    if (_depthVkImage != VK_NULL_HANDLE)
+    if (_depthTexture != nullptr)
     {
         subpass.pDepthStencilAttachment = &depthAttachmentRef;
     }
@@ -171,7 +171,7 @@ void RenderTarget::init(VkFormat vkFormat)
     dependency.srcAccessMask = 0;
     dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
     dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-    if (_depthVkImage != VK_NULL_HANDLE)
+    if (_depthTexture != nullptr)
     {
         dependency.srcStageMask |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
         dependency.dstStageMask |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
@@ -203,15 +203,15 @@ void RenderTarget::initFramebuffer()
         std::vector<VkImageView> attachments;
         if (_vkSampleCountFlagBits != VK_SAMPLE_COUNT_1_BIT)
         {
-            attachments.push_back(_msaaVkImageView);
+            attachments.push_back(_msaaTexture->getVkImageView());
         }
         else
         {
             attachments.push_back(_vkImageViews[i]);
         }
-        if (_depthVkImageView != VK_NULL_HANDLE)
+        if (_depthTexture != nullptr)
         {
-            attachments.push_back(_depthVkImageView);
+            attachments.push_back(_depthTexture->getVkImageView());
         }
         if (_vkSampleCountFlagBits != VK_SAMPLE_COUNT_1_BIT)
         {
@@ -244,150 +244,14 @@ void RenderTarget::initSemaphore()
     }
 }
 
-void RenderTarget::initMultisamplingResources()
-{
-    VkImageCreateInfo vkImageCreateInfo{};
-    vkImageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-    vkImageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
-    vkImageCreateInfo.format = _vkFormat;
-    vkImageCreateInfo.extent.width = _size.x;
-    vkImageCreateInfo.extent.height = _size.y;
-    vkImageCreateInfo.extent.depth = 1;
-    vkImageCreateInfo.mipLevels = 1;
-    vkImageCreateInfo.arrayLayers = 1;
-    vkImageCreateInfo.samples = _vkSampleCountFlagBits;
-    vkImageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-    vkImageCreateInfo.usage = VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-    vkImageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-    vkImageCreateInfo.queueFamilyIndexCount = 0;
-    vkImageCreateInfo.pQueueFamilyIndices = nullptr;
-    vkImageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    if (vkCreateImage(_renderDevice->getVkDevice(), &vkImageCreateInfo, _renderDevice->allocator(), &_msaaVkImage) != VK_SUCCESS)
-    {
-        throw std::runtime_error("failed to create image!");
-    }
-
-    VkMemoryRequirements vkMemoryRequirements;
-    vkGetImageMemoryRequirements(_renderDevice->getVkDevice(), _msaaVkImage, &vkMemoryRequirements);
-
-    VkMemoryAllocateInfo vkMemoryAllocateInfo{};
-    vkMemoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    vkMemoryAllocateInfo.allocationSize = vkMemoryRequirements.size;
-    vkMemoryAllocateInfo.memoryTypeIndex = _renderDevice->findMemoryType(vkMemoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-
-    if (vkAllocateMemory(_renderDevice->getVkDevice(), &vkMemoryAllocateInfo, _renderDevice->allocator(), &_msaaVkDeviceMemory) != VK_SUCCESS)
-    {
-        throw std::runtime_error("failed to allocate image memory!");
-    }
-    vkBindImageMemory(_renderDevice->getVkDevice(), _msaaVkImage, _msaaVkDeviceMemory, 0);
-
-    VkImageViewCreateInfo vkImageViewCreateInfo{};
-    vkImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-    vkImageViewCreateInfo.image = _msaaVkImage;
-    vkImageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-    vkImageViewCreateInfo.format = vkImageCreateInfo.format;
-    vkImageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    vkImageViewCreateInfo.subresourceRange.baseMipLevel = 0;
-    vkImageViewCreateInfo.subresourceRange.levelCount = 1;
-    vkImageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
-    vkImageViewCreateInfo.subresourceRange.layerCount = 1;
-    if (vkCreateImageView(_renderDevice->getVkDevice(), &vkImageViewCreateInfo, _renderDevice->allocator(), &_msaaVkImageView) != VK_SUCCESS)
-    {
-        throw std::runtime_error("failed to create texture image view!");
-    }
-}
-
-void RenderTarget::initDepthResources()
-{
-    VkImageCreateInfo vkImageCreateInfo{};
-    vkImageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-    vkImageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
-    vkImageCreateInfo.format = VK_FORMAT_D32_SFLOAT;
-    vkImageCreateInfo.extent.width = _size.x;
-    vkImageCreateInfo.extent.height = _size.y;
-    vkImageCreateInfo.extent.depth = 1;
-    vkImageCreateInfo.mipLevels = 1;
-    vkImageCreateInfo.arrayLayers = 1;
-    vkImageCreateInfo.samples = _vkSampleCountFlagBits;
-    vkImageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-    vkImageCreateInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-    vkImageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-    vkImageCreateInfo.queueFamilyIndexCount = 0;
-    vkImageCreateInfo.pQueueFamilyIndices = nullptr;
-    vkImageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    if (vkCreateImage(_renderDevice->getVkDevice(), &vkImageCreateInfo, _renderDevice->allocator(), &_depthVkImage) != VK_SUCCESS)
-    {
-        throw std::runtime_error("failed to create image!");
-    }
-
-    VkMemoryRequirements vkMemoryRequirements;
-    vkGetImageMemoryRequirements(_renderDevice->getVkDevice(), _depthVkImage, &vkMemoryRequirements);
-
-    VkMemoryAllocateInfo vkMemoryAllocateInfo{};
-    vkMemoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    vkMemoryAllocateInfo.allocationSize = vkMemoryRequirements.size;
-    vkMemoryAllocateInfo.memoryTypeIndex = _renderDevice->findMemoryType(vkMemoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-
-    if (vkAllocateMemory(_renderDevice->getVkDevice(), &vkMemoryAllocateInfo, _renderDevice->allocator(), &_depthVkDeviceMemory) != VK_SUCCESS)
-    {
-        throw std::runtime_error("failed to allocate image memory!");
-    }
-    vkBindImageMemory(_renderDevice->getVkDevice(), _depthVkImage, _depthVkDeviceMemory, 0);
-
-    VkImageViewCreateInfo vkImageViewCreateInfo{};
-    vkImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-    vkImageViewCreateInfo.image = _depthVkImage;
-    vkImageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-    vkImageViewCreateInfo.format = vkImageCreateInfo.format;
-    vkImageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-    vkImageViewCreateInfo.subresourceRange.baseMipLevel = 0;
-    vkImageViewCreateInfo.subresourceRange.levelCount = 1;
-    vkImageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
-    vkImageViewCreateInfo.subresourceRange.layerCount = 1;
-    if (vkCreateImageView(_renderDevice->getVkDevice(), &vkImageViewCreateInfo, _renderDevice->allocator(), &_depthVkImageView) != VK_SUCCESS)
-    {
-        throw std::runtime_error("failed to create texture image view!");
-    }
-}
-
 void RenderTarget::destroy()
 {
     if (_vkSemaphore != VK_NULL_HANDLE)
     {
         vkDestroySemaphore(_renderDevice->getVkDevice(), _vkSemaphore, _renderDevice->allocator());
     }
-    
-    if (_msaaVkImageView != VK_NULL_HANDLE)
-    {
-        vkDestroyImageView(_renderDevice->getVkDevice(), _msaaVkImageView, _renderDevice->allocator());
-        _msaaVkImageView = VK_NULL_HANDLE;
-    }
-    if (_msaaVkImage != VK_NULL_HANDLE)
-    {
-        vkDestroyImage(_renderDevice->getVkDevice(), _msaaVkImage, _renderDevice->allocator());
-        _msaaVkImage = VK_NULL_HANDLE;
-    }
-    if (_msaaVkDeviceMemory != VK_NULL_HANDLE)
-    {
-        vkFreeMemory(_renderDevice->getVkDevice(), _msaaVkDeviceMemory, _renderDevice->allocator());
-        _msaaVkDeviceMemory = VK_NULL_HANDLE;
-    }
-
-    if (_depthVkImageView != VK_NULL_HANDLE)
-    {
-        vkDestroyImageView(_renderDevice->getVkDevice(), _depthVkImageView, _renderDevice->allocator());
-        _depthVkImageView = VK_NULL_HANDLE;
-    }
-    if (_depthVkImage != VK_NULL_HANDLE)
-    {
-        vkDestroyImage(_renderDevice->getVkDevice(), _depthVkImage, _renderDevice->allocator());
-        _depthVkImage = VK_NULL_HANDLE;
-    }
-    if (_depthVkDeviceMemory != VK_NULL_HANDLE)
-    {
-        vkFreeMemory(_renderDevice->getVkDevice(), _depthVkDeviceMemory, _renderDevice->allocator());
-        _depthVkDeviceMemory = VK_NULL_HANDLE;
-    }
+    _depthTexture = nullptr;
+    _msaaTexture = nullptr;
     for (auto framebuffer : _vkFramebuffers)
     {
         vkDestroyFramebuffer(_renderDevice->getVkDevice(), framebuffer, _renderDevice->allocator());
