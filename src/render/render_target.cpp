@@ -5,13 +5,29 @@
 #include <array>
 #include <stdexcept>
 
-RenderTarget::RenderTarget(const std::shared_ptr<RenderDevice>& renderDevice, const std::vector<VkImageView>& vkImageViews, VkFormat vkFormat, glm::ivec2 size, VkSampleCountFlagBits vkSampleCountFlagBits, bool hasDepth)
+RenderTarget::RenderTarget(const std::shared_ptr<RenderDevice>& renderDevice, const std::vector<VkImageView>& vkImageViews, VkFormat vkFormat, glm::ivec2 size, VkSampleCountFlagBits vkSampleCountFlagBits, bool hasDepth, VkImageLayout finalColorLayout, const glm::vec4& clearColor)
     : _renderDevice(renderDevice)
     , _vkImageViews(vkImageViews)
     , _vkFormat(vkFormat)
     , _size(size)
     , _vkSampleCountFlagBits(vkSampleCountFlagBits)
+    , _finalColorLayout(finalColorLayout)
+    , _clearColor(clearColor)
 {
+    if (_vkImageViews.empty())
+    {
+        VkImageUsageFlags colorTextureUsage;
+        if (finalColorLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+        {
+            colorTextureUsage = VK_IMAGE_USAGE_SAMPLED_BIT;
+        }
+        else if (finalColorLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
+        {
+            colorTextureUsage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+        }
+        _colorTexture = std::make_shared<GpuTexture>(_renderDevice, _vkFormat, VK_SAMPLE_COUNT_1_BIT, colorTextureUsage, VK_IMAGE_ASPECT_COLOR_BIT, _size, true);
+        _vkImageViews.push_back(_colorTexture->getVkImageView());
+    }
     if (hasDepth)
     {
         _depthTexture = std::make_shared<GpuTexture>(_renderDevice, VK_FORMAT_D32_SFLOAT, _vkSampleCountFlagBits, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_IMAGE_ASPECT_DEPTH_BIT, _size);
@@ -40,7 +56,7 @@ void RenderTarget::bind(VkCommandBuffer vkCommandBuffer) const
     
     uint32_t clearValueCount = 1;
     std::array<VkClearValue, 2> clearValues{};
-    clearValues[0].color = {{0.0f, 0.0f, 0.0f, 1.0f}};
+    clearValues[0].color = {{ _clearColor.x, _clearColor.y, _clearColor.z, _clearColor.w }};
     clearValues[1].depthStencil = {1.0f, 0};
     if (_depthTexture != nullptr)
     {
@@ -87,6 +103,16 @@ VkSampleCountFlagBits RenderTarget::getVkSampleCount() const
     return _vkSampleCountFlagBits;
 }
 
+std::shared_ptr<GpuTexture> RenderTarget::getColorTexture()
+{
+    return _colorTexture;
+}
+
+std::shared_ptr<GpuTexture> RenderTarget::getDepthTexture()
+{
+    return _depthTexture;
+}
+
 void RenderTarget::init(VkFormat vkFormat)
 {
     std::vector<VkAttachmentDescription> vkAttachmentDescriptions;
@@ -109,7 +135,7 @@ void RenderTarget::init(VkFormat vkFormat)
         }
         else
         {
-            colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+            colorAttachment.finalLayout = _finalColorLayout;
         }
         vkAttachmentDescriptions.push_back(colorAttachment);
         colorAttachmentRef.attachment = static_cast<uint32_t>(vkAttachmentDescriptions.size() - 1);
@@ -146,7 +172,7 @@ void RenderTarget::init(VkFormat vkFormat)
         colorAttachmentResolve.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
         colorAttachmentResolve.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         colorAttachmentResolve.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        colorAttachmentResolve.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        colorAttachmentResolve.finalLayout = _finalColorLayout;
         vkAttachmentDescriptions.push_back(colorAttachmentResolve);
         colorAttachmentResolveRef.attachment = static_cast<uint32_t>(vkAttachmentDescriptions.size() - 1);
     }
@@ -250,6 +276,7 @@ void RenderTarget::destroy()
     {
         vkDestroySemaphore(_renderDevice->getVkDevice(), _vkSemaphore, _renderDevice->allocator());
     }
+    _colorTexture = nullptr;
     _depthTexture = nullptr;
     _msaaTexture = nullptr;
     for (auto framebuffer : _vkFramebuffers)

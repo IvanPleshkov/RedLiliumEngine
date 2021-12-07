@@ -13,7 +13,7 @@ GpuTexture::GpuTexture(const std::shared_ptr<RenderDevice>& renderDevice, bool g
     , _generateMips(generateMips)
 { }
 
-GpuTexture::GpuTexture(const std::shared_ptr<RenderDevice>& renderDevice, VkFormat vkFormat, VkSampleCountFlagBits samples, VkImageUsageFlags usage, VkImageAspectFlags aspect, glm::ivec2 size)
+GpuTexture::GpuTexture(const std::shared_ptr<RenderDevice>& renderDevice, VkFormat vkFormat, VkSampleCountFlagBits samples, VkImageUsageFlags usage, VkImageAspectFlags aspect, glm::ivec2 size, bool needSampler)
     : _renderDevice(renderDevice)
     , _generateMips(false)
     , _mipLevels(1)
@@ -67,6 +67,11 @@ GpuTexture::GpuTexture(const std::shared_ptr<RenderDevice>& renderDevice, VkForm
     if (vkCreateImageView(_renderDevice->getVkDevice(), &vkImageViewCreateInfo, _renderDevice->allocator(), &_vkImageView) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create texture image view!");
+    }
+    
+    if (needSampler)
+    {
+        createSampler();
     }
 }
 

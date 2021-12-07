@@ -16,7 +16,7 @@ class GpuTexture : public std::enable_shared_from_this<GpuTexture>
 public:
     GpuTexture(const std::shared_ptr<RenderDevice>& renderDevice, bool generateMips = false);
 
-    GpuTexture(const std::shared_ptr<RenderDevice>& renderDevice, VkFormat vkFormat, VkSampleCountFlagBits samples, VkImageUsageFlags usage, VkImageAspectFlags aspect, glm::ivec2 size);
+    GpuTexture(const std::shared_ptr<RenderDevice>& renderDevice, VkFormat vkFormat, VkSampleCountFlagBits samples, VkImageUsageFlags usage, VkImageAspectFlags aspect, glm::ivec2 size, bool needSampler = false);
 
     ~GpuTexture();
 

@@ -36,7 +36,19 @@ RenderTargetBuilder& RenderTargetBuilder::addMultisampling(VkSampleCountFlagBits
     return *this;
 }
 
+RenderTargetBuilder& RenderTargetBuilder::setFinalColorLayout(VkImageLayout finalColorLayout)
+{
+    _finalColorLayout = finalColorLayout;
+    return *this;
+}
+
+RenderTargetBuilder& RenderTargetBuilder::setClearColor(const glm::vec4& clearColor)
+{
+    _clearColor = clearColor;
+    return *this;
+}
+
 std::shared_ptr<RenderTarget> RenderTargetBuilder::build()
 {
-    return std::make_shared<RenderTarget>(_renderDevice, _vkImageViews, _vkFormat, _size, _vkSampleCountFlagBits, _enableDepth);
+    return std::make_shared<RenderTarget>(_renderDevice, _vkImageViews, _vkFormat, _size, _vkSampleCountFlagBits, _enableDepth, _finalColorLayout, _clearColor);
 }

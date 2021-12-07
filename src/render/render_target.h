@@ -1,7 +1,10 @@
 #pragma once
 
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <glm/glm.hpp>
+
 #include <vulkan/vulkan.h>
-#include <glm/vec2.hpp>
 #include <memory>
 #include <vector>
 
@@ -11,7 +14,7 @@ class GpuTexture;
 class RenderTarget
 {
 public:
-    RenderTarget(const std::shared_ptr<RenderDevice>& renderDevice, const std::vector<VkImageView>& vkImageViews, VkFormat vkFormat, glm::ivec2 size, VkSampleCountFlagBits vkSampleCountFlagBits, bool hasDepth);
+    RenderTarget(const std::shared_ptr<RenderDevice>& renderDevice, const std::vector<VkImageView>& vkImageViews, VkFormat vkFormat, glm::ivec2 size, VkSampleCountFlagBits vkSampleCountFlagBits, bool hasDepth, VkImageLayout finalColorLayout, const glm::vec4& clearColor);
 
     ~RenderTarget();
     
@@ -30,6 +33,10 @@ public:
     bool hasDepth() const;
     
     VkSampleCountFlagBits getVkSampleCount() const;
+    
+    std::shared_ptr<GpuTexture> getColorTexture();
+
+    std::shared_ptr<GpuTexture> getDepthTexture();
 
 private:
     void init(VkFormat vkFormat);
@@ -45,6 +52,7 @@ private:
     std::shared_ptr<RenderDevice> _renderDevice;
     std::vector<VkFramebuffer> _vkFramebuffers;
     std::vector<VkImageView> _vkImageViews;
+    std::shared_ptr<GpuTexture> _colorTexture;
     std::shared_ptr<GpuTexture> _depthTexture;
     std::shared_ptr<GpuTexture> _msaaTexture;
     uint32_t _framebufferIndex = 0;
@@ -52,5 +60,7 @@ private:
     VkSemaphore _vkSemaphore = VK_NULL_HANDLE;
     VkFormat _vkFormat;
     glm::ivec2 _size = { 0, 0 };
+    glm::vec4 _clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
     VkSampleCountFlagBits _vkSampleCountFlagBits = VK_SAMPLE_COUNT_1_BIT;
+    VkImageLayout _finalColorLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 };
