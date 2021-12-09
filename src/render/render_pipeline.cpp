@@ -1,16 +1,16 @@
 #include "render_pipeline.h"
 #include "render_device.h"
 #include "render_instance.h"
-#include "render_descriptor.h"
+#include "render_pipeline_layout.h"
 #include "render_pipeline_builder.h"
 #include <stdexcept>
 
 RenderPipeline::RenderPipeline(
                                const std::shared_ptr<RenderDevice>& renderDevice,
-                               const std::shared_ptr<RenderDescriptor>& renderDescriptor,
+                               const std::shared_ptr<RenderPipelineLayout>& renderPipelineLayout,
                                const RenderPipelineBuilder& renderPipelineBuilder)
     : _renderDevice(renderDevice)
-    , _renderDescriptor(renderDescriptor)
+    , _renderPipelineLayout(renderPipelineLayout)
 {
     init(renderPipelineBuilder);
 }
@@ -23,10 +23,7 @@ RenderPipeline::~RenderPipeline()
 void RenderPipeline::bind(VkCommandBuffer vkCommandBuffer) const
 {
     vkCmdBindPipeline(vkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _vkPipeline);
-    if (_renderDescriptor != nullptr)
-    {
-        _renderDescriptor->bind(vkCommandBuffer);
-    }
+    _renderPipelineLayout->bind(vkCommandBuffer);
 }
 
 VkPipeline RenderPipeline::getVkPipeline() const
@@ -49,5 +46,5 @@ void RenderPipeline::destroy()
         vkDestroyPipeline(_renderDevice->getVkDevice(), _vkPipeline, _renderDevice->allocator());
         _vkPipeline = VK_NULL_HANDLE;
     }
-    _renderDescriptor = nullptr;
+    _renderPipelineLayout = nullptr;
 }

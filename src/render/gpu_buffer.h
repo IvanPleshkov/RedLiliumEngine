@@ -4,7 +4,7 @@
 #include <memory>
 
 class RenderDevice;
-class RenderStep;
+class RenderContext;
 
 class GpuBuffer : public std::enable_shared_from_this<GpuBuffer>
 {
@@ -22,7 +22,7 @@ public:
 
     void update(const char* data, size_t size);
 
-    void update(const std::shared_ptr<RenderStep>& renderStep, const char* data, size_t size);
+    void update(const std::shared_ptr<RenderContext>& renderContext, const char* data, size_t size);
     
     void download(char* data, size_t size);
 

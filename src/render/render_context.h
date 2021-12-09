@@ -7,17 +7,17 @@
 class RenderDevice;
 class RenderTarget;
 class RenderPipeline;
-class RenderDescriptor;
+class RenderPipelineLayout;
 class GpuMesh;
 class GpuBuffer;
 class GpuTexture;
 
-class RenderStep
+class RenderContext
 {
 public:
-    RenderStep(const std::shared_ptr<RenderDevice>& renderDevice, VkQueue vkQueue, uint32_t vkFamilyIndex);
+    RenderContext(const std::shared_ptr<RenderDevice>& renderDevice, VkQueue vkQueue, uint32_t vkFamilyIndex);
 
-    ~RenderStep();
+    ~RenderContext();
 
     void draw(
               const std::shared_ptr<RenderTarget>& renderTarget,

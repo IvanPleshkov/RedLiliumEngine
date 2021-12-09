@@ -1,22 +1,21 @@
-#include "render_descriptor.h"
-#include "render_descriptor_builder.h"
+#include "render_pipeline_layout.h"
 #include "gpu_buffer.h"
 #include "gpu_texture.h"
 #include "render_device.h"
 #include "render_pipeline.h"
 
-RenderDescriptor::RenderDescriptor(const std::shared_ptr<RenderDevice>& renderDevice, const RenderDescriptorBuilder& renderDescriptorBuilder)
+RenderPipelineLayout::RenderPipelineLayout(const std::shared_ptr<RenderDevice>& renderDevice, const std::vector<UniformBufferDescription>& uniformBufferDescriptions, const std::vector<CombinedImageSamplerDescription>& combinedImageSamplerDescriptions)
     : _renderDevice(renderDevice)
 {
-    init(renderDescriptorBuilder);
+    init(uniformBufferDescriptions, combinedImageSamplerDescriptions);
 }
 
-RenderDescriptor::~RenderDescriptor()
+RenderPipelineLayout::~RenderPipelineLayout()
 {
     destroy();
 }
 
-void RenderDescriptor::bind(VkCommandBuffer vkCommandBuffer) const
+void RenderPipelineLayout::bind(VkCommandBuffer vkCommandBuffer) const
 {
     if (_vkDescriptorSet != VK_NULL_HANDLE)
     {
@@ -24,18 +23,18 @@ void RenderDescriptor::bind(VkCommandBuffer vkCommandBuffer) const
     }
 }
 
-VkPipelineLayout RenderDescriptor::getVkPipelineLayout() const
+VkPipelineLayout RenderPipelineLayout::getVkPipelineLayout() const
 {
     return _vkPipelineLayout;
 }
 
-void RenderDescriptor::init(const RenderDescriptorBuilder& renderDescriptorBuilder)
+void RenderPipelineLayout::init(const std::vector<UniformBufferDescription>& uniformBufferDescriptions, const std::vector<CombinedImageSamplerDescription>& combinedImageSamplerDescriptions)
 {
-    if (!renderDescriptorBuilder._uniformBuffers.empty() || !renderDescriptorBuilder._combinedImageSamplers.empty())
+    if (!uniformBufferDescriptions.empty() || !combinedImageSamplerDescriptions.empty())
     {
-        initDescriptorSetLayout(renderDescriptorBuilder);
-        initDescriptorPool(renderDescriptorBuilder);
-        initDescriptorSets(renderDescriptorBuilder);
+        initDescriptorSetLayout(uniformBufferDescriptions, combinedImageSamplerDescriptions);
+        initDescriptorPool(uniformBufferDescriptions, combinedImageSamplerDescriptions);
+        initDescriptorSets(uniformBufferDescriptions, combinedImageSamplerDescriptions);
     }
 
     VkPipelineLayoutCreateInfo _vkPipelineLayoutCreateInfo{};
@@ -58,10 +57,10 @@ void RenderDescriptor::init(const RenderDescriptorBuilder& renderDescriptorBuild
     }
 }
 
-void RenderDescriptor::initDescriptorSetLayout(const RenderDescriptorBuilder& renderDescriptorBuilder)
+void RenderPipelineLayout::initDescriptorSetLayout(const std::vector<UniformBufferDescription>& uniformBufferDescriptions, const std::vector<CombinedImageSamplerDescription>& combinedImageSamplerDescriptions)
 {
     std::vector<VkDescriptorSetLayoutBinding> vkDescriptorSetLayoutBindings;
-    for (auto& uniformBuffer : renderDescriptorBuilder._uniformBuffers)
+    for (const auto& uniformBuffer : uniformBufferDescriptions)
     {
         VkDescriptorSetLayoutBinding vkDescriptorSetLayoutBinding{};
         vkDescriptorSetLayoutBinding.binding = uniformBuffer._binding;
@@ -72,7 +71,7 @@ void RenderDescriptor::initDescriptorSetLayout(const RenderDescriptorBuilder& re
         vkDescriptorSetLayoutBindings.push_back(vkDescriptorSetLayoutBinding);
     }
 
-    for (auto& combinedImageSampler : renderDescriptorBuilder._combinedImageSamplers)
+    for (const auto& combinedImageSampler : combinedImageSamplerDescriptions)
     {
         VkDescriptorSetLayoutBinding vkDescriptorSetLayoutBinding{};
         vkDescriptorSetLayoutBinding.binding = combinedImageSampler._binding;
@@ -96,21 +95,21 @@ void RenderDescriptor::initDescriptorSetLayout(const RenderDescriptorBuilder& re
     _vkDescriptorSetLayouts.push_back(vkDescriptorSetLayout);
 }
 
-void RenderDescriptor::initDescriptorPool(const RenderDescriptorBuilder& renderDescriptorBuilder)
+void RenderPipelineLayout::initDescriptorPool(const std::vector<UniformBufferDescription>& uniformBufferDescriptions, const std::vector<CombinedImageSamplerDescription>& combinedImageSamplerDescriptions)
 {
     std::vector<VkDescriptorPoolSize> vkDescriptorPoolSizes;
-    if (!renderDescriptorBuilder._uniformBuffers.empty())
+    if (!uniformBufferDescriptions.empty())
     {
         VkDescriptorPoolSize vkDescriptorPoolSize{};
         vkDescriptorPoolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        vkDescriptorPoolSize.descriptorCount = static_cast<uint32_t>(renderDescriptorBuilder._uniformBuffers.size());
+        vkDescriptorPoolSize.descriptorCount = static_cast<uint32_t>(uniformBufferDescriptions.size());
         vkDescriptorPoolSizes.push_back(vkDescriptorPoolSize);
     }
-    if (!renderDescriptorBuilder._combinedImageSamplers.empty())
+    if (!combinedImageSamplerDescriptions.empty())
     {
         VkDescriptorPoolSize vkDescriptorPoolSize{};
         vkDescriptorPoolSize.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        vkDescriptorPoolSize.descriptorCount = static_cast<uint32_t>(renderDescriptorBuilder._combinedImageSamplers.size());
+        vkDescriptorPoolSize.descriptorCount = static_cast<uint32_t>(combinedImageSamplerDescriptions.size());
         vkDescriptorPoolSizes.push_back(vkDescriptorPoolSize);
     }
 
@@ -126,7 +125,7 @@ void RenderDescriptor::initDescriptorPool(const RenderDescriptorBuilder& renderD
     }
 }
 
-void RenderDescriptor::initDescriptorSets(const RenderDescriptorBuilder& renderDescriptorBuilder)
+void RenderPipelineLayout::initDescriptorSets(const std::vector<UniformBufferDescription>& uniformBufferDescriptions, const std::vector<CombinedImageSamplerDescription>& combinedImageSamplerDescriptions)
 {
     VkDescriptorSetAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -149,7 +148,7 @@ void RenderDescriptor::initDescriptorSets(const RenderDescriptorBuilder& renderD
 
     std::vector<VkWriteDescriptorSet> vkWriteDescriptorSets;
     std::vector<VkDescriptorBufferInfo> vkDescriptorBufferInfos;
-    for (auto& uniformBuffer : renderDescriptorBuilder._uniformBuffers)
+    for (auto& uniformBuffer : uniformBufferDescriptions)
     {
         VkDescriptorBufferInfo vkDescriptorBufferInfo{};
         vkDescriptorBufferInfo.buffer = uniformBuffer._gpuBuffer->getVkBuffer();
@@ -170,7 +169,7 @@ void RenderDescriptor::initDescriptorSets(const RenderDescriptorBuilder& renderD
         vkWriteDescriptorSets.push_back(vkWriteDescriptorSet);
     }
 
-    for (auto& combinedImageSampler : renderDescriptorBuilder._combinedImageSamplers)
+    for (auto& combinedImageSampler : combinedImageSamplerDescriptions)
     {
         VkDescriptorImageInfo vkDescriptorImageInfo{};
         vkDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -191,7 +190,7 @@ void RenderDescriptor::initDescriptorSets(const RenderDescriptorBuilder& renderD
     vkUpdateDescriptorSets(_renderDevice->getVkDevice(), static_cast<uint32_t>(vkWriteDescriptorSets.size()), vkWriteDescriptorSets.data(), 0, nullptr);
 }
 
-void RenderDescriptor::destroy()
+void RenderPipelineLayout::destroy()
 {
     if (_vkPipelineLayout != VK_NULL_HANDLE)
     {

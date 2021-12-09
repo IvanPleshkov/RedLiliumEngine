@@ -10,7 +10,7 @@
 
 class RenderDevice;
 class GpuBuffer;
-class RenderStep;
+class RenderContext;
 
 class GpuTexture : public std::enable_shared_from_this<GpuTexture>
 {
@@ -22,9 +22,7 @@ public:
     ~GpuTexture();
 
     void uploadStbImage(std::string_view textureData);
-    
-    void upload(const std::shared_ptr<RenderStep>& renderStep, const std::shared_ptr<GpuBuffer>& textureData, uint32_t mipLevel);
-    
+
     glm::ivec2 getSize() const;
     
     uint32_t getMipsCount() const;

@@ -14,11 +14,9 @@
 #include "render/render_target_builder.h"
 #include "render/render_pipeline.h"
 #include "render/render_pipeline_builder.h"
-#include "render/render_step.h"
+#include "render/render_context.h"
 #include "render/gpu_buffer.h"
 #include "render/gpu_mesh.h"
-#include "render/render_descriptor.h"
-#include "render/render_descriptor_builder.h"
 #include "render/gpu_texture.h"
 
 #include "mesh.h"
@@ -41,12 +39,12 @@ void triangleSample(SDL_Window* window)
         renderTargetBuilder.addImageView(vkImageView);
     }
     auto renderTarget = renderTargetBuilder.build();
-    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget, nullptr)
+    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget)
         .setFrontFace(VK_FRONT_FACE_CLOCKWISE)
         .setVertexShader(resourcesManager.readResourceData("shaders/triangle.vert.spv"))
         .setFragmentShader(resourcesManager.readResourceData("shaders/triangle.frag.spv"))
         .build();
-    auto renderStep = std::make_shared<RenderStep>(renderDevice, renderDevice->getGraphicsVkQueue().first, renderDevice->getGraphicsVkQueue().second);
+    auto renderContext = std::make_shared<RenderContext>(renderDevice, renderDevice->getGraphicsVkQueue().first, renderDevice->getGraphicsVkQueue().second);
 
     bool quit = false;
     SDL_Event e;
@@ -60,8 +58,8 @@ void triangleSample(SDL_Window* window)
         
         renderDevice->startFrame();
         renderTarget->setFramebufferIndex(renderDevice->getSwapChainCurrentImageIndex());
-        renderStep->draw(renderTarget, renderPipeline, nullptr);
-        renderStep->run(renderDevice->getSwapChainVkSemaphore(), renderTarget->getVkSemaphore());
+        renderContext->draw(renderTarget, renderPipeline, nullptr);
+        renderContext->run(renderDevice->getSwapChainVkSemaphore(), renderTarget->getVkSemaphore());
         renderDevice->endFrame(renderTarget->getVkSemaphore());
     }
 }
@@ -80,7 +78,7 @@ void meshSample(SDL_Window* window)
         renderTargetBuilder.addImageView(vkImageView);
     }
     auto renderTarget = renderTargetBuilder.build();
-    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget, nullptr)
+    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget)
         .setFrontFace(VK_FRONT_FACE_CLOCKWISE)
         .setVertexShader(resourcesManager.readResourceData("shaders/colored_mesh.vert.spv"))
         .setFragmentShader(resourcesManager.readResourceData("shaders/colored_mesh.frag.spv"))
@@ -96,7 +94,7 @@ void meshSample(SDL_Window* window)
     };
     auto gpuMesh = std::make_shared<GpuMesh>(renderDevice);
     gpuMesh->update(mesh);
-    auto renderStep = std::make_shared<RenderStep>(renderDevice, renderDevice->getGraphicsVkQueue().first, renderDevice->getGraphicsVkQueue().second);
+    auto renderContext = std::make_shared<RenderContext>(renderDevice, renderDevice->getGraphicsVkQueue().first, renderDevice->getGraphicsVkQueue().second);
 
     bool quit = false;
     SDL_Event e;
@@ -110,8 +108,8 @@ void meshSample(SDL_Window* window)
         
         renderDevice->startFrame();
         renderTarget->setFramebufferIndex(renderDevice->getSwapChainCurrentImageIndex());
-        renderStep->draw(renderTarget, renderPipeline, gpuMesh);
-        renderStep->run(renderDevice->getSwapChainVkSemaphore(), renderTarget->getVkSemaphore());
+        renderContext->draw(renderTarget, renderPipeline, gpuMesh);
+        renderContext->run(renderDevice->getSwapChainVkSemaphore(), renderTarget->getVkSemaphore());
         renderDevice->endFrame(renderTarget->getVkSemaphore());
     }
 }
@@ -130,7 +128,7 @@ void indexedMeshSample(SDL_Window* window)
         renderTargetBuilder.addImageView(vkImageView);
     }
     auto renderTarget = renderTargetBuilder.build();
-    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget, nullptr)
+    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget)
         .setFrontFace(VK_FRONT_FACE_CLOCKWISE)
         .setVertexShader(resourcesManager.readResourceData("shaders/colored_mesh.vert.spv"))
         .setFragmentShader(resourcesManager.readResourceData("shaders/colored_mesh.frag.spv"))
@@ -150,7 +148,7 @@ void indexedMeshSample(SDL_Window* window)
     };
     auto gpuMesh = std::make_shared<GpuMesh>(renderDevice);
     gpuMesh->update(mesh);
-    auto renderStep = std::make_shared<RenderStep>(renderDevice, renderDevice->getGraphicsVkQueue().first, renderDevice->getGraphicsVkQueue().second);
+    auto renderContext = std::make_shared<RenderContext>(renderDevice, renderDevice->getGraphicsVkQueue().first, renderDevice->getGraphicsVkQueue().second);
 
     bool quit = false;
     SDL_Event e;
@@ -164,8 +162,8 @@ void indexedMeshSample(SDL_Window* window)
         
         renderDevice->startFrame();
         renderTarget->setFramebufferIndex(renderDevice->getSwapChainCurrentImageIndex());
-        renderStep->draw(renderTarget, renderPipeline, gpuMesh);
-        renderStep->run(renderDevice->getSwapChainVkSemaphore(), renderTarget->getVkSemaphore());
+        renderContext->draw(renderTarget, renderPipeline, gpuMesh);
+        renderContext->run(renderDevice->getSwapChainVkSemaphore(), renderTarget->getVkSemaphore());
         renderDevice->endFrame(renderTarget->getVkSemaphore());
     }
 }
@@ -195,14 +193,13 @@ void uniformBufferSample(SDL_Window* window)
     auto uniformBuffer = std::make_shared<GpuBuffer>(renderDevice, GpuBuffer::Uniform, false);
     std::vector<char> bufferData(sizeof(UniformBufferObject), 0);
     uniformBuffer->update(bufferData.data(), sizeof(UniformBufferObject));
-    auto renderDescriptor = RenderDescriptorBuilder(renderDevice)
-        .addUniformBuffer(uniformBuffer, VK_SHADER_STAGE_VERTEX_BIT, 0)
-        .build();
-    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget, renderDescriptor)
+
+    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget)
         .setVertexShader(resourcesManager.readResourceData("shaders/uniform_buffer.vert.spv"))
         .setFragmentShader(resourcesManager.readResourceData("shaders/uniform_buffer.frag.spv"))
         .addVertexAttribute(0, 0, VK_FORMAT_R32G32_SFLOAT)
         .addVertexAttribute(1, 2 * sizeof(float), VK_FORMAT_R32G32B32_SFLOAT)
+        .addUniformBuffer(uniformBuffer, VK_SHADER_STAGE_VERTEX_BIT, 0)
         .build();
 
     Mesh mesh;
@@ -217,7 +214,7 @@ void uniformBufferSample(SDL_Window* window)
     };
     auto gpuMesh = std::make_shared<GpuMesh>(renderDevice);
     gpuMesh->update(mesh);
-    auto renderStep = std::make_shared<RenderStep>(renderDevice, renderDevice->getGraphicsVkQueue().first, renderDevice->getGraphicsVkQueue().second);
+    auto renderContext = std::make_shared<RenderContext>(renderDevice, renderDevice->getGraphicsVkQueue().first, renderDevice->getGraphicsVkQueue().second);
 
     bool quit = false;
     SDL_Event e;
@@ -241,8 +238,8 @@ void uniformBufferSample(SDL_Window* window)
 
         renderDevice->startFrame();
         renderTarget->setFramebufferIndex(renderDevice->getSwapChainCurrentImageIndex());
-        renderStep->draw(renderTarget, renderPipeline, gpuMesh);
-        renderStep->run(renderDevice->getSwapChainVkSemaphore(), renderTarget->getVkSemaphore());
+        renderContext->draw(renderTarget, renderPipeline, gpuMesh);
+        renderContext->run(renderDevice->getSwapChainVkSemaphore(), renderTarget->getVkSemaphore());
         renderDevice->endFrame(renderTarget->getVkSemaphore());
     }
 }
@@ -275,16 +272,15 @@ void textureSample(SDL_Window* window)
     auto uniformBuffer = std::make_shared<GpuBuffer>(renderDevice, GpuBuffer::Uniform, false);
     std::vector<char> bufferData(sizeof(UniformBufferObject), 0);
     uniformBuffer->update(bufferData.data(), sizeof(UniformBufferObject));
-    auto renderDescriptor = RenderDescriptorBuilder(renderDevice)
-        .addUniformBuffer(uniformBuffer, VK_SHADER_STAGE_VERTEX_BIT, 0)
-        .addCombinedImageSampler(gpuTexture, VK_SHADER_STAGE_FRAGMENT_BIT, 1)
-        .build();
-    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget, renderDescriptor)
+
+    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget)
         .setVertexShader(resourcesManager.readResourceData("shaders/texture.vert.spv"))
         .setFragmentShader(resourcesManager.readResourceData("shaders/texture.frag.spv"))
         .addVertexAttribute(0, 0, VK_FORMAT_R32G32_SFLOAT)
         .addVertexAttribute(1, 2 * sizeof(float), VK_FORMAT_R32G32B32_SFLOAT)
         .addVertexAttribute(2, 5 * sizeof(float), VK_FORMAT_R32G32_SFLOAT)
+        .addUniformBuffer(uniformBuffer, VK_SHADER_STAGE_VERTEX_BIT, 0)
+        .addCombinedImageSampler(gpuTexture, VK_SHADER_STAGE_FRAGMENT_BIT, 1)
         .build();
 
     Mesh mesh;
@@ -299,7 +295,7 @@ void textureSample(SDL_Window* window)
     };
     auto gpuMesh = std::make_shared<GpuMesh>(renderDevice);
     gpuMesh->update(mesh);
-    auto renderStep = std::make_shared<RenderStep>(renderDevice, renderDevice->getGraphicsVkQueue().first, renderDevice->getGraphicsVkQueue().second);
+    auto renderContext = std::make_shared<RenderContext>(renderDevice, renderDevice->getGraphicsVkQueue().first, renderDevice->getGraphicsVkQueue().second);
 
     bool quit = false;
     SDL_Event e;
@@ -323,8 +319,8 @@ void textureSample(SDL_Window* window)
 
         renderDevice->startFrame();
         renderTarget->setFramebufferIndex(renderDevice->getSwapChainCurrentImageIndex());
-        renderStep->draw(renderTarget, renderPipeline, gpuMesh);
-        renderStep->run(renderDevice->getSwapChainVkSemaphore(), renderTarget->getVkSemaphore());
+        renderContext->draw(renderTarget, renderPipeline, gpuMesh);
+        renderContext->run(renderDevice->getSwapChainVkSemaphore(), renderTarget->getVkSemaphore());
         renderDevice->endFrame(renderTarget->getVkSemaphore());
     }
 }
@@ -358,16 +354,15 @@ void depthBufferSample(SDL_Window* window)
     auto uniformBuffer = std::make_shared<GpuBuffer>(renderDevice, GpuBuffer::Uniform, false);
     std::vector<char> bufferData(sizeof(UniformBufferObject), 0);
     uniformBuffer->update(bufferData.data(), sizeof(UniformBufferObject));
-    auto renderDescriptor = RenderDescriptorBuilder(renderDevice)
-        .addUniformBuffer(uniformBuffer, VK_SHADER_STAGE_VERTEX_BIT, 0)
-        .addCombinedImageSampler(gpuTexture, VK_SHADER_STAGE_FRAGMENT_BIT, 1)
-        .build();
-    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget, renderDescriptor)
+
+    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget)
         .setVertexShader(resourcesManager.readResourceData("shaders/depth_buffer.vert.spv"))
         .setFragmentShader(resourcesManager.readResourceData("shaders/depth_buffer.frag.spv"))
         .addVertexAttribute(0, 0, VK_FORMAT_R32G32B32_SFLOAT)
         .addVertexAttribute(1, 3 * sizeof(float), VK_FORMAT_R32G32B32_SFLOAT)
         .addVertexAttribute(2, 6 * sizeof(float), VK_FORMAT_R32G32_SFLOAT)
+        .addUniformBuffer(uniformBuffer, VK_SHADER_STAGE_VERTEX_BIT, 0)
+        .addCombinedImageSampler(gpuTexture, VK_SHADER_STAGE_FRAGMENT_BIT, 1)
         .build();
 
     Mesh mesh;
@@ -388,7 +383,7 @@ void depthBufferSample(SDL_Window* window)
     };
     auto gpuMesh = std::make_shared<GpuMesh>(renderDevice);
     gpuMesh->update(mesh);
-    auto renderStep = std::make_shared<RenderStep>(renderDevice, renderDevice->getGraphicsVkQueue().first, renderDevice->getGraphicsVkQueue().second);
+    auto renderContext = std::make_shared<RenderContext>(renderDevice, renderDevice->getGraphicsVkQueue().first, renderDevice->getGraphicsVkQueue().second);
 
     bool quit = false;
     SDL_Event e;
@@ -412,8 +407,8 @@ void depthBufferSample(SDL_Window* window)
 
         renderDevice->startFrame();
         renderTarget->setFramebufferIndex(renderDevice->getSwapChainCurrentImageIndex());
-        renderStep->draw(renderTarget, renderPipeline, gpuMesh);
-        renderStep->run(renderDevice->getSwapChainVkSemaphore(), renderTarget->getVkSemaphore());
+        renderContext->draw(renderTarget, renderPipeline, gpuMesh);
+        renderContext->run(renderDevice->getSwapChainVkSemaphore(), renderTarget->getVkSemaphore());
         renderDevice->endFrame(renderTarget->getVkSemaphore());
     }
 }
@@ -448,21 +443,20 @@ void objMeshSample(SDL_Window* window)
     auto uniformBuffer = std::make_shared<GpuBuffer>(renderDevice, GpuBuffer::Uniform);
     std::vector<char> bufferData(sizeof(UniformBufferObject), 0);
     uniformBuffer->update(bufferData.data(), sizeof(UniformBufferObject));
-    auto renderDescriptor = RenderDescriptorBuilder(renderDevice)
-        .addUniformBuffer(uniformBuffer, VK_SHADER_STAGE_VERTEX_BIT, 0)
-        .addCombinedImageSampler(gpuTexture, VK_SHADER_STAGE_FRAGMENT_BIT, 1)
-        .build();
-    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget, renderDescriptor)
+
+    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget)
         .setVertexShader(resourcesManager.readResourceData("shaders/obj_mesh.vert.spv"))
         .setFragmentShader(resourcesManager.readResourceData("shaders/obj_mesh.frag.spv"))
         .addVertexAttribute(0, 0, VK_FORMAT_R32G32B32_SFLOAT)
         .addVertexAttribute(1, 3 * sizeof(float), VK_FORMAT_R32G32_SFLOAT)
+        .addUniformBuffer(uniformBuffer, VK_SHADER_STAGE_VERTEX_BIT, 0)
+        .addCombinedImageSampler(gpuTexture, VK_SHADER_STAGE_FRAGMENT_BIT, 1)
         .build();
 
     auto mesh = resourcesManager.loadObj("models/viking_room.obj");
     auto gpuMesh = std::make_shared<GpuMesh>(renderDevice);
     gpuMesh->update(*mesh);
-    auto renderStep = std::make_shared<RenderStep>(renderDevice, renderDevice->getGraphicsVkQueue().first, renderDevice->getGraphicsVkQueue().second);
+    auto renderContext = std::make_shared<RenderContext>(renderDevice, renderDevice->getGraphicsVkQueue().first, renderDevice->getGraphicsVkQueue().second);
 
     bool quit = false;
     SDL_Event e;
@@ -482,12 +476,12 @@ void objMeshSample(SDL_Window* window)
         float aspectRatio = static_cast<float>(screenSize.y) / static_cast<float>(screenSize.x);
         ubo.proj = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 10.0f);
         ubo.proj[1][1] *= -1;
-        uniformBuffer->update(renderStep, reinterpret_cast<const char*>(&ubo), sizeof(UniformBufferObject));
+        uniformBuffer->update(renderContext, reinterpret_cast<const char*>(&ubo), sizeof(UniformBufferObject));
 
         renderDevice->startFrame();
         renderTarget->setFramebufferIndex(renderDevice->getSwapChainCurrentImageIndex());
-        renderStep->draw(renderTarget, renderPipeline, gpuMesh);
-        renderStep->run(renderDevice->getSwapChainVkSemaphore(), renderTarget->getVkSemaphore());
+        renderContext->draw(renderTarget, renderPipeline, gpuMesh);
+        renderContext->run(renderDevice->getSwapChainVkSemaphore(), renderTarget->getVkSemaphore());
         renderDevice->endFrame(renderTarget->getVkSemaphore());
     }
 }
@@ -532,26 +526,22 @@ void renderToTextureSample(SDL_Window* window)
     std::vector<char> bufferData(sizeof(UniformBufferObject), 0);
     uniformBuffer->update(bufferData.data(), sizeof(UniformBufferObject));
     
-    auto renderDescriptor2 = RenderDescriptorBuilder(renderDevice)
+    auto renderPipeline2 = RenderPipelineBuilder(renderDevice, renderTarget2)
+        .setVertexShader(resourcesManager.readResourceData("shaders/obj_mesh.vert.spv"))
+        .setFragmentShader(resourcesManager.readResourceData("shaders/obj_mesh.frag.spv"))
+        .addVertexAttribute(0, 0, VK_FORMAT_R32G32B32_SFLOAT)
+        .addVertexAttribute(1, 3 * sizeof(float), VK_FORMAT_R32G32_SFLOAT)
         .addUniformBuffer(uniformBuffer, VK_SHADER_STAGE_VERTEX_BIT, 0)
         .addCombinedImageSampler(gpuTexture, VK_SHADER_STAGE_FRAGMENT_BIT, 1)
         .build();
-    auto renderPipeline2 = RenderPipelineBuilder(renderDevice, renderTarget2, renderDescriptor2)
+
+    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget)
         .setVertexShader(resourcesManager.readResourceData("shaders/obj_mesh.vert.spv"))
         .setFragmentShader(resourcesManager.readResourceData("shaders/obj_mesh.frag.spv"))
         .addVertexAttribute(0, 0, VK_FORMAT_R32G32B32_SFLOAT)
         .addVertexAttribute(1, 3 * sizeof(float), VK_FORMAT_R32G32_SFLOAT)
-        .build();
-
-    auto renderDescriptor = RenderDescriptorBuilder(renderDevice)
         .addUniformBuffer(uniformBuffer, VK_SHADER_STAGE_VERTEX_BIT, 0)
         .addCombinedImageSampler(renderTarget2->getColorTexture(), VK_SHADER_STAGE_FRAGMENT_BIT, 1)
-        .build();
-    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget, renderDescriptor)
-        .setVertexShader(resourcesManager.readResourceData("shaders/obj_mesh.vert.spv"))
-        .setFragmentShader(resourcesManager.readResourceData("shaders/obj_mesh.frag.spv"))
-        .addVertexAttribute(0, 0, VK_FORMAT_R32G32B32_SFLOAT)
-        .addVertexAttribute(1, 3 * sizeof(float), VK_FORMAT_R32G32_SFLOAT)
         .build();
 
     auto mesh2 = resourcesManager.loadObj("models/viking_room.obj");
@@ -571,7 +561,7 @@ void renderToTextureSample(SDL_Window* window)
     auto gpuMesh = std::make_shared<GpuMesh>(renderDevice);
     gpuMesh->update(mesh);
 
-    auto renderStep = std::make_shared<RenderStep>(renderDevice, renderDevice->getGraphicsVkQueue().first, renderDevice->getGraphicsVkQueue().second);
+    auto renderContext = std::make_shared<RenderContext>(renderDevice, renderDevice->getGraphicsVkQueue().first, renderDevice->getGraphicsVkQueue().second);
 
     bool quit = false;
     SDL_Event e;
@@ -593,13 +583,13 @@ void renderToTextureSample(SDL_Window* window)
         float aspectRatio = static_cast<float>(screenSize.y) / static_cast<float>(screenSize.x);
         ubo.proj = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 10.0f);
         ubo.proj[1][1] *= -1;
-        uniformBuffer->update(renderStep, reinterpret_cast<const char*>(&ubo), sizeof(UniformBufferObject));
+        uniformBuffer->update(renderContext, reinterpret_cast<const char*>(&ubo), sizeof(UniformBufferObject));
 
-        renderStep->draw(renderTarget2, renderPipeline2, gpuMesh2);
+        renderContext->draw(renderTarget2, renderPipeline2, gpuMesh2);
         
         renderTarget->setFramebufferIndex(renderDevice->getSwapChainCurrentImageIndex());
-        renderStep->draw(renderTarget, renderPipeline, gpuMesh);
-        renderStep->run(renderDevice->getSwapChainVkSemaphore(), renderTarget->getVkSemaphore());
+        renderContext->draw(renderTarget, renderPipeline, gpuMesh);
+        renderContext->run(renderDevice->getSwapChainVkSemaphore(), renderTarget->getVkSemaphore());
         renderDevice->endFrame(renderTarget->getVkSemaphore());
     }
 }
@@ -636,15 +626,13 @@ void downloadRendedSample(SDL_Window* window)
     auto uniformBuffer = std::make_shared<GpuBuffer>(renderDevice, GpuBuffer::Uniform, false);
     uniformBuffer->update(reinterpret_cast<const char*>(&ubo), sizeof(UniformBufferObject));
 
-    auto renderDescriptor = RenderDescriptorBuilder(renderDevice)
-        .addUniformBuffer(uniformBuffer, VK_SHADER_STAGE_VERTEX_BIT, 0)
-        .addCombinedImageSampler(gpuTexture, VK_SHADER_STAGE_FRAGMENT_BIT, 1)
-        .build();
-    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget, renderDescriptor)
+    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget)
         .setVertexShader(resourcesManager.readResourceData("shaders/obj_mesh.vert.spv"))
         .setFragmentShader(resourcesManager.readResourceData("shaders/obj_mesh.frag.spv"))
         .addVertexAttribute(0, 0, VK_FORMAT_R32G32B32_SFLOAT)
         .addVertexAttribute(1, 3 * sizeof(float), VK_FORMAT_R32G32_SFLOAT)
+        .addUniformBuffer(uniformBuffer, VK_SHADER_STAGE_VERTEX_BIT, 0)
+        .addCombinedImageSampler(gpuTexture, VK_SHADER_STAGE_FRAGMENT_BIT, 1)
         .build();
 
     auto mesh = resourcesManager.loadObj("models/viking_room.obj");
@@ -655,11 +643,11 @@ void downloadRendedSample(SDL_Window* window)
     std::vector<char> imageData(4 * textureSize.x * textureSize.y, 0);
     renderingResultBuffer->update(imageData.data(), imageData.size());
 
-    auto renderStep = std::make_shared<RenderStep>(renderDevice, renderDevice->getGraphicsVkQueue().first, renderDevice->getGraphicsVkQueue().second);
+    auto renderContext = std::make_shared<RenderContext>(renderDevice, renderDevice->getGraphicsVkQueue().first, renderDevice->getGraphicsVkQueue().second);
     renderDevice->startFrame();
-    renderStep->draw(renderTarget, renderPipeline, gpuMesh);
-    renderStep->copyImageToBuffer(renderTarget->getColorTexture(), renderingResultBuffer);
-    renderStep->run(VK_NULL_HANDLE, VK_NULL_HANDLE);
+    renderContext->draw(renderTarget, renderPipeline, gpuMesh);
+    renderContext->copyImageToBuffer(renderTarget->getColorTexture(), renderingResultBuffer);
+    renderContext->run(VK_NULL_HANDLE, VK_NULL_HANDLE);
     
     renderingResultBuffer->download(imageData.data(), imageData.size());
     stbi_write_png("render_target.png", textureSize.x, textureSize.y, 4, imageData.data(), 4 * textureSize.x);
@@ -699,16 +687,15 @@ void dynamicTextureSample(SDL_Window* window)
     auto uniformBuffer = std::make_shared<GpuBuffer>(renderDevice, GpuBuffer::Uniform, false);
     std::vector<char> bufferData(sizeof(UniformBufferObject), 0);
     uniformBuffer->update(bufferData.data(), sizeof(UniformBufferObject));
-    auto renderDescriptor = RenderDescriptorBuilder(renderDevice)
-        .addUniformBuffer(uniformBuffer, VK_SHADER_STAGE_VERTEX_BIT, 0)
-        .addCombinedImageSampler(gpuTexture, VK_SHADER_STAGE_FRAGMENT_BIT, 1)
-        .build();
-    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget, renderDescriptor)
+
+    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget)
         .setVertexShader(resourcesManager.readResourceData("shaders/texture.vert.spv"))
         .setFragmentShader(resourcesManager.readResourceData("shaders/texture.frag.spv"))
         .addVertexAttribute(0, 0, VK_FORMAT_R32G32_SFLOAT)
         .addVertexAttribute(1, 2 * sizeof(float), VK_FORMAT_R32G32B32_SFLOAT)
         .addVertexAttribute(2, 5 * sizeof(float), VK_FORMAT_R32G32_SFLOAT)
+        .addUniformBuffer(uniformBuffer, VK_SHADER_STAGE_VERTEX_BIT, 0)
+        .addCombinedImageSampler(gpuTexture, VK_SHADER_STAGE_FRAGMENT_BIT, 1)
         .build();
 
     Mesh mesh;
@@ -723,7 +710,7 @@ void dynamicTextureSample(SDL_Window* window)
     };
     auto gpuMesh = std::make_shared<GpuMesh>(renderDevice);
     gpuMesh->update(mesh);
-    auto renderStep = std::make_shared<RenderStep>(renderDevice, renderDevice->getGraphicsVkQueue().first, renderDevice->getGraphicsVkQueue().second);
+    auto renderContext = std::make_shared<RenderContext>(renderDevice, renderDevice->getGraphicsVkQueue().first, renderDevice->getGraphicsVkQueue().second);
 
     bool quit = false;
     SDL_Event e;
@@ -746,12 +733,12 @@ void dynamicTextureSample(SDL_Window* window)
         uniformBuffer->update(reinterpret_cast<const char*>(&ubo), sizeof(UniformBufferObject));
         
         renderDevice->startFrame();
-        renderStep->transitionImageLayout(gpuTexture, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-        renderStep->copyBufferToImage(textureDataBuffer, gpuTexture, 0);
-        renderStep->transitionImageLayout(gpuTexture, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        renderContext->transitionImageLayout(gpuTexture, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+        renderContext->copyBufferToImage(textureDataBuffer, gpuTexture, 0);
+        renderContext->transitionImageLayout(gpuTexture, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
         renderTarget->setFramebufferIndex(renderDevice->getSwapChainCurrentImageIndex());
-        renderStep->draw(renderTarget, renderPipeline, gpuMesh);
-        renderStep->run(renderDevice->getSwapChainVkSemaphore(), renderTarget->getVkSemaphore());
+        renderContext->draw(renderTarget, renderPipeline, gpuMesh);
+        renderContext->run(renderDevice->getSwapChainVkSemaphore(), renderTarget->getVkSemaphore());
         renderDevice->endFrame(renderTarget->getVkSemaphore());
     }
 }
@@ -763,9 +750,9 @@ int main(int argc, char *args[])
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
     SDL_Window* window = SDL_CreateWindow("vulkan demo", -1, -1, 640, 480, SDL_WINDOW_VULKAN | SDL_WINDOW_ALLOW_HIGHDPI);
 
-    dynamicTextureSample(window);
+    // dynamicTextureSample(window);
     // downloadRendedSample(window);
-    // renderToTextureSample(window);
+    renderToTextureSample(window);
     // objMeshSample(window);
     // depthBufferSample(window);
     // textureSample(window);

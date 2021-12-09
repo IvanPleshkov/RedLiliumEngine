@@ -3,8 +3,7 @@
 #include "render_device.h"
 #include "render_instance.h"
 #include "render_target.h"
-#include "render_descriptor.h"
-#include "render_descriptor_builder.h"
+#include "render_pipeline_layout.h"
 #include <stdexcept>
 
 namespace
@@ -12,10 +11,9 @@ namespace
 const char* g_shaderMainFunctionName = "main";
 }
 
-RenderPipelineBuilder::RenderPipelineBuilder(const std::shared_ptr<RenderDevice>& renderDevice, const std::shared_ptr<RenderTarget>& renderTarget, const std::shared_ptr<RenderDescriptor>& renderDescriptor)
+RenderPipelineBuilder::RenderPipelineBuilder(const std::shared_ptr<RenderDevice>& renderDevice, const std::shared_ptr<RenderTarget>& renderTarget)
     : _renderDevice(renderDevice)
     , _renderTarget(renderTarget)
-    , _renderDescriptor(renderDescriptor)
     , _vkGraphicsPipelineCreateInfo{}
     , _vkPipelineColorBlendStateCreateInfo{}
     , _vkPipelineMultisampleStateCreateInfo{}
@@ -27,11 +25,6 @@ RenderPipelineBuilder::RenderPipelineBuilder(const std::shared_ptr<RenderDevice>
     , _vkPipelineInputAssemblyStateCreateInfo{}
     , _vkPipelineVertexInputStateCreateInfo{}
 {
-    if (_renderDescriptor == nullptr)
-    {
-        _renderDescriptor = RenderDescriptorBuilder(_renderDevice).build();
-    }
-
     _vkPipelineVertexInputStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
     _vkPipelineVertexInputStateCreateInfo.vertexBindingDescriptionCount = 0;
     _vkPipelineVertexInputStateCreateInfo.pVertexBindingDescriptions = nullptr;
@@ -74,10 +67,10 @@ RenderPipelineBuilder::RenderPipelineBuilder(const std::shared_ptr<RenderDevice>
     _vkPipelineMultisampleStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
     _vkPipelineMultisampleStateCreateInfo.sampleShadingEnable = VK_FALSE;
     _vkPipelineMultisampleStateCreateInfo.rasterizationSamples = _renderTarget->getVkSampleCount();
-    _vkPipelineMultisampleStateCreateInfo.minSampleShading = 1.0f; // Optional
-    _vkPipelineMultisampleStateCreateInfo.pSampleMask = nullptr; // Optional
-    _vkPipelineMultisampleStateCreateInfo.alphaToCoverageEnable = VK_FALSE; // Optional
-    _vkPipelineMultisampleStateCreateInfo.alphaToOneEnable = VK_FALSE; // Optional
+    _vkPipelineMultisampleStateCreateInfo.minSampleShading = 1.0f;
+    _vkPipelineMultisampleStateCreateInfo.pSampleMask = nullptr;
+    _vkPipelineMultisampleStateCreateInfo.alphaToCoverageEnable = VK_FALSE;
+    _vkPipelineMultisampleStateCreateInfo.alphaToOneEnable = VK_FALSE;
     
     VkPipelineColorBlendAttachmentState colorBlendAttachment;
     colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
@@ -92,7 +85,7 @@ RenderPipelineBuilder::RenderPipelineBuilder(const std::shared_ptr<RenderDevice>
 
     _vkPipelineColorBlendStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
     _vkPipelineColorBlendStateCreateInfo.logicOpEnable = VK_FALSE;
-    _vkPipelineColorBlendStateCreateInfo.logicOp = VK_LOGIC_OP_COPY; // Optional
+    _vkPipelineColorBlendStateCreateInfo.logicOp = VK_LOGIC_OP_COPY;
     if (!_vkPipelineColorBlendAttachmentStates.empty())
     {
         _vkPipelineColorBlendStateCreateInfo.attachmentCount = static_cast<uint32_t>(_vkPipelineColorBlendAttachmentStates.size());
@@ -114,14 +107,14 @@ RenderPipelineBuilder::RenderPipelineBuilder(const std::shared_ptr<RenderDevice>
     _vkGraphicsPipelineCreateInfo.pViewportState = &_vkPipelineViewportStateCreateInfo;
     _vkGraphicsPipelineCreateInfo.pRasterizationState = &_vkPipelineRasterizationStateCreateInfo;
     _vkGraphicsPipelineCreateInfo.pMultisampleState = &_vkPipelineMultisampleStateCreateInfo;
-    _vkGraphicsPipelineCreateInfo.pDepthStencilState = nullptr; // Optional
+    _vkGraphicsPipelineCreateInfo.pDepthStencilState = nullptr;
     _vkGraphicsPipelineCreateInfo.pColorBlendState = &_vkPipelineColorBlendStateCreateInfo;
-    _vkGraphicsPipelineCreateInfo.pDynamicState = nullptr; // Optional
-    _vkGraphicsPipelineCreateInfo.layout = _renderDescriptor->getVkPipelineLayout();
+    _vkGraphicsPipelineCreateInfo.pDynamicState = nullptr;
+    _vkGraphicsPipelineCreateInfo.layout = VK_NULL_HANDLE; // setup layer in build method
     _vkGraphicsPipelineCreateInfo.renderPass = _renderTarget->getVkRenderPass();
     _vkGraphicsPipelineCreateInfo.subpass = 0;
-    _vkGraphicsPipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
-    _vkGraphicsPipelineCreateInfo.basePipelineIndex = -1; // Optional
+    _vkGraphicsPipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
+    _vkGraphicsPipelineCreateInfo.basePipelineIndex = -1;
 
     if (_renderTarget->hasDepth())
     {
@@ -218,6 +211,26 @@ RenderPipelineBuilder& RenderPipelineBuilder::addVertexAttribute(uint32_t locati
     return *this;
 }
 
+RenderPipelineBuilder& RenderPipelineBuilder::addUniformBuffer(const std::shared_ptr<GpuBuffer>& gpuBuffer, VkShaderStageFlags vkShaderStageFlags, uint32_t binding)
+{
+    UniformBufferDescription uniformBufferDescription;
+    uniformBufferDescription._gpuBuffer = gpuBuffer;
+    uniformBufferDescription._vkShaderStageFlags = vkShaderStageFlags;
+    uniformBufferDescription._binding = binding;
+    _uniformBufferDescriptions.push_back(uniformBufferDescription);
+    return *this;
+}
+
+RenderPipelineBuilder& RenderPipelineBuilder::addCombinedImageSampler(const std::shared_ptr<GpuTexture>& gpuTexture, VkShaderStageFlags vkShaderStageFlags, uint32_t binding)
+{
+    CombinedImageSamplerDescription combinedImageSamplerDescription;
+    combinedImageSamplerDescription._gpuTexture = gpuTexture;
+    combinedImageSamplerDescription._binding = binding;
+    combinedImageSamplerDescription._vkShaderStageFlags = vkShaderStageFlags;
+    _combinedImageSamplerDescriptions.push_back(combinedImageSamplerDescription);
+    return *this;
+}
+
 RenderPipelineBuilder& RenderPipelineBuilder::setFrontFace(VkFrontFace vkFrontFace)
 {
     _vkPipelineRasterizationStateCreateInfo.frontFace = vkFrontFace;
@@ -226,7 +239,9 @@ RenderPipelineBuilder& RenderPipelineBuilder::setFrontFace(VkFrontFace vkFrontFa
 
 std::shared_ptr<RenderPipeline> RenderPipelineBuilder::build()
 {
-    return std::make_shared<RenderPipeline>(_renderDevice, _renderDescriptor, *this);
+    auto renderPipelineLayout = std::make_shared<RenderPipelineLayout>(_renderDevice, _uniformBufferDescriptions, _combinedImageSamplerDescriptions);
+    _vkGraphicsPipelineCreateInfo.layout = renderPipelineLayout->getVkPipelineLayout();
+    return std::make_shared<RenderPipeline>(_renderDevice, renderPipelineLayout, *this);
 }
 
 VkShaderModule RenderPipelineBuilder::createShaderModule(std::string_view spirvShader)

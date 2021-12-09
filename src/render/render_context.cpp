@@ -1,14 +1,14 @@
-#include "render_step.h"
+#include "render_context.h"
 #include "render_target.h"
 #include "render_pipeline.h"
 #include "render_device.h"
 #include "gpu_mesh.h"
 #include "gpu_buffer.h"
 #include "gpu_texture.h"
-#include "render_descriptor.h"
+#include "render_pipeline_layout.h"
 #include <stdexcept>
 
-RenderStep::RenderStep(const std::shared_ptr<RenderDevice>& renderDevice, VkQueue vkQueue, uint32_t vkFamilyIndex)
+RenderContext::RenderContext(const std::shared_ptr<RenderDevice>& renderDevice, VkQueue vkQueue, uint32_t vkFamilyIndex)
     : _renderDevice(renderDevice)
     , _vkQueue(vkQueue)
     , _vkFamilyIndex(vkFamilyIndex)
@@ -16,12 +16,12 @@ RenderStep::RenderStep(const std::shared_ptr<RenderDevice>& renderDevice, VkQueu
     init();
 }
 
-RenderStep::~RenderStep()
+RenderContext::~RenderContext()
 {
     destroy();
 }
 
-void RenderStep::draw(
+void RenderContext::draw(
           const std::shared_ptr<RenderTarget>& renderTarget,
           const std::shared_ptr<RenderPipeline>& renderPipeline,
           const std::shared_ptr<GpuMesh>& gpuMesh)
@@ -58,7 +58,7 @@ void RenderStep::draw(
     renderTarget->unbind(_vkCommandBuffer);
 }
 
-void RenderStep::copyBufferToImage(const std::shared_ptr<GpuBuffer>& gpuBuffer, const std::shared_ptr<GpuTexture>& gpuTexture, uint32_t mipLevel)
+void RenderContext::copyBufferToImage(const std::shared_ptr<GpuBuffer>& gpuBuffer, const std::shared_ptr<GpuTexture>& gpuTexture, uint32_t mipLevel)
 {
     if (_vkCommandBuffer == VK_NULL_HANDLE)
     {
@@ -92,7 +92,7 @@ void RenderStep::copyBufferToImage(const std::shared_ptr<GpuBuffer>& gpuBuffer, 
     );
 }
 
-void RenderStep::copyImageToBuffer(const std::shared_ptr<GpuTexture>& gpuTexture, const std::shared_ptr<GpuBuffer>& gpuBuffer, uint32_t mipLevel)
+void RenderContext::copyImageToBuffer(const std::shared_ptr<GpuTexture>& gpuTexture, const std::shared_ptr<GpuBuffer>& gpuBuffer, uint32_t mipLevel)
 {
     if (_vkCommandBuffer == VK_NULL_HANDLE)
     {
@@ -126,7 +126,7 @@ void RenderStep::copyImageToBuffer(const std::shared_ptr<GpuTexture>& gpuTexture
     );
 }
 
-void RenderStep::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
+void RenderContext::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
 {
     if (_vkCommandBuffer == VK_NULL_HANDLE)
     {
@@ -140,7 +140,7 @@ void RenderStep::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize
     vkCmdCopyBuffer(_vkCommandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
 }
 
-void RenderStep::transitionImageLayout(const std::shared_ptr<GpuTexture>& gpuTexture, VkImageLayout oldVkImageLayout, VkImageLayout newVkImageLayout, uint32_t mipsLevel)
+void RenderContext::transitionImageLayout(const std::shared_ptr<GpuTexture>& gpuTexture, VkImageLayout oldVkImageLayout, VkImageLayout newVkImageLayout, uint32_t mipsLevel)
 {
     if (_vkCommandBuffer == VK_NULL_HANDLE)
     {
@@ -211,7 +211,7 @@ void RenderStep::transitionImageLayout(const std::shared_ptr<GpuTexture>& gpuTex
     );
 }
 
-void RenderStep::generateMipmaps(const std::shared_ptr<GpuTexture>& gpuTexture)
+void RenderContext::generateMipmaps(const std::shared_ptr<GpuTexture>& gpuTexture)
 {
     if (_vkCommandBuffer == VK_NULL_HANDLE)
     {
@@ -300,7 +300,7 @@ void RenderStep::generateMipmaps(const std::shared_ptr<GpuTexture>& gpuTexture)
         1, &barrier);
 }
 
-void RenderStep::run(VkSemaphore waitVkSemaphore, VkSemaphore signalVkSemaphore)
+void RenderContext::run(VkSemaphore waitVkSemaphore, VkSemaphore signalVkSemaphore)
 {
     if (vkEndCommandBuffer(_vkCommandBuffer) != VK_SUCCESS)
     {
@@ -337,7 +337,7 @@ void RenderStep::run(VkSemaphore waitVkSemaphore, VkSemaphore signalVkSemaphore)
     destroyCommandBuffer();
 }
 
-void RenderStep::init()
+void RenderContext::init()
 {
     VkCommandPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -352,7 +352,7 @@ void RenderStep::init()
     initCommandBuffer();
 }
 
-void RenderStep::initCommandBuffer()
+void RenderContext::initCommandBuffer()
 {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -376,7 +376,7 @@ void RenderStep::initCommandBuffer()
     }
 }
 
-void RenderStep::destroy()
+void RenderContext::destroy()
 {
     destroyCommandBuffer();
     if (_vkCommandPool != VK_NULL_HANDLE)
@@ -386,7 +386,7 @@ void RenderStep::destroy()
     }
 }
 
-void RenderStep::destroyCommandBuffer()
+void RenderContext::destroyCommandBuffer()
 {
     if (_vkCommandBuffer != VK_NULL_HANDLE)
     {

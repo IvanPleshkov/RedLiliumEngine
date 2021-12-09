@@ -1,6 +1,6 @@
 #include "gpu_buffer.h"
 #include "render_device.h"
-#include "render_step.h"
+#include "render_context.h"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -37,9 +37,9 @@ void GpuBuffer::update(const char* data, size_t size)
         std::memcpy(gpuData, data, size);
         vkUnmapMemory(_renderDevice->getVkDevice(), _vkStagingBufferMemory);
 
-        auto renderStep = std::make_shared<RenderStep>(_renderDevice, _renderDevice->getGraphicsVkQueue().first, _renderDevice->getGraphicsVkQueue().second);
-        renderStep->copyBuffer(_vkStagingBuffer, _vkBuffer, vkSize);
-        renderStep->run(VK_NULL_HANDLE, VK_NULL_HANDLE);
+        auto renderContext = std::make_shared<RenderContext>(_renderDevice, _renderDevice->getGraphicsVkQueue().first, _renderDevice->getGraphicsVkQueue().second);
+        renderContext->copyBuffer(_vkStagingBuffer, _vkBuffer, vkSize);
+        renderContext->run(VK_NULL_HANDLE, VK_NULL_HANDLE);
     }
     else
     {
@@ -50,7 +50,7 @@ void GpuBuffer::update(const char* data, size_t size)
     }
 }
 
-void GpuBuffer::update(const std::shared_ptr<RenderStep>& renderStep, const char* data, size_t size)
+void GpuBuffer::update(const std::shared_ptr<RenderContext>& renderContext, const char* data, size_t size)
 {
     if (!_useStagingBuffers)
     {
@@ -70,7 +70,7 @@ void GpuBuffer::update(const std::shared_ptr<RenderStep>& renderStep, const char
     std::memcpy(gpuData, data, size);
     vkUnmapMemory(_renderDevice->getVkDevice(), _vkStagingBufferMemory);
 
-    renderStep->copyBuffer(_vkStagingBuffer, _vkBuffer, vkSize);
+    renderContext->copyBuffer(_vkStagingBuffer, _vkBuffer, vkSize);
 }
 
 void GpuBuffer::download(char* data, size_t size)

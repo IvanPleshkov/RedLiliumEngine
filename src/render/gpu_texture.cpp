@@ -1,7 +1,7 @@
 #include "gpu_texture.h"
 #include "gpu_buffer.h"
 #include "render_device.h"
-#include "render_step.h"
+#include "render_context.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -170,30 +170,25 @@ void GpuTexture::uploadStbImage(std::string_view textureData)
 
     vkBindImageMemory(_renderDevice->getVkDevice(), _vkImage, _vkImageMemory, 0);
     
-    auto renderStep = std::make_shared<RenderStep>(_renderDevice, _renderDevice->getGraphicsVkQueue().first, _renderDevice->getGraphicsVkQueue().second);
+    auto renderContext = std::make_shared<RenderContext>(_renderDevice, _renderDevice->getGraphicsVkQueue().first, _renderDevice->getGraphicsVkQueue().second);
 
-    renderStep->transitionImageLayout(shared_from_this(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, _mipLevels);
-    renderStep->copyBufferToImage(stagingBuffer, shared_from_this(), 0);
+    renderContext->transitionImageLayout(shared_from_this(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, _mipLevels);
+    renderContext->copyBufferToImage(stagingBuffer, shared_from_this(), 0);
 
     if (_generateMips)
     {
-        renderStep->generateMipmaps(shared_from_this());
+        renderContext->generateMipmaps(shared_from_this());
     }
     else
     {
-        renderStep->transitionImageLayout(shared_from_this(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, _mipLevels);
+        renderContext->transitionImageLayout(shared_from_this(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, _mipLevels);
     }
     
-    renderStep->run(VK_NULL_HANDLE, VK_NULL_HANDLE);
-    renderStep = nullptr;
+    renderContext->run(VK_NULL_HANDLE, VK_NULL_HANDLE);
+    renderContext = nullptr;
     
     createImageView();
     createSampler();
-}
-
-void GpuTexture::upload(const std::shared_ptr<RenderStep>& renderStep, const std::shared_ptr<GpuBuffer>& textureData, uint32_t mipLevel)
-{
-    
 }
 
 void GpuTexture::destroy()
