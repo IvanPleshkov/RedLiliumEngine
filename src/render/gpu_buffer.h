@@ -23,6 +23,8 @@ public:
     void update(const char* data, size_t size);
 
     void update(const std::shared_ptr<RenderStep>& renderStep, const char* data, size_t size);
+    
+    void download(char* data, size_t size);
 
     VkBuffer getVkBuffer() const;
     

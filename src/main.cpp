@@ -1,5 +1,7 @@
 #include <SDL.h>
 #include <spdlog/spdlog.h>
+#include <stb_image.h>
+#include <stb_image_write.h>
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -268,7 +270,7 @@ void textureSample(SDL_Window* window)
     auto renderTarget = renderTargetBuilder.build();
 
     auto gpuTexture = std::make_shared<GpuTexture>(renderDevice);
-    gpuTexture->upload(resourcesManager.readResourceData("textures/texture.jpeg"));
+    gpuTexture->uploadStbImage(resourcesManager.readResourceData("textures/texture.jpeg"));
 
     auto uniformBuffer = std::make_shared<GpuBuffer>(renderDevice, GpuBuffer::Uniform, false);
     std::vector<char> bufferData(sizeof(UniformBufferObject), 0);
@@ -351,7 +353,7 @@ void depthBufferSample(SDL_Window* window)
     auto renderTarget = renderTargetBuilder.build();
 
     auto gpuTexture = std::make_shared<GpuTexture>(renderDevice);
-    gpuTexture->upload(resourcesManager.readResourceData("textures/texture.jpeg"));
+    gpuTexture->uploadStbImage(resourcesManager.readResourceData("textures/texture.jpeg"));
 
     auto uniformBuffer = std::make_shared<GpuBuffer>(renderDevice, GpuBuffer::Uniform, false);
     std::vector<char> bufferData(sizeof(UniformBufferObject), 0);
@@ -441,7 +443,7 @@ void objMeshSample(SDL_Window* window)
     auto renderTarget = renderTargetBuilder.build();
 
     auto gpuTexture = std::make_shared<GpuTexture>(renderDevice, true);
-    gpuTexture->upload(resourcesManager.readResourceData("textures/viking_room.png"));
+    gpuTexture->uploadStbImage(resourcesManager.readResourceData("textures/viking_room.png"));
 
     auto uniformBuffer = std::make_shared<GpuBuffer>(renderDevice, GpuBuffer::Uniform);
     std::vector<char> bufferData(sizeof(UniformBufferObject), 0);
@@ -513,7 +515,7 @@ void renderToTextureSample(SDL_Window* window)
         renderTargetBuilder.addImageView(vkImageView);
     }
     auto renderTarget = renderTargetBuilder.build();
-    
+
     auto renderTarget2 = RenderTargetBuilder(renderDevice)
         .setSize({ 512, 512 })
         .setClearColor({ 0.5f, 0.5f, 0.5f, 1.0f })
@@ -524,7 +526,7 @@ void renderToTextureSample(SDL_Window* window)
         .build();
 
     auto gpuTexture = std::make_shared<GpuTexture>(renderDevice, true);
-    gpuTexture->upload(resourcesManager.readResourceData("textures/viking_room.png"));
+    gpuTexture->uploadStbImage(resourcesManager.readResourceData("textures/viking_room.png"));
 
     auto uniformBuffer = std::make_shared<GpuBuffer>(renderDevice, GpuBuffer::Uniform);
     std::vector<char> bufferData(sizeof(UniformBufferObject), 0);
@@ -602,6 +604,158 @@ void renderToTextureSample(SDL_Window* window)
     }
 }
 
+void downloadRendedSample(SDL_Window* window)
+{
+    glm::ivec2 textureSize = { 512, 512 };
+    struct UniformBufferObject {
+        glm::mat4 model;
+        glm::mat4 view;
+        glm::mat4 proj;
+    } ubo;
+    ubo.model = glm::rotate(glm::mat4(1.0f), 0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+    ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    float aspectRatio = 1.0f;
+    ubo.proj = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 10.0f);
+    ubo.proj[1][1] *= -1;
+
+    ResourcesManager resourcesManager;
+
+    auto renderInstance = std::make_shared<RenderInstance>(window, true);
+    auto renderDevice = std::make_shared<RenderDevice>(renderInstance);
+    auto renderTarget = RenderTargetBuilder(renderDevice)
+        .setVkFormat(renderDevice->getSwapChainVkImageFormat())
+        .setSize(textureSize)
+        .addMultisampling(renderDevice->getMaxSampleCount())
+        .enableDepth(true)
+        .setFinalColorLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
+        .build();
+
+    auto gpuTexture = std::make_shared<GpuTexture>(renderDevice, true);
+    gpuTexture->uploadStbImage(resourcesManager.readResourceData("textures/viking_room.png"));
+
+    auto uniformBuffer = std::make_shared<GpuBuffer>(renderDevice, GpuBuffer::Uniform, false);
+    uniformBuffer->update(reinterpret_cast<const char*>(&ubo), sizeof(UniformBufferObject));
+
+    auto renderDescriptor = RenderDescriptorBuilder(renderDevice)
+        .addUniformBuffer(uniformBuffer, VK_SHADER_STAGE_VERTEX_BIT, 0)
+        .addCombinedImageSampler(gpuTexture, VK_SHADER_STAGE_FRAGMENT_BIT, 1)
+        .build();
+    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget, renderDescriptor)
+        .setVertexShader(resourcesManager.readResourceData("shaders/obj_mesh.vert.spv"))
+        .setFragmentShader(resourcesManager.readResourceData("shaders/obj_mesh.frag.spv"))
+        .addVertexAttribute(0, 0, VK_FORMAT_R32G32B32_SFLOAT)
+        .addVertexAttribute(1, 3 * sizeof(float), VK_FORMAT_R32G32_SFLOAT)
+        .build();
+
+    auto mesh = resourcesManager.loadObj("models/viking_room.obj");
+    auto gpuMesh = std::make_shared<GpuMesh>(renderDevice);
+    gpuMesh->update(*mesh);
+    
+    auto renderingResultBuffer = std::make_shared<GpuBuffer>(renderDevice, GpuBuffer::Uniform, false);
+    std::vector<char> imageData(4 * textureSize.x * textureSize.y, 0);
+    renderingResultBuffer->update(imageData.data(), imageData.size());
+
+    auto renderStep = std::make_shared<RenderStep>(renderDevice, renderDevice->getGraphicsVkQueue().first, renderDevice->getGraphicsVkQueue().second);
+    renderDevice->startFrame();
+    renderStep->draw(renderTarget, renderPipeline, gpuMesh);
+    renderStep->copyImageToBuffer(renderTarget->getColorTexture(), renderingResultBuffer);
+    renderStep->run(VK_NULL_HANDLE, VK_NULL_HANDLE);
+    
+    renderingResultBuffer->download(imageData.data(), imageData.size());
+    stbi_write_png("render_target.png", textureSize.x, textureSize.y, 4, imageData.data(), 4 * textureSize.x);
+}
+
+void dynamicTextureSample(SDL_Window* window)
+{
+    struct UniformBufferObject {
+        glm::mat4 model;
+        glm::mat4 view;
+        glm::mat4 proj;
+    } ubo;
+
+    auto startTime = std::chrono::high_resolution_clock::now();
+    ResourcesManager resourcesManager;
+
+    auto renderInstance = std::make_shared<RenderInstance>(window, true);
+    auto renderDevice = std::make_shared<RenderDevice>(renderInstance);
+    auto renderTargetBuilder = RenderTargetBuilder(renderDevice)
+        .setVkFormat(renderDevice->getSwapChainVkImageFormat())
+        .setClearColor({0.5, 0.5, 0.5, 1.0f})
+        .setSize(renderDevice->getSwapChainSize());
+    for (auto& vkImageView : renderDevice->getSwapChainVkImageViews())
+    {
+        renderTargetBuilder.addImageView(vkImageView);
+    }
+    auto renderTarget = renderTargetBuilder.build();
+
+    int texWidth, texHeight, texChannels;
+    auto textureData = resourcesManager.readResourceData("textures/texture.jpeg");
+    stbi_uc* pixels = stbi_load_from_memory(reinterpret_cast<const stbi_uc*>(textureData.data()), static_cast<int>(textureData.size()), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+    glm::ivec2 size = { texWidth, texHeight };
+    auto gpuTexture = std::make_shared<GpuTexture>(renderDevice, VK_FORMAT_R8G8B8A8_SNORM, VK_SAMPLE_COUNT_1_BIT, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_IMAGE_ASPECT_COLOR_BIT, size, true);
+    auto textureDataBuffer = std::make_shared<GpuBuffer>(renderDevice, GpuBuffer::Uniform, false);
+    textureDataBuffer->update(reinterpret_cast<const char*>(pixels), 4 * texWidth * texHeight);
+
+    auto uniformBuffer = std::make_shared<GpuBuffer>(renderDevice, GpuBuffer::Uniform, false);
+    std::vector<char> bufferData(sizeof(UniformBufferObject), 0);
+    uniformBuffer->update(bufferData.data(), sizeof(UniformBufferObject));
+    auto renderDescriptor = RenderDescriptorBuilder(renderDevice)
+        .addUniformBuffer(uniformBuffer, VK_SHADER_STAGE_VERTEX_BIT, 0)
+        .addCombinedImageSampler(gpuTexture, VK_SHADER_STAGE_FRAGMENT_BIT, 1)
+        .build();
+    auto renderPipeline = RenderPipelineBuilder(renderDevice, renderTarget, renderDescriptor)
+        .setVertexShader(resourcesManager.readResourceData("shaders/texture.vert.spv"))
+        .setFragmentShader(resourcesManager.readResourceData("shaders/texture.frag.spv"))
+        .addVertexAttribute(0, 0, VK_FORMAT_R32G32_SFLOAT)
+        .addVertexAttribute(1, 2 * sizeof(float), VK_FORMAT_R32G32B32_SFLOAT)
+        .addVertexAttribute(2, 5 * sizeof(float), VK_FORMAT_R32G32_SFLOAT)
+        .build();
+
+    Mesh mesh;
+    mesh._vertices = {
+        -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+        0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+        -0.5f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
+    };
+    mesh._indices = {
+        0, 1, 2, 2, 3, 0
+    };
+    auto gpuMesh = std::make_shared<GpuMesh>(renderDevice);
+    gpuMesh->update(mesh);
+    auto renderStep = std::make_shared<RenderStep>(renderDevice, renderDevice->getGraphicsVkQueue().first, renderDevice->getGraphicsVkQueue().second);
+
+    bool quit = false;
+    SDL_Event e;
+
+    while (!quit) {
+        while (SDL_PollEvent(&e) != 0) {
+            switch (e.type) {
+                case SDL_QUIT: quit = true; break;
+            }
+        }
+
+        auto currentTime = std::chrono::high_resolution_clock::now();
+        float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+        ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        auto screenSize = renderTarget->getSize();
+        float aspectRatio = static_cast<float>(screenSize.y) / static_cast<float>(screenSize.x);
+        ubo.proj = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 10.0f);
+        ubo.proj[1][1] *= -1;
+        uniformBuffer->update(reinterpret_cast<const char*>(&ubo), sizeof(UniformBufferObject));
+        
+        renderDevice->startFrame();
+        renderStep->transitionImageLayout(gpuTexture, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+        renderStep->copyBufferToImage(textureDataBuffer, gpuTexture, 0);
+        renderStep->transitionImageLayout(gpuTexture, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        renderTarget->setFramebufferIndex(renderDevice->getSwapChainCurrentImageIndex());
+        renderStep->draw(renderTarget, renderPipeline, gpuMesh);
+        renderStep->run(renderDevice->getSwapChainVkSemaphore(), renderTarget->getVkSemaphore());
+        renderDevice->endFrame(renderTarget->getVkSemaphore());
+    }
+}
+
 int main(int argc, char *args[])
 {
     spdlog::info("Start application");
@@ -609,7 +763,9 @@ int main(int argc, char *args[])
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
     SDL_Window* window = SDL_CreateWindow("vulkan demo", -1, -1, 640, 480, SDL_WINDOW_VULKAN | SDL_WINDOW_ALLOW_HIGHDPI);
 
-    renderToTextureSample(window);
+    dynamicTextureSample(window);
+    // downloadRendedSample(window);
+    // renderToTextureSample(window);
     // objMeshSample(window);
     // depthBufferSample(window);
     // textureSample(window);

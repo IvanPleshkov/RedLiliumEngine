@@ -16,14 +16,14 @@ RenderTarget::RenderTarget(const std::shared_ptr<RenderDevice>& renderDevice, co
 {
     if (_vkImageViews.empty())
     {
-        VkImageUsageFlags colorTextureUsage;
+        VkImageUsageFlags colorTextureUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
         if (finalColorLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
         {
-            colorTextureUsage = VK_IMAGE_USAGE_SAMPLED_BIT;
+            colorTextureUsage |= VK_IMAGE_USAGE_SAMPLED_BIT;
         }
         else if (finalColorLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
         {
-            colorTextureUsage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+            colorTextureUsage |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
         }
         _colorTexture = std::make_shared<GpuTexture>(_renderDevice, _vkFormat, VK_SAMPLE_COUNT_1_BIT, colorTextureUsage, VK_IMAGE_ASPECT_COLOR_BIT, _size, true);
         _vkImageViews.push_back(_colorTexture->getVkImageView());

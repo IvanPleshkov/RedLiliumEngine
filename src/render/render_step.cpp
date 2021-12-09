@@ -92,6 +92,40 @@ void RenderStep::copyBufferToImage(const std::shared_ptr<GpuBuffer>& gpuBuffer, 
     );
 }
 
+void RenderStep::copyImageToBuffer(const std::shared_ptr<GpuTexture>& gpuTexture, const std::shared_ptr<GpuBuffer>& gpuBuffer, uint32_t mipLevel)
+{
+    if (_vkCommandBuffer == VK_NULL_HANDLE)
+    {
+        initCommandBuffer();
+    }
+
+    VkBufferImageCopy vkBufferImageCopy{};
+    vkBufferImageCopy.bufferOffset = 0;
+    vkBufferImageCopy.bufferRowLength = 0;
+    vkBufferImageCopy.bufferImageHeight = 0;
+
+    vkBufferImageCopy.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    vkBufferImageCopy.imageSubresource.mipLevel = mipLevel;
+    vkBufferImageCopy.imageSubresource.baseArrayLayer = 0;
+    vkBufferImageCopy.imageSubresource.layerCount = 1;
+
+    vkBufferImageCopy.imageOffset = {0, 0, 0};
+    vkBufferImageCopy.imageExtent = {
+        static_cast<uint32_t>(gpuTexture->getSize().x),
+        static_cast<uint32_t>(gpuTexture->getSize().y),
+        1
+    };
+
+    vkCmdCopyImageToBuffer(
+        _vkCommandBuffer,
+        gpuTexture->getVkImage(),
+        VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+        gpuBuffer->getVkBuffer(),
+        1,
+        &vkBufferImageCopy
+    );
+}
+
 void RenderStep::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
 {
     if (_vkCommandBuffer == VK_NULL_HANDLE)

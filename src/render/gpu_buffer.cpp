@@ -34,7 +34,7 @@ void GpuBuffer::update(const char* data, size_t size)
     {
         void* gpuData;
         vkMapMemory(_renderDevice->getVkDevice(), _vkStagingBufferMemory, 0, vkSize, 0, &gpuData);
-        memcpy(gpuData, data, size);
+        std::memcpy(gpuData, data, size);
         vkUnmapMemory(_renderDevice->getVkDevice(), _vkStagingBufferMemory);
 
         auto renderStep = std::make_shared<RenderStep>(_renderDevice, _renderDevice->getGraphicsVkQueue().first, _renderDevice->getGraphicsVkQueue().second);
@@ -45,7 +45,7 @@ void GpuBuffer::update(const char* data, size_t size)
     {
         void* gpuData;
         vkMapMemory(_renderDevice->getVkDevice(), _vkBufferMemory, 0, vkSize, 0, &gpuData);
-        memcpy(gpuData, data, size);
+        std::memcpy(gpuData, data, size);
         vkUnmapMemory(_renderDevice->getVkDevice(), _vkBufferMemory);
     }
 }
@@ -67,10 +67,24 @@ void GpuBuffer::update(const std::shared_ptr<RenderStep>& renderStep, const char
 
     void* gpuData;
     vkMapMemory(_renderDevice->getVkDevice(), _vkStagingBufferMemory, 0, vkSize, 0, &gpuData);
-    memcpy(gpuData, data, size);
+    std::memcpy(gpuData, data, size);
     vkUnmapMemory(_renderDevice->getVkDevice(), _vkStagingBufferMemory);
 
     renderStep->copyBuffer(_vkStagingBuffer, _vkBuffer, vkSize);
+}
+
+void GpuBuffer::download(char* data, size_t size)
+{
+    if (_useStagingBuffers)
+    {
+        throw std::runtime_error("cannot download gpu buffer because buffer was initialized without staging flag");
+    }
+    
+    const VkDeviceSize vkSize = static_cast<VkDeviceSize>(size);
+    void* gpuData;
+    vkMapMemory(_renderDevice->getVkDevice(), _vkBufferMemory, 0, vkSize, 0, &gpuData);
+    std::memcpy(data, gpuData, size);
+    vkUnmapMemory(_renderDevice->getVkDevice(), _vkBufferMemory);
 }
 
 VkBuffer GpuBuffer::getVkBuffer() const
@@ -89,13 +103,13 @@ void GpuBuffer::init()
     switch (_bufferType)
     {
         case Index:
-        usageFlags = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
-        break;
+            usageFlags = VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+            break;
         case Vertex:
-            usageFlags = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+            usageFlags = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
             break;
         case Uniform:
-            usageFlags = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+            usageFlags = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
             break;
         default:
             throw std::runtime_error("not supported buffer type");

@@ -4,7 +4,9 @@
 #include "render_step.h"
 
 #define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image.h>
+#include <stb_image_write.h>
 
 #include <cmath>
 
@@ -105,7 +107,7 @@ VkSampler GpuTexture::getVkSampler() const
     return _vkSampler;
 }
 
-void GpuTexture::upload(std::string_view textureData)
+void GpuTexture::uploadStbImage(std::string_view textureData)
 {
     int texWidth, texHeight, texChannels;
     stbi_uc* pixels = stbi_load_from_memory(reinterpret_cast<const stbi_uc*>(textureData.data()), static_cast<int>(textureData.size()), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
@@ -187,6 +189,11 @@ void GpuTexture::upload(std::string_view textureData)
     
     createImageView();
     createSampler();
+}
+
+void GpuTexture::upload(const std::shared_ptr<RenderStep>& renderStep, const std::shared_ptr<GpuBuffer>& textureData, uint32_t mipLevel)
+{
+    
 }
 
 void GpuTexture::destroy()
